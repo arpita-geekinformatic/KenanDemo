@@ -1,8 +1,11 @@
 const EMAIL_REQUIRED = "Email is required.";
 const USER_EXISTS = "User already exists.";
 const PASSWORD_REQUIRED = "Password is required.";
-const TOKEN_REQUIRED = "Token is required";
+const USER_NOT_FOUND = "User not found.";
+const INVALID_PASSWORD = "Invalid password.";
+const INACTIVE_ACCOUNT = "Your account is not activated yet, please activate it to log in.";
 
+const TOKEN_REQUIRED = "Token is required";
 const TOKEN_EXPIRED = "Token Expired";
 const UNAUTHORIZED = "Unauthorized";
 
@@ -11,7 +14,6 @@ const LOGOUT_SUCCESS = "User logout successFully";
 const SOMETHING_WRONG = "Something went wrong.";
 const DATA_NOT_FOUND = "Data not found.";
 const USER_ID_REQUIRED = "User Id is required.";
-const USER_NOT_FOUND = "User not found.";
 const CHILD_ID_REQUIRED = "Child Id is required.";
 const INVALID_CHILD_ID = "Invalid child ID.";
 const CHILD_NOT_FOUND = "Child not found.";
@@ -48,8 +50,11 @@ module.exports = {
   EMAIL_REQUIRED,
   USER_EXISTS,
   PASSWORD_REQUIRED,
-  TOKEN_REQUIRED,
+  USER_NOT_FOUND,
+  INVALID_PASSWORD,
+  INACTIVE_ACCOUNT,
 
+  TOKEN_REQUIRED,
   TOKEN_EXPIRED,
   UNAUTHORIZED,
 
@@ -58,7 +63,6 @@ module.exports = {
   SOMETHING_WRONG,
   DATA_NOT_FOUND,
   USER_ID_REQUIRED,
-  USER_NOT_FOUND,
   CHILD_ID_REQUIRED,
   INVALID_CHILD_ID,
   CHILD_NOT_FOUND,

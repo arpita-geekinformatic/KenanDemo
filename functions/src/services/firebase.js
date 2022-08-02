@@ -9,9 +9,9 @@ const db = getFirestore();
 //  is user exists //
 const isParentExists = async (email) => {
     try {
-        let userRes = await db.collection("parents").where("email", "==", email).where("isDeleted", "==", false).limit(1).get();
+        let parentRes = await db.collection("parents").where("email", "==", email).where("isDeleted", "==", false).limit(1).get();
 
-        if (userRes.empty) {
+        if (parentRes.empty) {
             return false;
         }
         return true;
@@ -30,6 +30,39 @@ const createParentProfile = async (newData) => {
         throw error;
     }
 }
+
+//  get parent data by Email  //
+const getParentDataByEmail = async (email) => {
+    try {
+        let parentRes = await db.collection("parents").where("email", "==", email).where("isDeleted", "==", false).limit(1).get();
+
+        if (parentRes.empty) {
+            return false;
+        }
+
+        let parentArr = [];
+        parentRes.forEach(doc => {
+            parentArr.push(doc.data())
+            parentArr[0].firestore_parentId = doc.id
+        })
+        return parentArr[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  update parent data by firestore ID  //
+const updateParentDataById = async (firestoreId, newData) => {
+    try {
+        await db.collection("parents").doc(firestoreId).update(newData);
+        return true;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+
 
 
 //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -119,6 +152,8 @@ const updateParentById = async (userId, newData) => {
 module.exports = {
     isParentExists,
     createParentProfile,
+    getParentDataByEmail,
+    updateParentDataById,
 
     addUser,
     getParentByEmail,

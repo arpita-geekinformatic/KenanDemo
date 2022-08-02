@@ -14,16 +14,20 @@ const signUp = async (res, bodyData) => {
         if (!bodyData.email) {
             return response.failure(res, 200, message.EMAIL_REQUIRED);
         }
+        if (!bodyData.password) {
+            return response.failure(res, 200, message.PASSWORD_REQUIRED);
+        }
 
         let isParentExists = await services.isParentExists(bodyData.email);
-        if(isParentExists){
+        if (isParentExists) {
             return response.failure(res, 200, message.USER_EXISTS);
         }
 
+        let hashedPassword = await KenanUtilities.cryptPassword(bodyData.password);
         let newData = {
             name: bodyData.name || "",
             email: bodyData.email || "",
-            // role: "parent",
+            password: hashedPassword,
             isActive: false,
             isDeleted: false,
             authToken: "",
@@ -44,78 +48,35 @@ const login = async (res, bodyData) => {
         if (!bodyData.password) {
             return response.failure(res, 200, message.PASSWORD_REQUIRED);
         }
+
+        const parentData = await services.getParentDataByEmail(bodyData.email);
+        if (!parentData) {
+            return response.failure(res, 200, message.USER_NOT_FOUND,);
+        }
+        if (!parentData.isActive) {
+            return response.failure(res, 200, message.INACTIVE_ACCOUNT,);
+        }
+
+        const match = await KenanUtilities.VerifyPassword(bodyData.password, parentData.password);
+        if(!match){
+            return response.failure(res, 200, message.INVALID_PASSWORD);
+        }
        
-        // let parentData = await services.getParentByEmail(authenticateUser.email);
-        // if (parentData.empty) {
-        //     let newData = {
-        //         uid: uid,
-        //         firebaseResponse: JSON.stringify(authenticateUser),
-        //         email: authenticateUser.email,
-        //         phone: authenticateUser.phoneNumber ? authenticateUser.phoneNumber : "",
-        //         picture: authenticateUser.photoURL ? authenticateUser.photoURL : "",
-        //         name: authenticateUser.displayName ? authenticateUser.displayName : bodyData.name,
-        //         fcmToken: bodyData.fcmToken ? bodyData.fcmToken : "",
-        //         countryCode: bodyData.countryCode ? bodyData.countryCode : "",
-        //     }
-        //     let newUser = await services.addUser(newData);
-        //     let getNewUserData = await services.getParentById(newUser);
+        const authToken = await KenanUtilities.generateToken(parentData.email, parentData.firestore_parentId);
+        parentData.authToken = authToken;
+        let newData = {
+            name: parentData.name,
+            email: parentData.email,
+            isActive: parentData.isActive,
+            isDeleted: parentData.isDeleted,
+            authToken: authToken,
+        }
 
-        //     const authToken = await KenanUtilities.generateToken(
-        //         getNewUserData.name, uid, authenticateUser.email
-        //     );
+        const updatePatrentData = await services.updateParentDataById(parentData.firestore_parentId, newData);
 
-        //     let finaldata = {
-        //         picture: getNewUserData.picture,
-        //         phone: getNewUserData.phone,
-        //         uid: getNewUserData.uid,
-        //         email: getNewUserData.email,
-        //         name: getNewUserData.name,
-        //         id: getNewUserData.id,
-        //         dob: getNewUserData.dob,
-        //         gender: getNewUserData.gender,
-        //         firstName: getNewUserData.firstName,
-        //         lastName: getNewUserData.lastName,
-        //         token: authToken,
-        //         fcmToken: getNewUserData.fcmToken,
-        //         countryCode: getNewUserData.countryCode,
-        //     }
-        //     return response.dataWithToken(res, finaldata, authToken, 200, message.SUCCESS);
-        // }
-        // else {
-        //     parentData.forEach(async (doc) => {
-        //         let newData = {
-        //             uid: uid,
-        //             firebaseResponse: JSON.stringify(authenticateUser),
-        //             email: authenticateUser.email,
-        //             phone: authenticateUser.phoneNumber ? authenticateUser.phoneNumber : "",
-        //             picture: authenticateUser.photoURL ? authenticateUser.photoURL : "",
-        //             name: authenticateUser.displayName ? authenticateUser.displayName : doc.data().name,
-        //             fcmToken: bodyData.fcmToken ? bodyData.fcmToken : "",
-        //         }
-        //         let updateUserData = await services.updateParentById(doc.id, newData);
-        //         let updatedUserdata = await services.getParentById(doc.id);
+        return res.send({ responseCode: 200, status: true, message: "success", data: parentData });
 
-        //         const authToken = await KenanUtilities.generateToken(
-        //             updatedUserdata.name, uid, authenticateUser.email
-        //         );
-        //         let finaldata = {
-        //             picture: updatedUserdata.picture,
-        //             phone: updatedUserdata.phone,
-        //             uid: updatedUserdata.uid,
-        //             email: updatedUserdata.email,
-        //             name: updatedUserdata.name,
-        //             id: updatedUserdata.id,
-        //             dob: updatedUserdata.dob,
-        //             gender: updatedUserdata.gender,
-        //             firstName: updatedUserdata.firstName,
-        //             lastName: updatedUserdata.lastName,
-        //             token: authToken,
-        //             fcmToken: updatedUserdata.fcmToken,
-        //             countryCode: updatedUserdata.countryCode,
-        //         }
-        //         return response.dataWithToken(res, finaldata, authToken, 200, message.SUCCESS);
-        //     })
-        // }
+
     } catch (error) {
         return response.failure(res, 400, error);
     }
