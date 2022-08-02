@@ -7,7 +7,8 @@ const { service } = require("firebase-functions/v1/analytics");
 const KenanUtilities = require("../utils/KenanUtilities");
 const MailerUtilities = require("../utils/MailerUtilities");
 const ejs = require("ejs");
-
+const dotenv = require('dotenv');
+dotenv.config();
 
 
 //  parent sign up  //
@@ -26,11 +27,6 @@ const signUp = async (res, bodyData) => {
         }
         let hashedPassword = await KenanUtilities.cryptPassword(bodyData.password);
 
-        // Get email template to send email
-        let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/otpEmail.ejs", { link: "activation link" }, { async: true });
-
-        let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Account Activation", text: messageHtml });
-
         let newData = {
             name: bodyData.name || "",
             email: bodyData.email || "",
@@ -40,6 +36,18 @@ const signUp = async (res, bodyData) => {
             authToken: "",
         }
         let createParentProfile = await services.createParentProfile(newData);
+
+        //  create activation link
+        let activationLink = process.env.BASE_URL + "activeAccount/" + createParentProfile;
+        console.log("********** activationLink : ", activationLink);
+
+        //  Get email template to send email
+        let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/activationEmail.ejs", { link: activationLink }, { async: true });
+
+        let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Account Activation", text: messageHtml });
+
+
+
         return response.success(res, 200, `Your account activation mail was sent to your email address.`);
     } catch (error) {
         return response.failure(res, 400, error);

@@ -6,8 +6,6 @@ dotenv.config();
 
 const sendSendgridMail = async (data) => {
     console.log("inside function")
-    console.log(">>>>>>>>>>>",console.log( process.env.SENDGRID_API_KEY))
-
     var options = {
         auth: {
             api_key:  process.env.SENDGRID_API_KEY
