@@ -1,0 +1,128 @@
+
+const { getFirestore, Timestamp, FieldValue, } = require("firebase-admin/firestore");
+const { error } = require("firebase-functions/logger");
+const db = getFirestore();
+// db.settings({ ignoreUndefinedProperties: true });
+
+
+
+//  is user exists //
+const isParentExists = async (email) => {
+    try {
+        let userRes = await db.collection("parents").where("email", "==", email).where("isDeleted", "==", false).limit(1).get();
+
+        if (userRes.empty) {
+            return false;
+        }
+        return true;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  create parent profile  //
+const createParentProfile = async (newData) => {
+    try {
+        let createParent = await db.collection("parents").add(newData);
+        return createParent.id;
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+//  Add new user  // 
+const addUser = async (newData) => {
+    try {
+        let addNewUser = await db.collection("users").add(newData);
+        return addNewUser.id;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//   Get parent data by Email  //
+const getParentByEmail = async (email) => {
+    try {
+        let userRes = await db.collection("users").where("email", "==", email).limit(1).get();
+        return userRes;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//   Get parent by EMAIL and update data  //
+const getParentByEmailandUpdate = async (email) => {
+    try {
+        let parentDetails = await db.collection("users").where("email", "==", email).limit(1).get();
+
+        parentDetails.forEach(async (doc) => {
+            let newData = {
+                fcmToken: "",
+                // firebaseResponse: "{}"
+            }
+            await updateParentById(doc.id, newData);
+        })
+        return true;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//   Get parent by ID  //
+const getParentById = async (userId) => {
+    try {
+        let parentDetails = await db.collection("users").doc(userId).get();
+        if (!parentDetails._fieldsProto) {
+            return false;
+        }
+        let parentData = {
+            id: parentDetails._ref._path.segments[1],
+            name: parentDetails._fieldsProto.name ? parentDetails._fieldsProto.name.stringValue : '',
+            email: parentDetails._fieldsProto.email ? parentDetails._fieldsProto.email.stringValue : '',
+            phone: parentDetails._fieldsProto.phone ? parentDetails._fieldsProto.phone.stringValue : '',
+            picture: parentDetails._fieldsProto.picture ? parentDetails._fieldsProto.picture.stringValue : '',
+            uid: parentDetails._fieldsProto.uid ? parentDetails._fieldsProto.uid.stringValue : '',
+            fcmToken: parentDetails._fieldsProto.fcmToken ? parentDetails._fieldsProto.fcmToken.stringValue : '',
+            dob: parentDetails._fieldsProto.dob ? parentDetails._fieldsProto.dob.stringValue : '',
+            gender: parentDetails._fieldsProto.gender ? parentDetails._fieldsProto.gender.stringValue : '',
+            firstName: parentDetails._fieldsProto.firstName ? parentDetails._fieldsProto.firstName.stringValue : '',
+            lastName: parentDetails._fieldsProto.lastName ? parentDetails._fieldsProto.lastName.stringValue : '',
+            countryCode: parentDetails._fieldsProto.countryCode ? parentDetails._fieldsProto.countryCode.stringValue : '',
+        }
+        return parentData;
+    } catch (error) {
+        return (error)
+    }
+}
+
+//   Update parent by ID  //
+const updateParentById = async (userId, newData) => {
+    try {
+        await db.collection("users").doc(userId).update(newData);
+        return true;
+    } catch (error) {
+        return (error);
+    }
+}
+
+
+
+
+
+
+
+
+
+module.exports = {
+    isParentExists,
+    createParentProfile,
+
+    addUser,
+    getParentByEmail,
+    getParentByEmailandUpdate,
+    getParentById,
+    updateParentById,
+}
