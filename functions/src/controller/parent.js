@@ -5,6 +5,8 @@ const firebaseAdmin = require("../utils/firebase");
 const notificationData = require("../services/notification");
 const { service } = require("firebase-functions/v1/analytics");
 const KenanUtilities = require("../utils/KenanUtilities");
+const MailerUtilities = require("../utils/MailerUtilities");
+const ejs = require("ejs");
 
 
 
@@ -22,8 +24,13 @@ const signUp = async (res, bodyData) => {
         if (isParentExists) {
             return response.failure(res, 200, message.USER_EXISTS);
         }
-
         let hashedPassword = await KenanUtilities.cryptPassword(bodyData.password);
+
+        // Get email template to send email
+        let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/otpEmail.ejs", { link: "activation link" }, { async: true });
+
+        let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Account Activation", text: messageHtml });
+
         let newData = {
             name: bodyData.name || "",
             email: bodyData.email || "",
@@ -58,10 +65,10 @@ const login = async (res, bodyData) => {
         }
 
         const match = await KenanUtilities.VerifyPassword(bodyData.password, parentData.password);
-        if(!match){
+        if (!match) {
             return response.failure(res, 200, message.INVALID_PASSWORD);
         }
-       
+
         const authToken = await KenanUtilities.generateToken(parentData.email, parentData.firestore_parentId);
         parentData.authToken = authToken;
         let newData = {
@@ -71,7 +78,6 @@ const login = async (res, bodyData) => {
             isDeleted: parentData.isDeleted,
             authToken: authToken,
         }
-
         const updatePatrentData = await services.updateParentDataById(parentData.firestore_parentId, newData);
 
         return res.send({ responseCode: 200, status: true, message: "success", data: parentData });

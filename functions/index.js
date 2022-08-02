@@ -20,6 +20,8 @@ const { getFirestore, Timestamp, FieldValue, } = require("firebase-admin/firesto
 const { error } = require("firebase-functions/logger");
 const db = getFirestore();
 db.settings({ ignoreUndefinedProperties: true });
+const dotenv = require('dotenv');
+dotenv.config();
 
 app.get("/testing", (req, res) => {
   res.send("api working");
