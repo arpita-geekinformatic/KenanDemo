@@ -40,17 +40,14 @@ app.post("/signUp", async (req, res, next) => {
 });
 
 //  parent account activation  //
-app.post("/acountAcctivation", async (req, res, next) => {
+app.get("/acountAcctivation/:activationLink", async (req, res, next) => {
   try{
-
-
+    let result = await parentController.acountAcctivation(res, req.params.activationLink);
+    return result;
   } catch (error){
     next(error)
   }
 })
-
-
-
 
 //  parent login   //
 app.post("/login", async (req, res, next) => {

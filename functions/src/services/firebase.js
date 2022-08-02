@@ -61,6 +61,39 @@ const updateParentDataById = async (firestoreId, newData) => {
     }
 }
 
+//  get parent data by firebase ID  //
+const getParentDataById = async(parentId) => {
+    try {
+        let parentDetails = await db.collection("parents").doc(parentId).get();
+        if (!parentDetails._fieldsProto) {
+            return false;
+        }
+        let parentData = {
+            firestore_parentId: parentDetails._ref._path.segments[1],
+            name: parentDetails._fieldsProto.name ? parentDetails._fieldsProto.name.stringValue : '',
+            email: parentDetails._fieldsProto.email ? parentDetails._fieldsProto.email.stringValue : '',
+            authToken: parentDetails._fieldsProto.authToken ? parentDetails._fieldsProto.authToken.stringValue : '',
+            isActive: parentDetails._fieldsProto.isActive ? parentDetails._fieldsProto.isActive.booleanValue : false,
+            isDeleted: parentDetails._fieldsProto.isDeleted ? parentDetails._fieldsProto.isDeleted.booleanValue : false,
+
+            // fcmToken: parentDetails._fieldsProto.fcmToken ? parentDetails._fieldsProto.fcmToken.stringValue : '',
+        }
+        return parentData;
+    } catch (error) {
+        return (error)
+    }
+}
+
+//  active parent profile by firebase ID  //
+const activeParentProfile = async(parentId) => {
+    try{
+        await db.collection("parents").doc(parentId).update({"isActive": true});
+        return true;
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 
 
@@ -154,6 +187,8 @@ module.exports = {
     createParentProfile,
     getParentDataByEmail,
     updateParentDataById,
+    getParentDataById,
+    activeParentProfile,
 
     addUser,
     getParentByEmail,

@@ -38,7 +38,7 @@ const signUp = async (res, bodyData) => {
         let createParentProfile = await services.createParentProfile(newData);
 
         //  create activation link
-        let activationLink = process.env.BASE_URL + "activeAccount/" + createParentProfile;
+        let activationLink = process.env.BASE_URL + "acountAcctivation/" + createParentProfile;
         console.log("********** activationLink : ", activationLink);
 
         //  Get email template to send email
@@ -46,9 +46,36 @@ const signUp = async (res, bodyData) => {
 
         let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Account Activation", text: messageHtml });
 
-
-
         return response.success(res, 200, `Your account activation mail was sent to your email address.`);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+//  account activation  //
+const acountAcctivation = async (res, parentId) => {
+    try {
+        let parentData = await services.getParentDataById(parentId);
+
+        if (parentData.isActive) {
+            return res.send(`<div className="container">
+            <header className="jumbotron">
+              <h1>
+                <strong>Account already active, please login!</strong>
+              </h1>
+            </header>
+          </div>`);
+
+        }
+        let activeParentProfile = await services.activeParentProfile(parentId);
+
+        return res.send(`<div className="container">
+            <header className="jumbotron">
+            <h1>
+                <strong>Account Activated!</strong>
+            </h1>
+            </header>
+        </div>`);
     } catch (error) {
         return response.failure(res, 400, error);
     }
@@ -88,7 +115,7 @@ const login = async (res, bodyData) => {
         }
         const updatePatrentData = await services.updateParentDataById(parentData.firestore_parentId, newData);
 
-        return res.send({ responseCode: 200, status: true, message: "success", data: parentData });
+        return res.send({ responseCode: 200, status: true, message: "success", data: newData });
 
 
     } catch (error) {
@@ -110,6 +137,7 @@ const logOut = async (res, bodyData) => {
 
 module.exports = {
     signUp,
+    acountAcctivation,
     login,
     logOut,
 }
