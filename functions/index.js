@@ -60,12 +60,10 @@ app.post("/login", async (req, res, next) => {
 });
 
 
-
-
-//  Log out  //
+//  parent Log out  //
 app.post('/logout', async (req, res, next) => {
   try {
-    let result = await parentController.logOut(res, req.body);
+    let result = await parentController.logOut(res, req.headers);
     return result;
   } catch (error) {
     next(error)

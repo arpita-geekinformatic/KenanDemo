@@ -34,6 +34,8 @@ const signUp = async (res, bodyData) => {
             isActive: false,
             isDeleted: false,
             authToken: "",
+            fcmToken: bodyData.fcmToken || "",
+            childId: []
         }
         let createParentProfile = await services.createParentProfile(newData);
 
@@ -124,10 +126,25 @@ const login = async (res, bodyData) => {
 }
 
 //  log out  //
-const logOut = async (res, bodyData) => {
+const logOut = async (res, headers) => {
     try {
-        const decoded = await KenanUtilities.decryptToken(bodyData.token);
-        let userData = await services.getParentByEmailandUpdate(decoded.email);
+        console.log("******* headers : ",headers);
+
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        console.log(">>>>>>> decoded : ",decoded);
+
+        // let userRes: any = await userModel.findOne({ accessToken: token });
+        // if (userRes) { 
+        //   return resolve(result);
+        // } else {
+        //   return reject({ message: "Invalid Token" });
+        // }
+
+        // let userData = await services.getParentByEmailandUpdate(decoded.email);
         return response.success(res, 200, message.SUCCESS);
     } catch (error) {
         return response.failure(res, 400, error);

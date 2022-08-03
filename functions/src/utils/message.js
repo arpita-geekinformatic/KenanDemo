@@ -4,8 +4,8 @@ const PASSWORD_REQUIRED = "Password is required.";
 const USER_NOT_FOUND = "User not found.";
 const INVALID_PASSWORD = "Invalid password.";
 const INACTIVE_ACCOUNT = "Your account is not activated yet, please activate it to log in.";
-
 const TOKEN_REQUIRED = "Token is required";
+
 const TOKEN_EXPIRED = "Token Expired";
 const UNAUTHORIZED = "Unauthorized";
 
@@ -53,8 +53,8 @@ module.exports = {
   USER_NOT_FOUND,
   INVALID_PASSWORD,
   INACTIVE_ACCOUNT,
-
   TOKEN_REQUIRED,
+  
   TOKEN_EXPIRED,
   UNAUTHORIZED,
 
