@@ -197,17 +197,48 @@ const verifyOTP = async (res, bodyData) => {
         let currentDateTime = moment();
         let date = new Date(parentRes.otpExipredAt);
         let otpExpireTime = moment(date);
-        
+
         if (currentDateTime.diff(otpExpireTime, 'm') > 10) {
             return response.failure(res, 200, message.OTP_EXPIRED);
         }
 
-        let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId, {otpVerified : true});
+        let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId, { otpVerified: true });
         return response.success(res, 200, message.OTP_VERIFIED);
     } catch (error) {
         return response.failure(res, 400, error);
     }
 }
+
+//  resend OTP  //
+const resendOTP = async (res, bodyData) => {
+    try {
+        if (!bodyData.email) {
+            return response.failure(res, 200, message.EMAIL_REQUIRED);
+        }
+
+        const parentRes = await parentService.getParentDataByEmail(bodyData.email);
+        if (!parentRes) {
+            return response.failure(res, 200, message.USER_NOT_FOUND);
+        }
+        let randomOTP = KenanUtilities.genNumericCode(8);
+        let expiredDate = moment().add(10, 'm');
+        let newData = {
+            otp: randomOTP,
+            otpVerified: false,
+            otpExipredAt: `${expiredDate}`
+        }
+
+        //  Get email template to send email
+        let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/otpEmail.ejs", { otp: randomOTP }, { async: true });
+        let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "OTP Verification", text: messageHtml });
+
+        let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId, newData);
+        return response.success(res, 200, message.SUCCESS);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
 
 
 
@@ -222,4 +253,5 @@ module.exports = {
     logOut,
     forgotPassword,
     verifyOTP,
+    resendOTP,
 }

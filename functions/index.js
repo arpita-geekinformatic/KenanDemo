@@ -89,6 +89,16 @@ app.post('/verifyOTP', async (req, res, next) => {
   }
 })
 
+//  resend OTP  //
+app.post('/resendOTP', async (req, res, next) => {
+  try {
+    let result = await parentController.resendOTP(res, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 
 
