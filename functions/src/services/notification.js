@@ -1,5 +1,5 @@
 const firebaseAdmin = require("../utils/firebase");
-const services = require("../services/firebase");
+const parentService = require("./parentService");
 const moment = require("moment");
 const notificationType = {
     type1: 1,      //  for open notification

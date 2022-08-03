@@ -1,4 +1,4 @@
-const services = require("../services/firebase");
+const parentService = require("../services/parentService");
 const response = require("../utils/response");
 const message = require("../utils/message");
 const firebaseAdmin = require("../utils/firebase");
@@ -21,7 +21,7 @@ const signUp = async (res, bodyData) => {
             return response.failure(res, 200, message.PASSWORD_REQUIRED);
         }
 
-        let isParentExists = await services.isParentExists(bodyData.email);
+        let isParentExists = await parentService.isParentExists(bodyData.email);
         if (isParentExists) {
             return response.failure(res, 200, message.USER_EXISTS);
         }
@@ -37,7 +37,7 @@ const signUp = async (res, bodyData) => {
             fcmToken: bodyData.fcmToken || "",
             childId: []
         }
-        let createParentProfile = await services.createParentProfile(newData);
+        let createParentProfile = await parentService.createParentProfile(newData);
 
         //  create activation link
         let activationLink = process.env.BASE_URL + "acountAcctivation/" + createParentProfile;
@@ -57,7 +57,7 @@ const signUp = async (res, bodyData) => {
 //  account activation  //
 const acountAcctivation = async (res, parentId) => {
     try {
-        let parentData = await services.getParentDataById(parentId);
+        let parentData = await parentService.getParentDataById(parentId);
 
         if (parentData.isActive) {
             return res.send(`<div className="container">
@@ -69,7 +69,7 @@ const acountAcctivation = async (res, parentId) => {
           </div>`);
 
         }
-        let activeParentProfile = await services.updateSpecificParentData(parentId, {"isActive": true});
+        let activeParentProfile = await parentService.updateSpecificParentData(parentId, {"isActive": true});
 
         return res.send(`<div className="container">
             <header className="jumbotron">
@@ -93,7 +93,7 @@ const login = async (res, bodyData) => {
             return response.failure(res, 200, message.PASSWORD_REQUIRED);
         }
 
-        const parentData = await services.getParentDataByEmail(bodyData.email);
+        const parentData = await parentService.getParentDataByEmail(bodyData.email);
         if (!parentData) {
             return response.failure(res, 200, message.USER_NOT_FOUND,);
         }
@@ -116,7 +116,7 @@ const login = async (res, bodyData) => {
             isDeleted: parentData.isDeleted,
             authToken: authToken,
         }
-        const updatePatrentData = await services.updateParentDataById(parentData.firestore_parentId, newData);
+        const updatePatrentData = await parentService.updateParentDataById(parentData.firestore_parentId, newData);
 
         return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data: newData });
 
@@ -134,12 +134,12 @@ const logOut = async (res, headers) => {
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
-        let parentRes = await services.findParentByToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
             return response.failure(res, 200, message.INVALID_TOKEN);
         }
 
-        let updateParentData = await services.updateSpecificParentData(parentRes.firestore_parentId , {authToken : ""})
+        let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId , {authToken : ""})
         return response.success(res, 200, message.SUCCESS);
     } catch (error) {
         return response.failure(res, 400, error);
