@@ -1,7 +1,8 @@
 const EMAIL_REQUIRED = "Email is required.";
 const USER_EXISTS = "User already exists.";
-const PASSWORD_REQUIRED = "Password is required.";
 const USER_NOT_FOUND = "User not found.";
+const PASSWORD_REQUIRED = "Password is required.";
+const NEW_PASSWORD_REQUIRED = "New password is required.";
 const INVALID_PASSWORD = "Invalid password.";
 const INACTIVE_ACCOUNT = "Your account is not activated yet, please activate it to log in.";
 const TOKEN_REQUIRED = "Token is required.";
@@ -53,8 +54,9 @@ const FAQ_MESSAGE = "Message for FAQ is required.";
 module.exports = {
   EMAIL_REQUIRED,
   USER_EXISTS,
-  PASSWORD_REQUIRED,
   USER_NOT_FOUND,
+  PASSWORD_REQUIRED,
+  NEW_PASSWORD_REQUIRED,
   INVALID_PASSWORD,
   INACTIVE_ACCOUNT,
   TOKEN_REQUIRED,
@@ -65,7 +67,7 @@ module.exports = {
   OTP_EXPIRED,
   OTP_VERIFIED,
 
-  
+
   
   TOKEN_EXPIRED,
   UNAUTHORIZED,

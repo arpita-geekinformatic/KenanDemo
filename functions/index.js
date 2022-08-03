@@ -99,6 +99,16 @@ app.post('/resendOTP', async (req, res, next) => {
   }
 })
 
+//  reset Password  //
+app.post('/resetPassword',  async (req, res, next) => {
+  try {
+    let result = await parentController.resetPassword(res, req.body, req.headers);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 
 

@@ -97,7 +97,7 @@ const updateSpecificParentData = async(parentId, updateData) => {
 //  find parent by Token  //
 const findParentByToken = async(authToken) => {
     try{
-        let parentRes = await db.collection("parents").where("authToken", "==", authToken).limit(1).get();
+        let parentRes = await db.collection("parents").where("authToken", "==", authToken).where("isDeleted", "==", false).limit(1).get();
 
         if (parentRes.empty) {
             return false;

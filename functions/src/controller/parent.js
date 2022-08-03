@@ -120,8 +120,6 @@ const login = async (res, bodyData) => {
         const updatePatrentData = await parentService.updateParentDataById(parentData.firestore_parentId, newData);
 
         return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data: newData });
-
-
     } catch (error) {
         return response.failure(res, 400, error);
     }
@@ -203,6 +201,9 @@ const verifyOTP = async (res, bodyData) => {
         }
 
         let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId, { otpVerified: true });
+        newData = { authToken: parentRes.authToken }
+        return res.send({ responseCode: 200, status: true, message: message.OTP_VERIFIED, data: newData });
+
         return response.success(res, 200, message.OTP_VERIFIED);
     } catch (error) {
         return response.failure(res, 400, error);
@@ -239,7 +240,38 @@ const resendOTP = async (res, bodyData) => {
     }
 }
 
+//  reset Password  //
+const resetPassword = async (res, bodyData, headers) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+        if (!bodyData.password) {
+            return response.failure(res, 200, message.PASSWORD_REQUIRED);
+        }
+        if (!bodyData.newPassword) {
+            return response.failure(res, 200, message.NEW_PASSWORD_REQUIRED);
+        }
 
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        const match = await KenanUtilities.VerifyPassword(bodyData.password, parentRes.password);
+        if (!match) {
+            return response.failure(res, 200, message.INVALID_PASSWORD);
+        }
+
+        let hashedPassword = await KenanUtilities.cryptPassword(bodyData.newPassword);
+        let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId, { password: hashedPassword });
+
+        return response.success(res, 200, message.SUCCESS);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
 
 
 
@@ -254,4 +286,5 @@ module.exports = {
     forgotPassword,
     verifyOTP,
     resendOTP,
+    resetPassword,
 }
