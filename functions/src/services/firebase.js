@@ -84,15 +84,37 @@ const getParentDataById = async(parentId) => {
     }
 }
 
-//  active parent profile by firebase ID  //
-const activeParentProfile = async(parentId) => {
+//  update specific field of parent profile by firebase ID  //
+const updateSpecificParentData = async(parentId, updateData) => {
     try{
-        await db.collection("parents").doc(parentId).update({"isActive": true});
+        await db.collection("parents").doc(parentId).update(updateData);
         return true;
     } catch (error) {
         throw error;
     }
 }
+
+//  find parent by Token  //
+const findParentByToken = async(authToken) => {
+    try{
+        let parentRes = await db.collection("parents").where("authToken", "==", authToken).limit(1).get();
+
+        if (parentRes.empty) {
+            return false;
+        }
+
+        let parentArr = [];
+        parentRes.forEach(doc => {
+            parentArr.push(doc.data())
+            parentArr[0].firestore_parentId = doc.id
+        })
+        return parentArr[0];
+    }catch (error) {
+        throw error;
+    }
+}
+
+
 
 
 
@@ -188,7 +210,9 @@ module.exports = {
     getParentDataByEmail,
     updateParentDataById,
     getParentDataById,
-    activeParentProfile,
+    updateSpecificParentData,
+    findParentByToken,
+
 
     addUser,
     getParentByEmail,

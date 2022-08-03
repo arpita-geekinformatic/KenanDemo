@@ -69,7 +69,7 @@ const acountAcctivation = async (res, parentId) => {
           </div>`);
 
         }
-        let activeParentProfile = await services.activeParentProfile(parentId);
+        let activeParentProfile = await services.updateSpecificParentData(parentId, {"isActive": true});
 
         return res.send(`<div className="container">
             <header className="jumbotron">
@@ -111,13 +111,14 @@ const login = async (res, bodyData) => {
         let newData = {
             name: parentData.name,
             email: parentData.email,
+            childId: parentData.childId,
             isActive: parentData.isActive,
             isDeleted: parentData.isDeleted,
             authToken: authToken,
         }
         const updatePatrentData = await services.updateParentDataById(parentData.firestore_parentId, newData);
 
-        return res.send({ responseCode: 200, status: true, message: "success", data: newData });
+        return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data: newData });
 
 
     } catch (error) {
@@ -128,23 +129,17 @@ const login = async (res, bodyData) => {
 //  log out  //
 const logOut = async (res, headers) => {
     try {
-        console.log("******* headers : ",headers);
-
         if (!headers.authorization) {
             return response.failure(res, 200, message.TOKEN_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
-        console.log(">>>>>>> decoded : ",decoded);
+        let parentRes = await services.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
 
-        // let userRes: any = await userModel.findOne({ accessToken: token });
-        // if (userRes) { 
-        //   return resolve(result);
-        // } else {
-        //   return reject({ message: "Invalid Token" });
-        // }
-
-        // let userData = await services.getParentByEmailandUpdate(decoded.email);
+        let updateParentData = await services.updateSpecificParentData(parentRes.firestore_parentId , {authToken : ""})
         return response.success(res, 200, message.SUCCESS);
     } catch (error) {
         return response.failure(res, 400, error);

@@ -25,7 +25,7 @@ const decryptToken = (token) => {
     const decodedToken = JWT.verify(token, JWT_SECRET);
     return decodedToken;
   } catch (err) {
-    return err;
+    return false;
   }
 };
 
