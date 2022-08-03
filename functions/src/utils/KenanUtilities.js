@@ -53,13 +53,27 @@ const cryptPassword = async (password) => {
 
 //  Verify password  //
 const VerifyPassword = async (password, hash) => {
-  try{
-    const passwordMatch =  bcrypt.compare(password, hash);
+  try {
+    const passwordMatch = bcrypt.compare(password, hash);
     return passwordMatch;
   } catch (error) {
     return error;
   }
 };
+
+//  OTP generate  //
+const genNumericCode = (length) => {
+  try {
+    let min =  Math.pow(10, length - 1);
+    let max =  (Math.pow(10, length) - Math.pow(10, length - 1) - 1);
+    let newOTP = Math.floor(min + Math.random() * max);
+    return newOTP;
+  } catch (error) {
+    return error;
+  }
+}
+
+
 
 module.exports = {
   generateToken,
@@ -67,4 +81,5 @@ module.exports = {
   mapToValues,
   cryptPassword,
   VerifyPassword,
+  genNumericCode,
 };

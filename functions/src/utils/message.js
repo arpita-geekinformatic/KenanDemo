@@ -11,7 +11,6 @@ const SUCCESS = "Sucess.";
 
 const TOKEN_EXPIRED = "Token Expired";
 const UNAUTHORIZED = "Unauthorized";
-const LOGOUT_SUCCESS = "User logout successFully";
 const SOMETHING_WRONG = "Something went wrong.";
 const DATA_NOT_FOUND = "Data not found.";
 const USER_ID_REQUIRED = "User Id is required.";
@@ -61,7 +60,6 @@ module.exports = {
   
   TOKEN_EXPIRED,
   UNAUTHORIZED,
-  LOGOUT_SUCCESS,
   SOMETHING_WRONG,
   DATA_NOT_FOUND,
   USER_ID_REQUIRED,

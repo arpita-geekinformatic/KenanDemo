@@ -41,10 +41,10 @@ app.post("/signUp", async (req, res, next) => {
 
 //  parent account activation  //
 app.get("/acountAcctivation/:activationLink", async (req, res, next) => {
-  try{
+  try {
     let result = await parentController.acountAcctivation(res, req.params.activationLink);
     return result;
-  } catch (error){
+  } catch (error) {
     next(error)
   }
 })
@@ -59,7 +59,6 @@ app.post("/login", async (req, res, next) => {
   }
 });
 
-
 //  parent Log out  //
 app.post('/logout', async (req, res, next) => {
   try {
@@ -69,6 +68,19 @@ app.post('/logout', async (req, res, next) => {
     next(error)
   }
 })
+
+//  parent forgot password  //
+app.post('/forgotPassword', async (req, res, next) => {
+  try {
+    let result = await parentController.forgotPassword(res, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+
+
 
 
 

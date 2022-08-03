@@ -9,6 +9,7 @@ const MailerUtilities = require("../utils/MailerUtilities");
 const ejs = require("ejs");
 const dotenv = require('dotenv');
 dotenv.config();
+const moment = require("moment");
 
 
 //  parent sign up  //
@@ -69,7 +70,7 @@ const acountAcctivation = async (res, parentId) => {
           </div>`);
 
         }
-        let activeParentProfile = await parentService.updateSpecificParentData(parentId, {"isActive": true});
+        let activeParentProfile = await parentService.updateSpecificParentData(parentId, { "isActive": true });
 
         return res.send(`<div className="container">
             <header className="jumbotron">
@@ -139,14 +140,44 @@ const logOut = async (res, headers) => {
             return response.failure(res, 200, message.INVALID_TOKEN);
         }
 
-        let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId , {authToken : ""})
+        let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId, { authToken: "" })
         return response.success(res, 200, message.SUCCESS);
     } catch (error) {
         return response.failure(res, 400, error);
     }
 }
 
-//  
+//  forgot password  //
+const forgotPassword = async (res, bodyData) => {
+    try {
+        if (!bodyData.email) {
+            return response.failure(res, 200, message.EMAIL_REQUIRED);
+        }
+
+        const parentData = await parentService.getParentDataByEmail(bodyData.email);
+        if (!parentData) {
+            return response.failure(res, 200, message.USER_NOT_FOUND,);
+        }
+
+        let randomOTP = KenanUtilities.genNumericCode(8);
+        let newData = {
+            otp: randomOTP,
+            otpVerified: false,
+            otpExipredAt: moment().add(10, 'm')
+        }
+
+        //  Get email template to send email
+        let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/otpEmail.ejs", { otp: randomOTP }, { async: true });
+
+        let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Forgot Password", text: messageHtml });
+
+        let updateParentData = await parentService.updateSpecificParentData(parentData.firestore_parentId, newData)
+        return response.success(res, 200, message.SUCCESS);
+
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
 
 
 
@@ -157,4 +188,5 @@ module.exports = {
     acountAcctivation,
     login,
     logOut,
+    forgotPassword,
 }
