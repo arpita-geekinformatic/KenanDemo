@@ -79,6 +79,16 @@ app.post('/forgotPassword', async (req, res, next) => {
   }
 })
 
+//  verify OTP  //
+app.post('/verifyOTP', async (req, res, next) => {
+  try {
+    let result = await parentController.verifyOTP(res, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 
 

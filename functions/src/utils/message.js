@@ -7,6 +7,10 @@ const INACTIVE_ACCOUNT = "Your account is not activated yet, please activate it 
 const TOKEN_REQUIRED = "Token is required.";
 const INVALID_TOKEN = "Invalid Token.";
 const SUCCESS = "Sucess.";
+const OTP_REQUIRED = "Please enter otp.";
+const INVALID_OTP = "Invalid otp entered.";
+const OTP_EXPIRED = "OTP Expired.";
+const OTP_VERIFIED = "OTP verified successfully.";
 
 
 const TOKEN_EXPIRED = "Token Expired";
@@ -56,7 +60,12 @@ module.exports = {
   TOKEN_REQUIRED,
   INVALID_TOKEN,
   SUCCESS,
+  OTP_REQUIRED,
+  INVALID_OTP,
+  OTP_EXPIRED,
+  OTP_VERIFIED,
 
+  
   
   TOKEN_EXPIRED,
   UNAUTHORIZED,

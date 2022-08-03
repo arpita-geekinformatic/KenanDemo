@@ -114,6 +114,27 @@ const findParentByToken = async(authToken) => {
     }
 }
 
+//  get parent data by otp  //
+const getParentDataByOTP =  async(bodyData) => {
+    try{
+        let parentRes = await db.collection("parents").where("email", "==", bodyData.email).where("otp", "==", bodyData.otp).where("isDeleted", "==", false).limit(1).get();
+
+        if (parentRes.empty) {
+            return false;
+        }
+
+        let parentArr = [];
+        parentRes.forEach(doc => {
+            parentArr.push(doc.data())
+            parentArr[0].firestore_parentId = doc.id
+        })
+        return parentArr[0];
+    }catch (error) {
+        throw error;
+    }
+}
+
+
 
 
 
@@ -212,6 +233,7 @@ module.exports = {
     getParentDataById,
     updateSpecificParentData,
     findParentByToken,
+    getParentDataByOTP,
 
 
     addUser,

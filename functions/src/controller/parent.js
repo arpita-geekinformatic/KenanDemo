@@ -160,24 +160,56 @@ const forgotPassword = async (res, bodyData) => {
         }
 
         let randomOTP = KenanUtilities.genNumericCode(8);
+        let expiredDate = moment().add(10, 'm');
         let newData = {
             otp: randomOTP,
             otpVerified: false,
-            otpExipredAt: moment().add(10, 'm')
+            otpExipredAt: `${expiredDate}`
         }
 
         //  Get email template to send email
         let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/otpEmail.ejs", { otp: randomOTP }, { async: true });
-
         let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Forgot Password", text: messageHtml });
 
         let updateParentData = await parentService.updateSpecificParentData(parentData.firestore_parentId, newData)
         return response.success(res, 200, message.SUCCESS);
-
     } catch (error) {
         return response.failure(res, 400, error);
     }
 }
+
+//  verify OTP  //
+const verifyOTP = async (res, bodyData) => {
+    try {
+        if (!bodyData.otp) {
+            return response.failure(res, 200, message.OTP_REQUIRED);
+        }
+        if (!bodyData.email) {
+            return response.failure(res, 200, message.EMAIL_REQUIRED);
+        }
+
+        const parentRes = await parentService.getParentDataByOTP(bodyData);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_OTP);
+        }
+
+        // Check if otp is expired or not ( otp valid for 1 minutes)
+        let currentDateTime = moment();
+        let date = new Date(parentRes.otpExipredAt);
+        let otpExpireTime = moment(date);
+        
+        if (currentDateTime.diff(otpExpireTime, 'm') > 10) {
+            return response.failure(res, 200, message.OTP_EXPIRED);
+        }
+
+        let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId, {otpVerified : true});
+        return response.success(res, 200, message.OTP_VERIFIED);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+
 
 
 
@@ -189,4 +221,5 @@ module.exports = {
     login,
     logOut,
     forgotPassword,
+    verifyOTP,
 }
