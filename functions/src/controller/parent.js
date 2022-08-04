@@ -156,8 +156,11 @@ const forgotPassword = async (res, bodyData) => {
         if (!parentData) {
             return response.failure(res, 200, message.USER_NOT_FOUND,);
         }
+        if (!parentData.isActive) {
+            return response.failure(res, 200, message.INACTIVE_ACCOUNT,);
+        }
 
-        let randomOTP = KenanUtilities.genNumericCode(8);
+        let randomOTP = KenanUtilities.genNumericCode(4);
         let expiredDate = moment().add(10, 'm');
         let newData = {
             otp: randomOTP,
@@ -221,7 +224,7 @@ const resendOTP = async (res, bodyData) => {
         if (!parentRes) {
             return response.failure(res, 200, message.USER_NOT_FOUND);
         }
-        let randomOTP = KenanUtilities.genNumericCode(8);
+        let randomOTP = KenanUtilities.genNumericCode(4);
         let expiredDate = moment().add(10, 'm');
         let newData = {
             otp: randomOTP,
@@ -234,6 +237,31 @@ const resendOTP = async (res, bodyData) => {
         let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "OTP Verification", text: messageHtml });
 
         let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId, newData);
+        return response.success(res, 200, message.SUCCESS);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+//  newPassword  //
+const newPassword = async (res, bodyData, headers) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+        if (!bodyData.newPassword) {
+            return response.failure(res, 200, message.NEW_PASSWORD_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        let hashedPassword = await KenanUtilities.cryptPassword(bodyData.newPassword);
+        let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId, { password: hashedPassword });
+
         return response.success(res, 200, message.SUCCESS);
     } catch (error) {
         return response.failure(res, 400, error);
@@ -286,5 +314,6 @@ module.exports = {
     forgotPassword,
     verifyOTP,
     resendOTP,
+    newPassword,
     resetPassword,
 }
