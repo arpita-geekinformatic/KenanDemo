@@ -12,6 +12,10 @@ const OTP_REQUIRED = "Please enter otp.";
 const INVALID_OTP = "Invalid otp entered.";
 const OTP_EXPIRED = "OTP Expired.";
 const OTP_VERIFIED = "OTP verified successfully.";
+const KID_NAME_REQUIRED = "Kid name is required.";
+const KID_ADDED = "Kid added successfully.";
+const KID_EXISTS = "Kid already exists.";
+
 
 
 const TOKEN_EXPIRED = "Token Expired";
@@ -66,7 +70,10 @@ module.exports = {
   INVALID_OTP,
   OTP_EXPIRED,
   OTP_VERIFIED,
-
+  KID_NAME_REQUIRED,
+  KID_ADDED,
+  KID_EXISTS,
+  
 
   
   TOKEN_EXPIRED,

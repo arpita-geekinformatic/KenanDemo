@@ -8,6 +8,7 @@ const { checkAuthenticate } = require("./src/middleware/chechAuth")
 const KenanUtilities = require("./src/utils/KenanUtilities");
 const firebaseAdmin = require("./src/utils/firebase");
 var multer = require('multer');
+const adminController = require("./src/controller/admin");
 const parentController = require("./src/controller/parent");
 const childController = require("./src/controller/child");
 const response = require("./src/utils/response");
@@ -119,8 +120,34 @@ app.post('/resetPassword',  async (req, res, next) => {
   }
 })
 
+//  add Child  //
+app.post('/addChild',  async (req, res, next) => {
+  try {
+    let result = await parentController.addChild(res, req.body, req.headers);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
 
 
+
+
+
+//   CHILD APP API   //
+
+
+
+//   ADMIN API   //
+//  create admin  //
+app.post('/createAdmin', async(req, res, next) => {
+  try{
+    let result = await adminController.createAdmin(res, req.body);
+    return result;
+  } catch (error) {
+    next (error)
+  }
+})
 
 
 

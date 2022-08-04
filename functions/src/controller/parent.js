@@ -1,4 +1,5 @@
 const parentService = require("../services/parentService");
+const childService = require("../services/childService");
 const response = require("../utils/response");
 const message = require("../utils/message");
 const firebaseAdmin = require("../utils/firebase");
@@ -47,7 +48,8 @@ const signUp = async (res, bodyData) => {
         //  Get email template to send email
         let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/activationEmail.ejs", { link: activationLink }, { async: true });
 
-        let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Account Activation", text: messageHtml });
+        let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Account Activation", text: messageHtml });
+        console.log("51  >>>>>>  mailResponse : ", mailResponse);
 
         return response.success(res, 200, `Your account activation mail was sent to your email address.`);
     } catch (error) {
@@ -301,6 +303,48 @@ const resetPassword = async (res, bodyData, headers) => {
     }
 }
 
+//  add Child  //
+const addChild = async (res, bodyData, headers) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+        if (!bodyData.name) {
+            return response.failure(res, 200, message.KID_NAME_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        let childData = await childService.getChildByParent(bodyData.name, parentRes.firestore_parentId);
+
+        if(!childData){
+           const newData = {
+                name : bodyData.name,
+                age : bodyData.age || 0,
+                email : bodyData.email || "",
+                gender : bodyData.gender || "",
+                photo : "",
+                parentId : parentRes.firestore_parentId,
+                deviceId : bodyData.deviceId || "",
+                isDeleted: false,
+                fcmToken: bodyData.fcmToken || "",
+            }
+
+            let addChildByParent = await childService.addChildByParent(newData);
+            newData.childId = addChildByParent;
+            return res.send({ responseCode: 200, status: true, message: message.KID_ADDED, data: newData });
+        }
+
+        return res.send({ responseCode: 200, status: true, message: message.KID_EXISTS, data: {} });
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
 
 
 
@@ -316,4 +360,5 @@ module.exports = {
     resendOTP,
     newPassword,
     resetPassword,
+    addChild,
 }
