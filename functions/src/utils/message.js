@@ -15,6 +15,9 @@ const OTP_VERIFIED = "OTP verified successfully.";
 const KID_NAME_REQUIRED = "Kid name is required.";
 const KID_ADDED = "Kid added successfully.";
 const KID_EXISTS = "Kid already exists.";
+const CHILD_ID_REQUIRED = "Child Id is required.";
+const INVALID_CHILD_ID = "Invalid child Id.";
+
 
 
 
@@ -23,8 +26,6 @@ const UNAUTHORIZED = "Unauthorized";
 const SOMETHING_WRONG = "Something went wrong.";
 const DATA_NOT_FOUND = "Data not found.";
 const USER_ID_REQUIRED = "User Id is required.";
-const CHILD_ID_REQUIRED = "Child Id is required.";
-const INVALID_CHILD_ID = "Invalid child ID.";
 const CHILD_NOT_FOUND = "Child not found.";
 const REQUIRE_CHILD_DEVICE_ID = "Child device Id is required.";
 const REQUIRE_FIRESTORE_CHILD_ID = "Firestore child Id is required.";
@@ -73,6 +74,9 @@ module.exports = {
   KID_NAME_REQUIRED,
   KID_ADDED,
   KID_EXISTS,
+  CHILD_ID_REQUIRED,
+  INVALID_CHILD_ID,
+
   
 
   
@@ -81,8 +85,6 @@ module.exports = {
   SOMETHING_WRONG,
   DATA_NOT_FOUND,
   USER_ID_REQUIRED,
-  CHILD_ID_REQUIRED,
-  INVALID_CHILD_ID,
   CHILD_NOT_FOUND,
   REQUIRE_CHILD_DEVICE_ID,
   REQUIRE_FIRESTORE_CHILD_ID,

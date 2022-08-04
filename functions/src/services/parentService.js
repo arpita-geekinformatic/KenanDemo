@@ -62,7 +62,7 @@ const updateParentDataById = async (firestoreId, newData) => {
 }
 
 //  get parent data by firebase ID  //
-const getParentDataById = async(parentId) => {
+const getParentDataById = async (parentId) => {
     try {
         let parentDetails = await db.collection("parents").doc(parentId).get();
         if (!parentDetails._fieldsProto) {
@@ -85,8 +85,8 @@ const getParentDataById = async(parentId) => {
 }
 
 //  update specific field of parent profile by firebase ID  //
-const updateSpecificParentData = async(parentId, updateData) => {
-    try{
+const updateSpecificParentData = async (parentId, updateData) => {
+    try {
         await db.collection("parents").doc(parentId).update(updateData);
         return true;
     } catch (error) {
@@ -95,8 +95,8 @@ const updateSpecificParentData = async(parentId, updateData) => {
 }
 
 //  find parent by Token  //
-const findParentByToken = async(authToken) => {
-    try{
+const findParentByToken = async (authToken) => {
+    try {
         let parentRes = await db.collection("parents").where("authToken", "==", authToken).where("isDeleted", "==", false).limit(1).get();
 
         if (parentRes.empty) {
@@ -109,14 +109,14 @@ const findParentByToken = async(authToken) => {
             parentArr[0].firestore_parentId = doc.id
         })
         return parentArr[0];
-    }catch (error) {
+    } catch (error) {
         throw error;
     }
 }
 
 //  get parent data by otp  //
-const getParentDataByOTP =  async(bodyData) => {
-    try{
+const getParentDataByOTP = async (bodyData) => {
+    try {
         let parentRes = await db.collection("parents").where("email", "==", bodyData.email).where("otp", "==", bodyData.otp).where("isDeleted", "==", false).limit(1).get();
 
         if (parentRes.empty) {
@@ -129,14 +129,87 @@ const getParentDataByOTP =  async(bodyData) => {
             parentArr[0].firestore_parentId = doc.id
         })
         return parentArr[0];
-    }catch (error) {
+    } catch (error) {
         throw error;
     }
 }
 
+//  get child details by name and Parent ID  // 
+const getChildByParent = async (childName, parentId) => {
+    try {
+        let childRes = await db.collection("childs").where("name", "==", childName).where("parentId", "==", parentId).where("isDeleted", "==", false).limit(1).get();
 
+        if (childRes.empty) {
+            return false;
+        }
 
+        let childArr = [];
+        childRes.forEach(doc => {
+            childArr.push(doc.data())
+            childArr[0].firestore_childId = doc.id
+        })
+        return childArr[0];
 
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  add child By Parent  //
+const addChildByParent = async (newData) => {
+    try {
+        let addChild = await db.collection("childs").add(newData);
+        return addChild.id;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  get Child List by Parent Id  //
+const getChildList = async (parentId) => {
+    try {
+        let childArr = [];
+        let childList = await db.collection("childs").where('parentId', '==', parentId).where('isDeleted', '==', false).get();
+        childList.forEach(doc => {
+            let childData = doc.data();
+            if (!childData.isDeleted) {
+                childData.firestore_childId = doc.id;
+                childArr.push(childData);
+            }
+        });
+        return childArr;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  getChildDataById  //
+const getChildDataById = async (childId) => {
+    try {
+        let childDetails = await db.collection("childs").doc(childId).get();
+        if (!childDetails._fieldsProto) {
+            return false;
+        }
+        if (childDetails._fieldsProto.isDeleted.booleanValue) {
+            return false;
+        }
+        return true;
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  deleteChildById  //
+const deleteChildById = async (childId) => {
+    try {
+        let childDetails = await db.collection("childs").doc(childId).update({isDeleted : true});
+        return true;
+
+    } catch (error) {
+        throw error;
+    }
+}
 
 
 
@@ -234,7 +307,12 @@ module.exports = {
     updateSpecificParentData,
     findParentByToken,
     getParentDataByOTP,
-
+    getChildByParent,
+    addChildByParent,
+    getChildList,
+    getChildDataById,
+    deleteChildById,
+    
 
     addUser,
     getParentByEmail,

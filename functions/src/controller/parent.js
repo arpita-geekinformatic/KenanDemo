@@ -1,5 +1,4 @@
 const parentService = require("../services/parentService");
-const childService = require("../services/childService");
 const response = require("../utils/response");
 const message = require("../utils/message");
 const firebaseAdmin = require("../utils/firebase");
@@ -319,27 +318,75 @@ const addChild = async (res, bodyData, headers) => {
             return response.failure(res, 200, message.INVALID_TOKEN);
         }
 
-        let childData = await childService.getChildByParent(bodyData.name, parentRes.firestore_parentId);
+        let childData = await parentService.getChildByParent(bodyData.name, parentRes.firestore_parentId);
 
-        if(!childData){
-           const newData = {
-                name : bodyData.name,
-                age : bodyData.age || 0,
-                email : bodyData.email || "",
-                gender : bodyData.gender || "",
-                photo : "",
-                parentId : parentRes.firestore_parentId,
-                deviceId : bodyData.deviceId || "",
+        if (!childData) {
+            const newData = {
+                name: bodyData.name,
+                age: bodyData.age || 0,
+                email: bodyData.email || "",
+                gender: bodyData.gender || "",
+                photo: "",
+                parentId: parentRes.firestore_parentId,
+                deviceId: bodyData.deviceId || "",
                 isDeleted: false,
                 fcmToken: bodyData.fcmToken || "",
             }
 
-            let addChildByParent = await childService.addChildByParent(newData);
+            let addChildByParent = await parentService.addChildByParent(newData);
             newData.childId = addChildByParent;
             return res.send({ responseCode: 200, status: true, message: message.KID_ADDED, data: newData });
         }
 
         return res.send({ responseCode: 200, status: true, message: message.KID_EXISTS, data: {} });
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+//  child List  //
+const childList = async (res, headers) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        let childList = await parentService.getChildList(parentRes.firestore_parentId)
+        return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data: childList });
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+//  delete Child by Id  //
+const deleteChild =  async (res, headers, paramData) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+        if (!paramData.id) {
+            return response.failure(res, 200, message.CHILD_ID_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        let childData = await parentService.getChildDataById(paramData.id);
+        if (!childData) {
+            return response.failure(res, 200, message.INVALID_CHILD_ID);
+        }
+
+        let deleteChildById = await parentService.deleteChildById(paramData.id);
+        return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data: childList });
     } catch (error) {
         return response.failure(res, 400, error);
     }
@@ -361,4 +408,6 @@ module.exports = {
     newPassword,
     resetPassword,
     addChild,
+    childList,
+    deleteChild,
 }

@@ -5,32 +5,13 @@ const db = getFirestore();
 
 
 
-//  get child details by name and Parent ID  // 
-const getChildByParent = async (childName, parentId) => {
+
+//  isDeviceExists  //
+const isDeviceExists = async (deviceId) => {
     try {
-        let childRes = await db.collection("childs").where("name", "==", childName).where("parentId", "==", parentId).where("isDeleted", "==", false).limit(1).get();
-
-        if (childRes.empty) {
-            return false;
-        }
-
-        let childArr = [];
-        childRes.forEach(doc => {
-            childArr.push(doc.data())
-            childArr[0].firestore_childId = doc.id
-        })
-        return childArr[0];
-
-    } catch (error) {
-        throw error;
-    }
-}
-
-//  add child By Parent  //
-const addChildByParent = async (newData) => {
-    try {
-        let addChild = await db.collection("childs").add(newData);
-        return addChild.id;
+        let deviceData =  await db.collection("devices").where("deviceId", "==", deviceId).limit(1).get();
+        console.log("************ deviceData : ",deviceData);
+        return deviceData;
     } catch (error) {
         throw error;
     }
@@ -38,6 +19,5 @@ const addChildByParent = async (newData) => {
 
 
 module.exports = {
-    getChildByParent,
-    addChildByParent,
+    isDeviceExists,
 }
