@@ -386,7 +386,7 @@ const deleteChild =  async (res, headers, paramData) => {
         }
 
         let deleteChildById = await parentService.deleteChildById(paramData.id);
-        return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data: childList });
+        return response.success(res, 200, message.SUCCESS);
     } catch (error) {
         return response.failure(res, 400, error);
     }
