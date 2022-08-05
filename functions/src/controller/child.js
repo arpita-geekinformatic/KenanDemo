@@ -186,9 +186,9 @@ const scanQrCode = async (res, bodyData) => {
         if (!bodyData.deviceId) {
             return response.failure(res, 200, message.REQUIRE_CHILD_DEVICE_ID);
         }
-        // if (!bodyData.password) {
-        //     return response.failure(res, 200, message.PASSWORD_REQUIRED);
-        // }
+        if (!bodyData.password) {
+            return response.failure(res, 200, message.PASSWORD_REQUIRED);
+        }
         if (!bodyData.FcmToken) {
             return response.failure(res, 200, message.REQUIRE_FCM);
         }
