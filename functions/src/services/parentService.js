@@ -68,15 +68,18 @@ const getParentDataById = async (parentId) => {
         if (!parentDetails._fieldsProto) {
             return false;
         }
+        if (parentDetails._fieldsProto.isDeleted.booleanValue ) {
+            return false;
+        }
+
         let parentData = {
-            firestore_parentId: parentDetails._ref._path.segments[1],
+            parentId: parentDetails._ref._path.segments[1],
             name: parentDetails._fieldsProto.name ? parentDetails._fieldsProto.name.stringValue : '',
             email: parentDetails._fieldsProto.email ? parentDetails._fieldsProto.email.stringValue : '',
             authToken: parentDetails._fieldsProto.authToken ? parentDetails._fieldsProto.authToken.stringValue : '',
             isActive: parentDetails._fieldsProto.isActive ? parentDetails._fieldsProto.isActive.booleanValue : false,
             isDeleted: parentDetails._fieldsProto.isDeleted ? parentDetails._fieldsProto.isDeleted.booleanValue : false,
-
-            // fcmToken: parentDetails._fieldsProto.fcmToken ? parentDetails._fieldsProto.fcmToken.stringValue : '',
+            fcmToken: parentDetails._fieldsProto.fcmToken ? parentDetails._fieldsProto.fcmToken.stringValue : '',
         }
         return parentData;
     } catch (error) {

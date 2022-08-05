@@ -164,6 +164,16 @@ app.post("/addDeviceApps", async (req, res, next) => {
   }
 });
 
+//  scan QR code  //
+app.post("/scanQrCode", async (req, res, next) => {
+  try {
+    let result = await childController.scanQrCode(res, req.body);
+    return result;
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 
 //   ADMIN API   //

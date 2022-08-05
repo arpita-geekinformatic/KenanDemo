@@ -144,6 +144,72 @@ const updateDeviceDataById = async (firestoreDevicePathId, updatedData) => {
     }
 }
 
+//  get Child Data By Id  //
+const getChildDataById = async (childId) => {
+    try {
+        let childDetails = await db.collection("childs").doc(childId).get();
+        if (!childDetails._fieldsProto) {
+            return false;
+        }
+        if (childDetails._fieldsProto.isDeleted.booleanValue) {
+            return false;
+        }
+
+        let childData = {
+            childId: childId,
+            age: childDetails._fieldsProto.age.integerValue,
+            deviceId: childDetails._fieldsProto.deviceId.stringValue,
+            email: childDetails._fieldsProto.email.stringValue,
+            fcmToken: childDetails._fieldsProto.fcmToken.stringValue,
+            gender: childDetails._fieldsProto.gender.stringValue,
+            name: childDetails._fieldsProto.name.stringValue,
+            parentId: childDetails._fieldsProto.parentId.stringValue,
+            photo: childDetails._fieldsProto.photo.stringValue,
+        }
+        return childData;
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  update Child Data By Id  //
+const updateChildDataById = async (childId, updatedData) => {
+    try {
+        let updateChild = await db.collection("childs").doc(childId).update(updatedData);
+        return true;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  get parent data by firebase ID  //
+const getParentDataById = async (parentId) => {
+    try {
+        let parentDetails = await db.collection("parents").doc(parentId).get();
+        if (!parentDetails._fieldsProto) {
+            return false;
+        }
+        if (parentDetails._fieldsProto.isDeleted.booleanValue ) {
+            return false;
+        }
+
+        let parentData = {
+            parentId: parentDetails._ref._path.segments[1],
+            name: parentDetails._fieldsProto.name ? parentDetails._fieldsProto.name.stringValue : '',
+            email: parentDetails._fieldsProto.email ? parentDetails._fieldsProto.email.stringValue : '',
+            authToken: parentDetails._fieldsProto.authToken ? parentDetails._fieldsProto.authToken.stringValue : '',
+            isActive: parentDetails._fieldsProto.isActive ? parentDetails._fieldsProto.isActive.booleanValue : false,
+            isDeleted: parentDetails._fieldsProto.isDeleted ? parentDetails._fieldsProto.isDeleted.booleanValue : false,
+            fcmToken: parentDetails._fieldsProto.fcmToken ? parentDetails._fieldsProto.fcmToken.stringValue : '',
+        }
+        return parentData;
+    } catch (error) {
+        return (error)
+    }
+}
+
+
 
 
 
@@ -158,4 +224,7 @@ module.exports = {
     addDeviceAppData,
     updateDeviceAppDataById,
     updateDeviceDataById,
+    getChildDataById,
+    updateChildDataById,
+    getParentDataById,
 }

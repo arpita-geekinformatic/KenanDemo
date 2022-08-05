@@ -4,14 +4,19 @@ const message = require("../utils/message");
 const notificationData = require("../services/notification");
 const differenceBy = require("lodash/differenceBy");
 const KenanUtilities = require("../utils/KenanUtilities");
+const firebaseAdmin = require('../utils/firebase');
 
 var deviceKeys = ["deviceId", "deviceName", "parentId", "childId", "versionCode", "listSize", "apps", "model", "fcmToken", "manufacturer", "model"]
 
 
 
-//  add Child  //
+//  add Child  // deviceId
 const addDeviceApps = async (res, reqBodyData) => {
     try {
+        if (!reqBodyData.deviceId) {
+            return response.failure(res, 200, message.REQUIRE_CHILD_DEVICE_ID);
+        }
+
         console.log("======= call 1");
         let bodyData = KenanUtilities.mapToValues(deviceKeys, reqBodyData);
         let isDeviceExists = await childService.isDeviceExists(bodyData.deviceId);
@@ -53,7 +58,7 @@ const addDeviceApps = async (res, reqBodyData) => {
                 //  Insert data in deviceapps  //
                 //  check if app already exists in deviceApps  //
                 let isDeviceAppExists = await childService.isDeviceAppExists(firestoreDevicePathId, firestoreAppId);
-                
+
                 if (!isDeviceAppExists) {
                     console.log("=====  Device App ADD IF NOT EXISTS");
                     let newDeviceAppData = {
@@ -105,7 +110,7 @@ const addDeviceApps = async (res, reqBodyData) => {
             appArr.forEach(async (element) => {
                 let getAppByName = await childService.getAppByName(element.appName, element.packageName);
                 let firestoreAppId;
-               
+
                 if (!getAppByName) {
                     console.log("*****  APP ADD on ELSE");
                     let newAppData = {
@@ -169,10 +174,103 @@ const addDeviceApps = async (res, reqBodyData) => {
     }
 }
 
+//  scan Qr Code  //
+const scanQrCode = async (res, bodyData) => {
+    try {
+        if (!bodyData.parentId) {
+            return response.failure(res, 200, message.PARENT_ID_REQUIRED);
+        }
+        if (!bodyData.childId) {
+            return response.failure(res, 200, message.CHILD_ID_REQUIRED);
+        }
+        if (!bodyData.deviceId) {
+            return response.failure(res, 200, message.REQUIRE_CHILD_DEVICE_ID);
+        }
+        // if (!bodyData.password) {
+        //     return response.failure(res, 200, message.PASSWORD_REQUIRED);
+        // }
+        if (!bodyData.FcmToken) {
+            return response.failure(res, 200, message.REQUIRE_FCM);
+        }
+
+        let isParentExists = await childService.getParentDataById(bodyData.parentId);
+        if (!isParentExists) {
+            return response.failure(res, 200, message.INVALID_PARENT_ID);
+        }
+
+        let isChildExists = await childService.getChildDataById(bodyData.childId);
+        if (!isChildExists) {
+            return response.failure(res, 200, message.INVALID_CHILD_ID);
+        }
+
+        let isDeviceExists = await childService.isDeviceExists(bodyData.deviceId);
+        if (!isDeviceExists) {
+            return response.failure(res, 200, message.INVALID_DEVICE_ID);
+        }
+
+        //  check is child already connected to other device or not  //
+        if ((isChildExists.deviceId != "") && (isChildExists.deviceId != bodyData.deviceId)) {
+            //  unlink connected device  //
+            let updatedChildData = {
+                deviceId: "",
+                fcmToken: ""
+            }
+            let updateChildDataById = await childService.updateChildDataById(bodyData.childId, updatedChildData);
+
+            let updatedDeviceData = {
+                childId : "",
+                parentId : ""
+            }
+            let updateDeviceDataById = await childService.updateDeviceDataById(isDeviceExists.firestoreDevicePathId, updatedDeviceData);
+        }
+
+        //  link device  //
+        let newChildData = {
+            deviceId: bodyData.deviceId,
+            fcmToken: bodyData.FcmToken,
+        }
+
+        if (bodyData.password && (bodyData.password != "")) {
+            let hashedPassword = await KenanUtilities.cryptPassword(bodyData.password);
+            newChildData.password = hashedPassword;
+        } else {
+            newChildData.password = "";
+        }
+        let updateNewChildDataById = await childService.updateChildDataById(bodyData.childId, newChildData);
+
+        let newdDeviceData = {
+            childId : bodyData.childId,
+            parentId : bodyData.parentId
+        }
+        let updateNewDeviceDataById = await childService.updateDeviceDataById(isDeviceExists.firestoreDevicePathId, newdDeviceData);
+
+        //  subscribe child topic with parent  // 
+        const registrationTokens = [isParentExists.fcmToken];
+        let topic = `child_${bodyData.childId}`;
+        let topicMsg = await firebaseAdmin.firebaseSubscribeTopicNotification(registrationTokens, topic);
+
+        let finaldata = {
+            parentId: bodyData.parentId,
+            deviceName: isDeviceExists.deviceName || "",
+            childId: bodyData.childId,
+            firestoreDeviceId: isDeviceExists.firestoreDevicePathId,
+            deviceId: bodyData.deviceId,
+            childFcmToken: bodyData.FcmToken,
+            parentName: isParentExists.name,
+        };
+        return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data: finaldata });
+
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+
 
 
 
 
 module.exports = {
     addDeviceApps,
+    scanQrCode,
 }
