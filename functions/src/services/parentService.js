@@ -68,7 +68,7 @@ const getParentDataById = async (parentId) => {
         if (!parentDetails._fieldsProto) {
             return false;
         }
-        if (parentDetails._fieldsProto.isDeleted.booleanValue ) {
+        if (parentDetails._fieldsProto.isDeleted.booleanValue) {
             return false;
         }
 
@@ -217,7 +217,7 @@ const getChildDataById = async (childId) => {
 //  deleteChildById  //
 const deleteChildById = async (childId) => {
     try {
-        let childDetails = await db.collection("childs").doc(childId).update({isDeleted : true});
+        let childDetails = await db.collection("childs").doc(childId).update({ isDeleted: true });
         return true;
 
     } catch (error) {
@@ -226,86 +226,26 @@ const deleteChildById = async (childId) => {
 }
 
 
-
-
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-//  Add new user  // 
-const addUser = async (newData) => {
+//  get child device apps list (with app image) by device ID  //
+const childDeviceAppList = async (deviceId) => {
     try {
-        let addNewUser = await db.collection("users").add(newData);
-        return addNewUser.id;
-    } catch (error) {
-        throw error;
-    }
-}
+        let deviceApps = await db.collection("deviceApps").where("deviceId", "==", deviceId).get();
+        let deviceAppArr = [];
+        deviceApps.forEach(async (doc) => {
+            await deviceAppArr.push(doc.data());
+        });
 
-//   Get parent data by Email  //
-const getParentByEmail = async (email) => {
-    try {
-        let userRes = await db.collection("users").where("email", "==", email).limit(1).get();
-        return userRes;
-    } catch (error) {
-        throw error;
-    }
-}
-
-//   Get parent by EMAIL and update data  //
-const getParentByEmailandUpdate = async (email) => {
-    try {
-        let parentDetails = await db.collection("users").where("email", "==", email).limit(1).get();
-
-        parentDetails.forEach(async (doc) => {
-            let newData = {
-                fcmToken: "",
-                // firebaseResponse: "{}"
-            }
-            await updateParentById(doc.id, newData);
-        })
-        return true;
-    } catch (error) {
-        throw error;
-    }
-}
-
-//   Get parent by ID  //
-const getParentById = async (userId) => {
-    try {
-        let parentDetails = await db.collection("users").doc(userId).get();
-        if (!parentDetails._fieldsProto) {
-            return false;
+        for (const element of deviceAppArr) {
+            let appDetails = await db.collection("apps").doc(element.firestoreAppId).get();
+            let appImage = appDetails._fieldsProto.baseImage.stringValue;
+            let image = appImage.replace(/\n/g, '');
+            element.baseImage = image;
         }
-        let parentData = {
-            id: parentDetails._ref._path.segments[1],
-            name: parentDetails._fieldsProto.name ? parentDetails._fieldsProto.name.stringValue : '',
-            email: parentDetails._fieldsProto.email ? parentDetails._fieldsProto.email.stringValue : '',
-            phone: parentDetails._fieldsProto.phone ? parentDetails._fieldsProto.phone.stringValue : '',
-            picture: parentDetails._fieldsProto.picture ? parentDetails._fieldsProto.picture.stringValue : '',
-            uid: parentDetails._fieldsProto.uid ? parentDetails._fieldsProto.uid.stringValue : '',
-            fcmToken: parentDetails._fieldsProto.fcmToken ? parentDetails._fieldsProto.fcmToken.stringValue : '',
-            dob: parentDetails._fieldsProto.dob ? parentDetails._fieldsProto.dob.stringValue : '',
-            gender: parentDetails._fieldsProto.gender ? parentDetails._fieldsProto.gender.stringValue : '',
-            firstName: parentDetails._fieldsProto.firstName ? parentDetails._fieldsProto.firstName.stringValue : '',
-            lastName: parentDetails._fieldsProto.lastName ? parentDetails._fieldsProto.lastName.stringValue : '',
-            countryCode: parentDetails._fieldsProto.countryCode ? parentDetails._fieldsProto.countryCode.stringValue : '',
-        }
-        return parentData;
+        return deviceAppArr
     } catch (error) {
-        return (error)
+        throw error
     }
 }
-
-//   Update parent by ID  //
-const updateParentById = async (userId, newData) => {
-    try {
-        await db.collection("users").doc(userId).update(newData);
-        return true;
-    } catch (error) {
-        return (error);
-    }
-}
-
-
-
 
 
 
@@ -326,11 +266,6 @@ module.exports = {
     getChildList,
     getChildDataById,
     deleteChildById,
-    
+    childDeviceAppList,
 
-    addUser,
-    getParentByEmail,
-    getParentByEmailandUpdate,
-    getParentById,
-    updateParentById,
 }

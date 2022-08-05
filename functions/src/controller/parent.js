@@ -420,6 +420,29 @@ const getChildByParent = async (res, headers, paramData) => {
     }
 }
 
+//  child device app list  //
+const childDeviceAppList = async (res, headers, bodyData) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+        if (!bodyData.deviceId) {
+            return response.failure(res, 200, message.REQUIRE_CHILD_DEVICE_ID);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        let childDeviceAppList = await parentService.childDeviceAppList(bodyData.deviceId)
+        return response.data(res, childDeviceAppList, 200, message.SUCCESS);
+
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
 
 
 
@@ -438,5 +461,6 @@ module.exports = {
     addChild,
     childList,
     deleteChild,
-    getChildByParent
+    getChildByParent,
+    childDeviceAppList,
 }

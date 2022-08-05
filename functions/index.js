@@ -160,6 +160,16 @@ app.post('/getChildByParent/:id', async (req, res, next) => {
   }
 });
 
+//  child Device App List //
+app.post('/childDeviceAppList', async (req, res, next) => {
+  try {
+    let result = await parentController.childDeviceAppList(res, req.headers, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+});
+
 
 
 
