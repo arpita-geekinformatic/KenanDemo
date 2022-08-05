@@ -365,7 +365,7 @@ const childList = async (res, headers) => {
 }
 
 //  delete Child by Id  //
-const deleteChild =  async (res, headers, paramData) => {
+const deleteChild = async (res, headers, paramData) => {
     try {
         if (!headers.authorization) {
             return response.failure(res, 200, message.TOKEN_REQUIRED);
@@ -392,6 +392,34 @@ const deleteChild =  async (res, headers, paramData) => {
     }
 }
 
+//  get Child By Parent  //
+const getChildByParent = async (res, headers, paramData) => {
+    try {
+        if (!paramData.id) {
+            return response.failure(res, 200, message.CHILD_ID_REQUIRED);
+        }
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        let childProfileDetails = await parentService.getChildDataById(paramData.id);
+
+        if (!childProfileDetails) {
+            return response.failure(res, 200, message.INVALID_CHILD_ID);
+        }
+
+        return response.data(res, childProfileDetails, 200, message.SUCCESS);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
 
 
 
@@ -410,4 +438,5 @@ module.exports = {
     addChild,
     childList,
     deleteChild,
+    getChildByParent
 }

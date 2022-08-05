@@ -25,8 +25,7 @@ const createAdmin = async (res, bodyData) => {
         email: "admin@gmail.com",
         password: password,
         isDeleted: false,
-        role: 'Admin',
-        userType: 'Admin'
+        role: 'Admin'
       }
 
       let createAdminProfile = await adminService.createAdminProfile(adminData);

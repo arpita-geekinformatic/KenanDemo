@@ -150,6 +150,17 @@ app.post('/deleteChild/:id', async (req, res, next) => {
   }
 })
 
+//  get child by id (for parent)   //
+app.post('/getChildByParent/:id', async (req, res, next) => {
+  try {
+    let result = await parentController.getChildByParent(res, req.headers, req.params);
+    return result;
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 
 
 

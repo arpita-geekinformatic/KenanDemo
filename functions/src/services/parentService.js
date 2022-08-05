@@ -196,8 +196,19 @@ const getChildDataById = async (childId) => {
         if (childDetails._fieldsProto.isDeleted.booleanValue) {
             return false;
         }
-        return true;
 
+        let childData = {};
+        childData.childId = childId;
+        childData.name = childDetails._fieldsProto.name ? childDetails._fieldsProto.name.stringValue : "";
+        childData.age = childDetails._fieldsProto.age ? childDetails._fieldsProto.age.integerValue : 0;
+        childData.deviceId = childDetails._fieldsProto.deviceId ? childDetails._fieldsProto.deviceId.stringValue : "";
+        childData.email = childDetails._fieldsProto.email ? childDetails._fieldsProto.email.stringValue : "";
+        childData.fcmToken = childDetails._fieldsProto.fcmToken ? childDetails._fieldsProto.fcmToken.stringValue : "";
+        childData.gender = childDetails._fieldsProto.gender ? childDetails._fieldsProto.gender.stringValue : "";
+        childData.parentId = childDetails._fieldsProto.parentId ? childDetails._fieldsProto.parentId.stringValue : "";
+        childData.photo = childDetails._fieldsProto.photo ? childDetails._fieldsProto.photo.stringValue : "";
+
+        return childData;
     } catch (error) {
         throw error;
     }
