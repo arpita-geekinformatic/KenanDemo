@@ -12,17 +12,48 @@ const adminController = require("./src/controller/admin");
 const parentController = require("./src/controller/parent");
 const childController = require("./src/controller/child");
 const response = require("./src/utils/response");
-const fileUpload = require('express-fileupload');
+const cors = require("cors");
+
+
+// //use multer for files parser (directory is public) 
+// const upload = multer({ dest: 'temp/' });
+// //key of files could be any
+// app.use(upload.any());
+// // to load files from public directory
+// app.use(express.static('public'));
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+// const fileUpload = require('express-fileupload');
 // enable files upload
-app.use(fileUpload({ createParentPath: true }));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json({ limit: "20mb" }));
+// app.use(fileUpload({ createParentPath: true }));
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json({ limit: "20mb" }));
 const { getFirestore, Timestamp, FieldValue, } = require("firebase-admin/firestore");
 const { error } = require("firebase-functions/logger");
 const db = getFirestore();
 db.settings({ ignoreUndefinedProperties: true });
 const dotenv = require('dotenv');
 dotenv.config();
+
+
+// // POST - Add Image to Cloud Storage
+// app.post('/upload', async (req, res, next) => {
+//   try {
+//     // console.log("******* req.files : ", req.files, req.file);
+//     // return response.data(res,req.files, 200, "data");
+
+//     let result = await firebaseAdmin.fileUpload(res, req)
+//     return result;
+//   }
+//   catch (error) {
+//     next(error)
+//   }
+// });
+
+
+
 
 app.get("/testing", (req, res) => {
   res.send("api working");

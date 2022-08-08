@@ -2,6 +2,8 @@ const admin = require("firebase-admin");
 const fs = require('fs').promises;
 const https = require('https');
 const { ref, Storage, getSignedUrl } = require('@firebase/storage');
+const response = require("../utils/response");
+
 
 // initialize firebase admin
 const serviceAccount = require("../config/firebase.json");
@@ -9,6 +11,38 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   storageBucket: "gs://kenandemo-bdb1d.appspot.com"
 });
+
+// Cloud storage
+const bucket = admin.storage().bucket();
+
+
+//  uploadImage  //
+const fileUpload = async (res, req) => {
+  console.log("?????????? req.file : ",  req.files);
+  if (req.files.length == 0) {
+    return response.success(res, 200, "No files found");
+  }
+
+  const blob = bucket.file(req.file.filename);
+  console.log(">>>>>>>>>>. blob : ", blob);
+
+  const blobWriter = blob.createWriteStream({
+    metadata: {
+      contentType: req.file.mimetype
+    }
+  })
+  blobWriter.on('error', (err) => {
+    console.log("*********** err : ", err)
+  })
+  blobWriter.on('finish', () => {
+    console.log(">>>>>>>>> finish : ")
+    // return response.success(res, 200, "File uploaded.");
+  })
+  console.log(">>>>>>>>>>. blobWriter : ", blobWriter);
+  blobWriter.end(req.file.buffer)
+
+}
+
 
 // to verify firebase token
 const firebaseVerifyToken = async (token) => {
@@ -83,6 +117,7 @@ const firebaseUnsubscribeTopicNotification = async (registrationTokens, topic) =
 
 
 module.exports = {
+  fileUpload,
   firebaseVerifyToken,
   firebaseUser,
   // createUser,

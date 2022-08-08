@@ -177,6 +177,7 @@ const addDeviceApps = async (res, reqBodyData) => {
 //  scan Qr Code  //
 const scanQrCode = async (res, bodyData) => {
     try {
+        console.log(">>>>>>>>>> bodyData : ",bodyData);
         if (!bodyData.parentId) {
             return response.failure(res, 200, message.PARENT_ID_REQUIRED);
         }

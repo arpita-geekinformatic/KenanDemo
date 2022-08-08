@@ -41,6 +41,18 @@ const createAdmin = async (res, bodyData) => {
 }
 
 
+//  addImage  //
+// const addImage = async (res, file) => {
+//   try {
+
+
+//   } catch (error) {
+//     return response.failure(res, 400, error);
+//   }
+// }
+
+
 module.exports = {
   createAdmin,
+  // addImage,
 }
