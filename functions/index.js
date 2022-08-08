@@ -14,6 +14,24 @@ const childController = require("./src/controller/child");
 const response = require("./src/utils/response");
 const cors = require("cors");
 
+// const path = require('path')
+// const uuid = require('uuid').v4;
+// const storage = multer.diskStorage({
+//   destination: function (req, file, callback) {
+//     callback(null, process.cwd() + "/src/uploads/")
+//   },
+//   filename: function (req, file, callback) {
+//     var fileName = path.parse(file.originalname).name;
+//     callback(null, uuid() + `-` + Date.now() + path.extname(file.originalname))
+//   }
+// })
+// const upload = multer({
+//   storage,
+//   limits: {
+//     fileSize: '4MB'
+//   },
+// });
+
 
 // //use multer for files parser (directory is public) 
 // const upload = multer({ dest: 'temp/' });
@@ -22,14 +40,12 @@ const cors = require("cors");
 // // to load files from public directory
 // app.use(express.static('public'));
 
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
 
 // const fileUpload = require('express-fileupload');
 // enable files upload
 // app.use(fileUpload({ createParentPath: true }));
-// app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(bodyParser.json({ limit: "20mb" }));
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json({ limit: "20mb" }));
 const { getFirestore, Timestamp, FieldValue, } = require("firebase-admin/firestore");
 const { error } = require("firebase-functions/logger");
 const db = getFirestore();
@@ -38,20 +54,15 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 
-// // POST - Add Image to Cloud Storage
-// app.post('/upload', async (req, res, next) => {
+// app.post('/upload', upload.any(), async (req, res, next) => {
 //   try {
-//     // console.log("******* req.files : ", req.files, req.file);
-//     // return response.data(res,req.files, 200, "data");
-
-//     let result = await firebaseAdmin.fileUpload(res, req)
-//     return result;
+//     console.log("******** req.file : ", req.file);
+//     console.log("******** req.files : ", req.files);
+//     res.send("file upload");
+//   } catch (error) {
+//     next(error);
 //   }
-//   catch (error) {
-//     next(error)
-//   }
-// });
-
+// })
 
 
 

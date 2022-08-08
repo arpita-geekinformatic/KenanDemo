@@ -15,10 +15,30 @@ admin.initializeApp({
 // Cloud storage
 const bucket = admin.storage().bucket();
 
+const uploadImage = async (res, req) => {
+  console.log("******  req : ", req.files);
+  const ref = admin.storage().bucket();
+
+  const file = req.files[0];
+  const name =new Date() + '-' + file.name;
+
+  const metadata = {
+    contentType: file.type
+  }
+
+  const task = ref.child(name).put(file, metadata);
+  task
+  .then(snapshot => snapshot.ref.getDownloadUrl())
+  .then(url => {
+    console.log(">>>>> url : ",url)
+  })
+
+}
+
 
 //  uploadImage  //
 const fileUpload = async (res, req) => {
-  console.log("?????????? req.file : ",  req.files);
+  console.log("?????????? req.file : ", req.files);
   if (req.files.length == 0) {
     return response.success(res, 200, "No files found");
   }
@@ -117,6 +137,7 @@ const firebaseUnsubscribeTopicNotification = async (registrationTokens, topic) =
 
 
 module.exports = {
+  uploadImage,
   fileUpload,
   firebaseVerifyToken,
   firebaseUser,
