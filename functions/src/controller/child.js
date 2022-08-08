@@ -10,6 +10,113 @@ var deviceKeys = ["deviceId", "deviceName", "parentId", "childId", "versionCode"
 
 
 
+
+//  scan Qr Code  //
+const scanQrCode = async (res, bodyData) => {
+    try {
+        console.log(">>>>>>>>>> bodyData : ", bodyData);
+        if (!bodyData.parentId) {
+            return response.failure(res, 200, message.PARENT_ID_REQUIRED);
+        }
+        if (!bodyData.childId) {
+            return response.failure(res, 200, message.CHILD_ID_REQUIRED);
+        }
+        if (!bodyData.deviceId) {
+            return response.failure(res, 200, message.REQUIRE_CHILD_DEVICE_ID);
+        }
+        if (!bodyData.password) {
+            return response.failure(res, 200, message.PASSWORD_REQUIRED);
+        }
+        if (!bodyData.FcmToken) {
+            return response.failure(res, 200, message.REQUIRE_FCM);
+        }
+
+        let isParentExists = await childService.getParentDataById(bodyData.parentId);
+        if (!isParentExists) {
+            return response.failure(res, 200, message.INVALID_PARENT_ID);
+        }
+
+        let isChildExists = await childService.getChildDataById(bodyData.childId);
+        if (!isChildExists) {
+            return response.failure(res, 200, message.INVALID_CHILD_ID);
+        }
+
+        //  check is child already connected to other device or not  //
+        if ((isChildExists.deviceId != "") && (isChildExists.deviceId != bodyData.deviceId)) {
+            //  update child data  //
+            let updatedChildData = {
+                deviceId: "",
+                fcmToken: ""
+            }
+            let updateChildDataById = await childService.updateChildDataById(bodyData.childId, updatedChildData);
+
+            //  unlink connected device  //
+            let connectedDeviceData = await childService.isDeviceExists(isChildExists.deviceId);
+            let updatedDeviceData = {
+                childId: "",
+                parentId: ""
+            }
+            let updateDeviceData = await childService.updateDeviceDataById(connectedDeviceData.firestoreDevicePathId, updatedDeviceData);
+        }
+
+
+        let isDeviceExists = await childService.isDeviceExists(bodyData.deviceId);
+        if (!isDeviceExists) {
+            console.log(">>>>>>>>>>>>>>> if device not exists ");
+            let newData = {
+                childId: bodyData.childId,
+                deviceId: bodyData.deviceId,
+                deviceName: "",
+                fcmToken: bodyData.FcmToken,
+                listSize: 0,
+                manufacturer: "",
+                model: "",
+                parentId: bodyData.parentId,
+                versionCode: ""
+            }
+            let addDeviceData = await childService.addDeviceData(newData);
+        }
+        else {
+            console.log("===========  if device exists ");
+            let newdDeviceData = {
+                childId: bodyData.childId,
+                parentId: bodyData.parentId,
+                fcmToken: bodyData.FcmToken
+            }
+            let updateNewDeviceDataById = await childService.updateDeviceDataById(isDeviceExists.firestoreDevicePathId, newdDeviceData);
+        }
+
+        let hashedPassword = await KenanUtilities.cryptPassword(bodyData.password);
+        let newChildData = {
+            deviceId: bodyData.deviceId,
+            fcmToken: bodyData.FcmToken,
+            password: hashedPassword
+        }
+        let updateNewChildDataById = await childService.updateChildDataById(bodyData.childId, newChildData);
+
+     
+        //  subscribe child topic with parent  // 
+        const registrationTokens = [isParentExists.fcmToken];
+        let topic = `child_${bodyData.childId}`;
+        let topicMsg = await firebaseAdmin.firebaseSubscribeTopicNotification(registrationTokens, topic);
+
+        let finaldata = {
+            parentId: bodyData.parentId,
+            deviceName: isDeviceExists.deviceName || "",
+            childId: bodyData.childId,
+            firestoreDeviceId: isDeviceExists.firestoreDevicePathId,
+            deviceId: bodyData.deviceId,
+            childFcmToken: bodyData.FcmToken,
+            parentName: isParentExists.name,
+        };
+        return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data: finaldata });
+
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+
 //  add Child  // deviceId
 const addDeviceApps = async (res, reqBodyData) => {
     try {
@@ -173,99 +280,6 @@ const addDeviceApps = async (res, reqBodyData) => {
         return response.failure(res, 400, error);
     }
 }
-
-//  scan Qr Code  //
-const scanQrCode = async (res, bodyData) => {
-    try {
-        console.log(">>>>>>>>>> bodyData : ",bodyData);
-        if (!bodyData.parentId) {
-            return response.failure(res, 200, message.PARENT_ID_REQUIRED);
-        }
-        if (!bodyData.childId) {
-            return response.failure(res, 200, message.CHILD_ID_REQUIRED);
-        }
-        if (!bodyData.deviceId) {
-            return response.failure(res, 200, message.REQUIRE_CHILD_DEVICE_ID);
-        }
-        if (!bodyData.password) {
-            return response.failure(res, 200, message.PASSWORD_REQUIRED);
-        }
-        if (!bodyData.FcmToken) {
-            return response.failure(res, 200, message.REQUIRE_FCM);
-        }
-
-        let isParentExists = await childService.getParentDataById(bodyData.parentId);
-        if (!isParentExists) {
-            return response.failure(res, 200, message.INVALID_PARENT_ID);
-        }
-
-        let isChildExists = await childService.getChildDataById(bodyData.childId);
-        if (!isChildExists) {
-            return response.failure(res, 200, message.INVALID_CHILD_ID);
-        }
-
-        let isDeviceExists = await childService.isDeviceExists(bodyData.deviceId);
-        if (!isDeviceExists) {
-            return response.failure(res, 200, message.INVALID_DEVICE_ID);
-        }
-
-        //  check is child already connected to other device or not  //
-        if ((isChildExists.deviceId != "") && (isChildExists.deviceId != bodyData.deviceId)) {
-            //  unlink connected device  //
-            let updatedChildData = {
-                deviceId: "",
-                fcmToken: ""
-            }
-            let updateChildDataById = await childService.updateChildDataById(bodyData.childId, updatedChildData);
-
-            let updatedDeviceData = {
-                childId : "",
-                parentId : ""
-            }
-            let updateDeviceDataById = await childService.updateDeviceDataById(isDeviceExists.firestoreDevicePathId, updatedDeviceData);
-        }
-
-        //  link device  //
-        let newChildData = {
-            deviceId: bodyData.deviceId,
-            fcmToken: bodyData.FcmToken,
-        }
-
-        if (bodyData.password && (bodyData.password != "")) {
-            let hashedPassword = await KenanUtilities.cryptPassword(bodyData.password);
-            newChildData.password = hashedPassword;
-        } else {
-            newChildData.password = "";
-        }
-        let updateNewChildDataById = await childService.updateChildDataById(bodyData.childId, newChildData);
-
-        let newdDeviceData = {
-            childId : bodyData.childId,
-            parentId : bodyData.parentId
-        }
-        let updateNewDeviceDataById = await childService.updateDeviceDataById(isDeviceExists.firestoreDevicePathId, newdDeviceData);
-
-        //  subscribe child topic with parent  // 
-        const registrationTokens = [isParentExists.fcmToken];
-        let topic = `child_${bodyData.childId}`;
-        let topicMsg = await firebaseAdmin.firebaseSubscribeTopicNotification(registrationTokens, topic);
-
-        let finaldata = {
-            parentId: bodyData.parentId,
-            deviceName: isDeviceExists.deviceName || "",
-            childId: bodyData.childId,
-            firestoreDeviceId: isDeviceExists.firestoreDevicePathId,
-            deviceId: bodyData.deviceId,
-            childFcmToken: bodyData.FcmToken,
-            parentName: isParentExists.name,
-        };
-        return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data: finaldata });
-
-    } catch (error) {
-        return response.failure(res, 400, error);
-    }
-}
-
 
 
 

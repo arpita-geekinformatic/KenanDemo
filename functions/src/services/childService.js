@@ -190,7 +190,7 @@ const getParentDataById = async (parentId) => {
         if (!parentDetails._fieldsProto) {
             return false;
         }
-        if (parentDetails._fieldsProto.isDeleted.booleanValue ) {
+        if (parentDetails._fieldsProto.isDeleted.booleanValue) {
             return false;
         }
 

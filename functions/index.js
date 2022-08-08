@@ -206,15 +206,6 @@ app.post('/childDeviceAppList', async (req, res, next) => {
 
 
 //   CHILD APP API   //
-//  add child device apps  //
-app.post("/addDeviceApps", async (req, res, next) => {
-  try {
-    let result = await childController.addDeviceApps(res, req.body);
-    return result;
-  } catch (error) {
-    next(error);
-  }
-});
 
 //  scan QR code  //
 app.post("/scanQrCode", async (req, res, next) => {
@@ -225,6 +216,17 @@ app.post("/scanQrCode", async (req, res, next) => {
     next(error);
   }
 });
+
+//  add child device apps  //
+app.post("/addDeviceApps", async (req, res, next) => {
+  try {
+    let result = await childController.addDeviceApps(res, req.body);
+    return result;
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 
 
