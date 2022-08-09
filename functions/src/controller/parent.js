@@ -10,6 +10,7 @@ const ejs = require("ejs");
 const dotenv = require('dotenv');
 dotenv.config();
 const moment = require("moment");
+var QRCode = require('qrcode');
 
 
 //  parent sign up  //
@@ -233,7 +234,7 @@ const resendOTP = async (res, bodyData) => {
             otpExipredAt: `${expiredDate}`
         }
 
-        //  Get email template to send email
+        //  Get email template to send email  //
         let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/otpEmail.ejs", { otp: randomOTP }, { async: true });
         let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "OTP Verification", text: messageHtml });
 
@@ -335,6 +336,28 @@ const addChild = async (res, bodyData, headers) => {
 
             let addChildByParent = await parentService.addChildByParent(newData);
             newData.childId = addChildByParent;
+
+            if (bodyData.email && (bodyData.email != '')) {
+                //  send mail to child with QR code  //
+                // let qrData = parentRes.firestore_parentId + '_' + addChildByParent;
+                // console.log("******* qr code : ", qrData);
+                // let qrCode = await KenanUtilities.generateQR("aaas");
+                // let data = `<img src='${qrCode}' alt ='code' style='width:100px; height:100px;'/>`
+                // console.log("??????????????? ", data);
+
+                // //  Get email template to send email with QR code  //
+                // let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/qrCodeEmail.ejs", { qrCode: data }, { async: true });
+                // let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "QR Code", text: messageHtml });
+
+                // Returns a Data URI containing a representation of the QR Code image.  
+                await QRCode.toDataURL("temp", { errorCorrectionLevel: 'H' }, async function (err, url) {
+                    console.log(url)
+                    // res.render('home', { data: url })
+                    let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/qrCodeEmail.ejs", { data: url }, { async: true });
+                    let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "QR Code", text: messageHtml });
+                });
+            }
+
             return res.send({ responseCode: 200, status: true, message: message.KID_ADDED, data: newData });
         }
 
@@ -444,6 +467,62 @@ const childDeviceAppList = async (res, headers, bodyData) => {
     }
 }
 
+//  add App Usage  //
+const addAppUsage = async (res, headers, bodyData) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+        if (!bodyData.childId) {
+            return response.failure(res, 200, message.CHILD_ID_REQUIRED);
+        }
+        if (!bodyData.packageName) {
+            return response.failure(res, 200, message.REQUIRE_PACKAGE_NAME);
+        }
+        if (!bodyData.status) {
+            return response.failure(res, 200, message.REQUIRE_APP_STATUS);
+        }
+        if (!bodyData.scheduledBy) {
+            return response.failure(res, 200, message.REQUIRE_SCHEDULE);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        let childRes = await parentService.getChildDataById(bodyData.childId);
+
+        if (bodyData.scheduledBy == 'everyDay') {
+            let updateData = {
+                status: parseInt(bodyData.status),
+                scheduledBy: bodyData.scheduledBy,
+                eachDaySchedule: [],
+                everyDaySchedule: bodyData.everyDaySchedule
+            }
+
+            let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageName(childRes.deviceId, bodyData.packageName);
+            let updateDeviceAppsById = await parentService.updateDeviceAppsById(getDeviceAppsIdByPackageName, updateData);
+        }
+        if (bodyData.scheduledBy == 'eachDay') {
+            let updateData = {
+                status: parseInt(bodyData.status),
+                scheduledBy: bodyData.scheduledBy,
+                eachDaySchedule: bodyData.eachDaySchedule,
+                everyDaySchedule: ""
+            }
+
+            let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageName(childRes.deviceId, bodyData.packageName);
+            let updateDeviceAppsById = await parentService.updateDeviceAppsById(getDeviceAppsIdByPackageName, updateData);
+        }
+
+        return response.success(res, 200, message.APP_USAGE_UPDATED);
+
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
 
 
 
@@ -463,4 +542,5 @@ module.exports = {
     deleteChild,
     getChildByParent,
     childDeviceAppList,
+    addAppUsage,
 }

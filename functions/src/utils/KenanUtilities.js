@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 //  const { JWT_SECRET, JWT_EXPIRE_TIME } = process.env;
 const JWT_SECRET = "d2h4b2h59fb32b54jnfnsh";
 const SALT = 10;
+const qr = require('qrcode');
 
 //  generate auth token  //
 const generateToken = (email, id) => {
@@ -64,8 +65,8 @@ const VerifyPassword = async (password, hash) => {
 //  OTP generate  //
 const genNumericCode = (length) => {
   try {
-    let min =  Math.pow(10, length - 1);
-    let max =  (Math.pow(10, length) - Math.pow(10, length - 1) - 1);
+    let min = Math.pow(10, length - 1);
+    let max = (Math.pow(10, length) - Math.pow(10, length - 1) - 1);
     let newOTP = Math.floor(min + Math.random() * max);
     return newOTP;
   } catch (error) {
@@ -73,6 +74,32 @@ const genNumericCode = (length) => {
   }
 }
 
+
+//  QR generate  //
+const generateQR =async (qrData) => {
+  try {
+    // var opts = {
+    //   errorCorrectionLevel: 'H',
+    //   type: 'image/jpeg',
+    //   quality: 0.3,
+    //   margin: 1,
+    //   color: {
+    //     dark:"#010599FF",
+    //     light:"#FFBF60FF"
+    //   }
+    // }
+
+    // let qrCode = await qr.toDataURL(qrData, opts)
+    // return qrCode
+
+     let qrCode = qr.toString(qrData, { type: 'terminal' });
+    return qrCode
+
+
+  } catch (error) {
+    return error;
+  }
+}
 
 
 
@@ -84,4 +111,5 @@ module.exports = {
   cryptPassword,
   VerifyPassword,
   genNumericCode,
+  generateQR,
 };

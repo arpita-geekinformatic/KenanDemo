@@ -213,6 +213,16 @@ app.post('/childDeviceAppList', async (req, res, next) => {
 });
 
 
+//  child device app dropdown  //
+app.post('/addAppUsage', async (req, res, next) => {
+  try {
+    let result = await parentController.addAppUsage(res, req.headers, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+});
+
 
 
 

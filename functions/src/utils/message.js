@@ -22,6 +22,10 @@ const PARENT_ID_REQUIRED = "Parent Id is required.";
 const INVALID_DEVICE_ID = "Invalid device Id.";
 const REQUIRE_FCM = "Fcm token is required.";
 const INVALID_PARENT_ID = "Invalid parent Id.";
+const REQUIRE_PACKAGE_NAME = "Package name is required.";
+const REQUIRE_APP_STATUS = "App status is required.";
+const REQUIRE_SCHEDULE = "App schedule is required.";
+const APP_USAGE_UPDATED = "Application usage updated successfully.";
 
 
 
@@ -50,7 +54,6 @@ const APP_NAME_REQUIRED = "App name is required.";
 const REQUIRE_TYPE = "Type (install / uninstall) is required.";
 const CORRECT_TYPE = "Please enter correct type.";
 const REQUIRE_APP_DETAILS = "App details is required.";
-const REQUIRE_PACKAGE_NAME = "package name is required.";
 const INVALID_PACKAGE_NAME = "Invalid package name.";
 const REQUIRE_NOTIFICATION_ID = "Notification ID is required.";
 const INVALID_FCM = "Invalid fcm token";
@@ -82,7 +85,10 @@ module.exports = {
   INVALID_DEVICE_ID,
   REQUIRE_FCM,
   INVALID_PARENT_ID,
-
+  REQUIRE_PACKAGE_NAME,
+  REQUIRE_APP_STATUS,
+  REQUIRE_SCHEDULE,
+  APP_USAGE_UPDATED,
   
 
   
@@ -110,7 +116,6 @@ module.exports = {
   REQUIRE_TYPE,
   CORRECT_TYPE,
   REQUIRE_APP_DETAILS,
-  REQUIRE_PACKAGE_NAME,
   INVALID_PACKAGE_NAME,
   REQUIRE_NOTIFICATION_ID,
   INVALID_FCM,

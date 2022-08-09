@@ -176,10 +176,13 @@ const addDeviceApps = async (res, reqBodyData) => {
                         status: element.status || 2,
                         firestoreDeviceId: firestoreDevicePathId,
                         noOfLaunches: element.noOfLaunches || 0,
-                        phoneTimeLimit: element.phoneTimeLimit || 1800,
-                        dailyTimeLimit: element.individualAppTimeLimit || 0,
+                        // phoneTimeLimit: element.phoneTimeLimit || 1800,
+                        // dailyTimeLimit: element.individualAppTimeLimit || 0,
                         spendTime: element.timeSpent || 0,
                         usageTimeOnDays: element.usageTimeOnDays || '',
+                        scheduledBy: element.scheduledBy || '',
+                        eachDaySchedule: element.eachDaySchedule || [],
+                        everyDaySchedule: element.everyDaySchedule || '',
                     }
                     let addDeviceAppData = await childService.addDeviceAppData(newDeviceAppData);
                 }
@@ -193,10 +196,13 @@ const addDeviceApps = async (res, reqBodyData) => {
                         status: element.status ? element.status : isDeviceAppExists.status ? isDeviceAppExists.status : 2,
                         firestoreDeviceId: firestoreDevicePathId,
                         noOfLaunches: isDeviceAppExists.noOfLaunches ? isDeviceAppExists.noOfLaunches : element.noOfLaunches,
-                        phoneTimeLimit: isDeviceAppExists.phoneTimeLimit ? isDeviceAppExists.phoneTimeLimit : element.phoneTimeLimit,
-                        dailyTimeLimit: isDeviceAppExists.dailyTimeLimit ? isDeviceAppExists.dailyTimeLimit : element.individualAppTimeLimit,
+                        // phoneTimeLimit: isDeviceAppExists.phoneTimeLimit ? isDeviceAppExists.phoneTimeLimit : element.phoneTimeLimit,
+                        // dailyTimeLimit: isDeviceAppExists.dailyTimeLimit ? isDeviceAppExists.dailyTimeLimit : element.individualAppTimeLimit,
                         spendTime: isDeviceAppExists.spendTime ? isDeviceAppExists.spendTime : element.timeSpent,
                         usageTimeOnDays: isDeviceAppExists.usageTimeOnDays ? isDeviceAppExists.usageTimeOnDays : element.usageTimeOnDays,
+                        scheduledBy: isDeviceAppExists.scheduledBy ? isDeviceAppExists.scheduledBy : element.scheduledBy,
+                        eachDaySchedule: isDeviceAppExists.eachDaySchedule ? isDeviceAppExists.eachDaySchedule : element.eachDaySchedule,
+                        everyDaySchedule: isDeviceAppExists.everyDaySchedule ? isDeviceAppExists.everyDaySchedule : element.everyDaySchedule,
                     }
                     let updateDeviceAppDataById = await childService.updateDeviceAppDataById(isDeviceAppExists.firestoreDeviceAppId, updatedDeviceAppData);
                 }
@@ -248,10 +254,13 @@ const addDeviceApps = async (res, reqBodyData) => {
                         status: element.status || 2,
                         firestoreDeviceId: firestoreDevicePathId,
                         noOfLaunches: element.noOfLaunches || 0,
-                        phoneTimeLimit: element.phoneTimeLimit || 1800,
-                        dailyTimeLimit: element.individualAppTimeLimit || 0,
+                        // phoneTimeLimit: element.phoneTimeLimit || 1800,
+                        // dailyTimeLimit: element.individualAppTimeLimit || 0,
                         spendTime: element.timeSpent || 0,
                         usageTimeOnDays: element.usageTimeOnDays || '',
+                        scheduledBy: element.scheduledBy || '',
+                        eachDaySchedule: element.eachDaySchedule || [],
+                        everyDaySchedule: element.everyDaySchedule || '',
                     }
                     let addDeviceAppData = await childService.addDeviceAppData(newDeviceAppData);
                 }
@@ -265,10 +274,13 @@ const addDeviceApps = async (res, reqBodyData) => {
                         status: element.status ? element.status : isDeviceAppExists.status ? isDeviceAppExists.status : 2,
                         firestoreDeviceId: firestoreDevicePathId,
                         noOfLaunches: isDeviceAppExists.noOfLaunches ? isDeviceAppExists.noOfLaunches : element.noOfLaunches,
-                        phoneTimeLimit: isDeviceAppExists.phoneTimeLimit ? isDeviceAppExists.phoneTimeLimit : element.phoneTimeLimit,
-                        dailyTimeLimit: isDeviceAppExists.dailyTimeLimit ? isDeviceAppExists.dailyTimeLimit : element.individualAppTimeLimit,
+                        // phoneTimeLimit: isDeviceAppExists.phoneTimeLimit ? isDeviceAppExists.phoneTimeLimit : element.phoneTimeLimit,
+                        // dailyTimeLimit: isDeviceAppExists.dailyTimeLimit ? isDeviceAppExists.dailyTimeLimit : element.individualAppTimeLimit,
                         spendTime: isDeviceAppExists.spendTime ? isDeviceAppExists.spendTime : element.timeSpent,
                         usageTimeOnDays: isDeviceAppExists.usageTimeOnDays ? isDeviceAppExists.usageTimeOnDays : element.usageTimeOnDays,
+                        scheduledBy: isDeviceAppExists.scheduledBy ? isDeviceAppExists.scheduledBy : element.scheduledBy,
+                        eachDaySchedule: isDeviceAppExists.eachDaySchedule ? isDeviceAppExists.eachDaySchedule : element.eachDaySchedule,
+                        everyDaySchedule: isDeviceAppExists.everyDaySchedule ? isDeviceAppExists.everyDaySchedule : element.everyDaySchedule,
                     }
                     let updateDeviceAppDataById = await childService.updateDeviceAppDataById(isDeviceAppExists.firestoreDeviceAppId, updatedDeviceAppData);
                 }

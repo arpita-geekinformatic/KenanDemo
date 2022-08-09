@@ -248,6 +248,37 @@ const childDeviceAppList = async (deviceId) => {
 }
 
 
+//  get device apps by packageName  //
+const getDeviceAppsIdByPackageName =  async (deviceId, packageName) => {
+    try {
+        let deviceAppData = await db.collection("deviceApps").where("deviceId", "==", deviceId).where("packageName", "==", packageName).get();
+
+        let firestoreDeviceAppId;
+        deviceAppData.forEach(doc => {
+            firestoreDeviceAppId = doc.id;
+        });
+        console.log(">>>>>>>... firestoreDeviceAppId : ",firestoreDeviceAppId);
+        return firestoreDeviceAppId
+    } catch (error) {
+        throw error
+    }
+}
+
+//  update Device Apps By ID   //
+const updateDeviceAppsById = async (deviceAppId, updatedData) => {
+    try {
+        let deviceAppData = await db.collection("deviceApps").doc(deviceAppId).update(updatedData).get();
+        return true
+
+    } catch (error) {
+        throw error
+    }
+}
+
+
+
+
+
 
 
 
@@ -267,5 +298,6 @@ module.exports = {
     getChildDataById,
     deleteChildById,
     childDeviceAppList,
-
+    getDeviceAppsIdByPackageName,
+    updateDeviceAppsById,
 }
