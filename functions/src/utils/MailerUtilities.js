@@ -15,7 +15,7 @@ const sendSendgridMail = async (data) => {
 
     var message = {
         to: [...data.recipient_email],
-        cc: ['kenan.co.ksa@gmail.com'],
+        cc: ['aditya@geekinformatic.com'],
         from: process.env.SENDGRID_SENDER_EMAIL,
         subject: data.subject,
         text: data.text,
@@ -27,12 +27,13 @@ const sendSendgridMail = async (data) => {
     }
 
     if (data.attachments) {
-        message.attachments = [
-            {
-                filename: 'test.txt',
-                path: __dirname + '/test.txt'
-            }
-        ]
+        message.attachments = data.attachments
+        //  [
+        //     {
+        //         filename: 'test.txt',
+        //         path: __dirname + '/test.txt'
+        //     }
+        // ]
     }
 
     const mailRes = await mailer.sendMail(message);

@@ -11,6 +11,9 @@ const dotenv = require('dotenv');
 dotenv.config();
 const moment = require("moment");
 var QRCode = require('qrcode');
+const fs = require('fs');
+var qr = require('node-qr-image');
+
 
 
 //  parent sign up  //
@@ -338,24 +341,23 @@ const addChild = async (res, bodyData, headers) => {
             newData.childId = addChildByParent;
 
             if (bodyData.email && (bodyData.email != '')) {
-                //  send mail to child with QR code  //
-                // let qrData = parentRes.firestore_parentId + '_' + addChildByParent;
-                // console.log("******* qr code : ", qrData);
-                // let qrCode = await KenanUtilities.generateQR("aaas");
-                // let data = `<img src='${qrCode}' alt ='code' style='width:100px; height:100px;'/>`
-                // console.log("??????????????? ", data);
+                // send mail to child with QR code  //
+                let qrData = parentRes.firestore_parentId + '_' + addChildByParent;
 
-                // //  Get email template to send email with QR code  //
-                // let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/qrCodeEmail.ejs", { qrCode: data }, { async: true });
-                // let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "QR Code", text: messageHtml });
+                var qr_svg = qr.image(qrData, { type: 'png' });
+                qr_svg.pipe(require('fs').createWriteStream(`./src/views/qrCode/${addChildByParent}.png`));
 
-                // Returns a Data URI containing a representation of the QR Code image.  
-                await QRCode.toDataURL("temp", { errorCorrectionLevel: 'H' }, async function (err, url) {
-                    console.log(url)
-                    // res.render('home', { data: url })
-                    let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/qrCodeEmail.ejs", { data: url }, { async: true });
-                    let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "QR Code", text: messageHtml });
-                });
+                var svg_string = qr.imageSync(qrData, { type: 'png' });
+
+                let attachments = [
+                    {
+                        path: `./src/views/qrCode/${addChildByParent}.png`
+                    }
+                ]
+
+                let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/qrCodeEmail.ejs", { data: "url" }, { async: true });
+                let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "QR Code", text: messageHtml, attachments: attachments });
+
             }
 
             return res.send({ responseCode: 200, status: true, message: message.KID_ADDED, data: newData });

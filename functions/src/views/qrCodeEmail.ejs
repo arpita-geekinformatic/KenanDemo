@@ -1,29 +1,36 @@
-<html lang="en">    
-<head>    
-    <meta charset="UTF-8">    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">    
-    <title>Qrcode</title>    
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">    
-</head>    
-<body>    
-    <div class="nav justify-content-center">    
-    <div class="card border-primary mb-3" style="max-width: 18rem;margin-top: 20px;">    
-        <div class="card-header">User Details</div>    
-        <div class="card-body text-primary">    
-            <form action="/" method="post">    
-                <input type="text" name="name" placeholder="enter the name" class="form-control"><br>    
-                <input type="text" name="phno" placeholder="enter the phone number" class="form-control"><br>    
-               <div class="text-center"> <input type="submit" value="get qrcode" class="btn"> </div>     
-             </form>    
-        </div>    
-      </div>    
-    </div>    
-    <%if(data){%>     
-        <div class="text-center">    
-         <h5>Scan QRCode</h5>    
-        <img src="<%=data%>" alt="" style="width:100px; height:100px;">    
-         </div>    
-    <%}%>      
-</body>    
-</html>   
+
+        <table style="width: 100%; max-width: 660px; margin-left: auto; margin-right:auto;font-family: 'Rubik', sans-serif;">
+            <%- await  include('header'); -%>
+            <tr>
+                <td>
+                    <table style="width: 100%; font-family: 'Rubik', sans-serif;">
+                        <tr>
+                            <td style="padding: 20px 24px 60px 24px; font-family: 'Rubik', sans-serif;">
+                                <table>
+                                <tr>
+                                    <td style="font-family: 'Rubik', sans-serif;">Hi,</td>
+                                </tr>
+                                <tr><td style="font-family: 'Rubik', sans-serif;">Greetings!</td></tr>
+                                <tr>                             
+                                    <td style="font-family: 'Rubik', sans-serif;">You are just a step away from accessing your kenan account.</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-family: 'Rubik', sans-serif;">We are sharing a QR code file to active your account.<br/>
+                                        Once you have activate your account, you'll be prompted to login immediately. This is to ensure that only you have access to your account.<br/><br/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="font-family: 'Rubik', sans-serif;">    
+                                        Best Regards,<br/>
+                                        Team Kenan
+                                    </td>    
+                                </tr>    
+                                </table>
+                            </td>
+        
+                        </tr>
+                        <%- await  include('footer'); -%>                    
+                    </table>
+                </td>
+            </tr>
+        </table>
