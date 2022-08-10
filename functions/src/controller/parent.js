@@ -373,11 +373,7 @@ const addChild = async (res, bodyData, headers) => {
             newData.childId = addChildByParent;
 
             if (bodyData.email && (bodyData.email != '')) {
-                // var dir = './src/views/qrCode';
-                // if (!fs.existsSync(dir)) {
-                //     fs.mkdirSync(dir, { recursive: true });
-                // }
-
+        
                 // send mail to child with QR code  //
                 let qrData = parentRes.firestore_parentId + '_' + addChildByParent;
 
@@ -385,8 +381,6 @@ const addChild = async (res, bodyData, headers) => {
                 // qr_svg.pipe(require('fs').createWriteStream(`./src/views/qrCode/${addChildByParent}.png`));
                 qr_svg.pipe(require('fs').createWriteStream(os.tmpdir() + `/${addChildByParent}.png`));
                 var svg_string = qr.imageSync(qrData, { type: 'png' });
-
-                // const file = path.join(tmp, "file.ext");
 
                 let attachments = [{
                     path: os.tmpdir() + `/${addChildByParent}.png`
@@ -396,7 +390,6 @@ const addChild = async (res, bodyData, headers) => {
                 let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "QR Code", text: messageHtml, attachments: attachments });
 
             }
-
             return res.send({ responseCode: 200, status: true, message: message.KID_ADDED, data: newData });
         }
 
