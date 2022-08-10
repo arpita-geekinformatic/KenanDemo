@@ -87,14 +87,18 @@ const scanQrCode = async (res, bodyData) => {
         }
 
         let hashedPassword = await KenanUtilities.cryptPassword(bodyData.password);
+        //  generate child auth token  //
+        const authToken = await KenanUtilities.generateChildToken(bodyData.childId, bodyData.deviceId);
+
         let newChildData = {
             deviceId: bodyData.deviceId,
             fcmToken: bodyData.FcmToken,
-            password: hashedPassword
+            password: hashedPassword,
+            authToken: authToken
         }
         let updateNewChildDataById = await childService.updateChildDataById(bodyData.childId, newChildData);
 
-     
+
         //  subscribe child topic with parent  // 
         const registrationTokens = [isParentExists.fcmToken];
         let topic = `child_${bodyData.childId}`;
@@ -108,6 +112,7 @@ const scanQrCode = async (res, bodyData) => {
             deviceId: bodyData.deviceId,
             childFcmToken: bodyData.FcmToken,
             parentName: isParentExists.name,
+            authToken: authToken,
         };
         return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data: finaldata });
 

@@ -20,6 +20,21 @@ const generateToken = (email, id) => {
   }
 };
 
+//  generate child auth token  //
+const generateChildToken = (childId, deviceId) => {
+  try {
+    const payload = {
+      childId: childId,
+      deviceId: deviceId,
+    };
+    const token = JWT.sign(payload, JWT_SECRET, {});
+
+    return token;
+  } catch (error) {
+    return error;
+  }
+}
+
 //  decrypt auth token //
 const decryptToken = (token) => {
   try {
@@ -75,41 +90,17 @@ const genNumericCode = (length) => {
 }
 
 
-//  QR generate  //
-const generateQR =async (qrData) => {
-  try {
-    // var opts = {
-    //   errorCorrectionLevel: 'H',
-    //   type: 'image/jpeg',
-    //   quality: 0.3,
-    //   margin: 1,
-    //   color: {
-    //     dark:"#010599FF",
-    //     light:"#FFBF60FF"
-    //   }
-    // }
 
-    // let qrCode = await qr.toDataURL(qrData, opts)
-    // return qrCode
-
-     let qrCode = qr.toString(qrData, { type: 'terminal' });
-    return qrCode
-
-
-  } catch (error) {
-    return error;
-  }
-}
 
 
 
 
 module.exports = {
   generateToken,
+  generateChildToken,
   decryptToken,
   mapToValues,
   cryptPassword,
   VerifyPassword,
   genNumericCode,
-  generateQR,
 };

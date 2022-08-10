@@ -258,6 +258,8 @@ app.post("/addDeviceApps", async (req, res, next) => {
   }
 });
 
+//  get chils details by Id //
+
 
 
 
