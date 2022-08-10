@@ -225,7 +225,6 @@ const deleteChildById = async (childId) => {
     }
 }
 
-
 //  get child device apps list (with app image) by device ID  //
 const childDeviceAppList = async (deviceId) => {
     try {
@@ -246,7 +245,6 @@ const childDeviceAppList = async (deviceId) => {
         throw error
     }
 }
-
 
 //  get device apps by packageName  //
 const getDeviceAppsIdByPackageName =  async (deviceId, packageName) => {

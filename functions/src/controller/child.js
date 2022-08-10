@@ -310,7 +310,29 @@ const childDetails = async (res, headers) => {
             return response.failure(res, 200, message.INVALID_TOKEN);
         }
 
-        return response.data(res,childData, 400, message.SUCCESS);
+        return response.data(res, childData, 400, message.SUCCESS);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+
+//  child Device App List for child  //
+const deviceAppListByChild = async (res, headers) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let childData = await childService.getChildDataById(decoded.childId);
+        if (!childData) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        let childDeviceAppList = await childService.childDeviceAppList(childData.deviceId)
+        return response.data(res, childDeviceAppList, 200, message.SUCCESS);
+
     } catch (error) {
         return response.failure(res, 400, error);
     }
@@ -325,4 +347,5 @@ module.exports = {
     addDeviceApps,
     scanQrCode,
     childDetails,
+    deviceAppListByChild,
 }

@@ -210,6 +210,27 @@ const getParentDataById = async (parentId) => {
     }
 }
 
+//  get child device apps list (with app image) by device ID  //
+const childDeviceAppList = async (deviceId) => {
+    try {
+        let deviceApps = await db.collection("deviceApps").where("deviceId", "==", deviceId).get();
+        let deviceAppArr = [];
+        deviceApps.forEach(async (doc) => {
+            await deviceAppArr.push(doc.data());
+        });
+
+        for (const element of deviceAppArr) {
+            let appDetails = await db.collection("apps").doc(element.firestoreAppId).get();
+            let appImage = appDetails._fieldsProto.baseImage.stringValue;
+            let image = appImage.replace(/\n/g, '');
+            element.baseImage = image;
+        }
+        return deviceAppArr
+    } catch (error) {
+        throw error
+    }
+}
+
 
 
 
@@ -228,4 +249,5 @@ module.exports = {
     getChildDataById,
     updateChildDataById,
     getParentDataById,
+    childDeviceAppList,
 }

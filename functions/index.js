@@ -164,11 +164,11 @@ app.post('/resetPassword', async (req, res, next) => {
 
 //  get profile by id  //
 app.post('/getParentProfile', async (req, res, next) => {
-  try{
+  try {
     let result = await parentController.getParentProfile(res, req.headers);
     return result;
   } catch (error) {
-    next (error)
+    next(error)
   }
 })
 
@@ -222,7 +222,6 @@ app.post('/childDeviceAppList', async (req, res, next) => {
   }
 });
 
-
 //  child device app dropdown  //
 app.post('/addAppUsage', async (req, res, next) => {
   try {
@@ -265,6 +264,16 @@ app.post("/childDetails", async (req, res, next) => {
     return result;
   } catch (error) {
     next(error);
+  }
+});
+
+//  child Device App List for child  //
+app.post('/deviceAppListByChild', async (req, res, next) => {
+  try {
+    let result = await childController.deviceAppListByChild(res, req.headers);
+    return result;
+  } catch (error) {
+    next(error)
   }
 });
 
