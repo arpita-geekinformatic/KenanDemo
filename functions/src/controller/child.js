@@ -121,8 +121,7 @@ const scanQrCode = async (res, bodyData) => {
     }
 }
 
-
-//  add Child  // deviceId
+//  add Child  // 
 const addDeviceApps = async (res, reqBodyData) => {
     try {
         if (!reqBodyData.deviceId) {
@@ -298,6 +297,26 @@ const addDeviceApps = async (res, reqBodyData) => {
     }
 }
 
+//  get child details  //
+const childDetails = async (res, headers) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let childData = await childService.getChildDataById(decoded.childId);
+        if (!childData) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        return response.data(res,childData, 400, message.SUCCESS);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+
 
 
 
@@ -305,4 +324,5 @@ const addDeviceApps = async (res, reqBodyData) => {
 module.exports = {
     addDeviceApps,
     scanQrCode,
+    childDetails,
 }

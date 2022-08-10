@@ -259,7 +259,14 @@ app.post("/addDeviceApps", async (req, res, next) => {
 });
 
 //  get chils details by Id //
-
+app.post("/childDetails", async (req, res, next) => {
+  try {
+    let result = await childController.childDetails(res, req.headers);
+    return result;
+  } catch (error) {
+    next(error);
+  }
+});
 
 
 
