@@ -13,7 +13,9 @@ const moment = require("moment");
 var QRCode = require('qrcode');
 const fs = require('fs');
 var qr = require('node-qr-image');
-
+let os = require('os');
+const path = require('path');
+const tmp = os.tmpdir();
 
 
 //  parent sign up  //
@@ -306,6 +308,36 @@ const resetPassword = async (res, bodyData, headers) => {
     }
 }
 
+//  get Parent Profile details  //
+const getParentProfile = async (res, headers) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        // let parentDetails = {
+        //     name : parentRes.name,
+        //     name : parentRes.name,
+        //     name : parentRes.name,
+        //     name : parentRes.name,
+        //     name : parentRes.name,
+        //     name : parentRes.name,
+        //     name : parentRes.name,
+        //     name : parentRes.name,
+        // }
+        return response.data(res, parentRes, 200, message.SUCCESS);
+
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
 //  add Child  //
 const addChild = async (res, bodyData, headers) => {
     try {
@@ -341,19 +373,24 @@ const addChild = async (res, bodyData, headers) => {
             newData.childId = addChildByParent;
 
             if (bodyData.email && (bodyData.email != '')) {
+                // var dir = './src/views/qrCode';
+                // if (!fs.existsSync(dir)) {
+                //     fs.mkdirSync(dir, { recursive: true });
+                // }
+
                 // send mail to child with QR code  //
                 let qrData = parentRes.firestore_parentId + '_' + addChildByParent;
 
                 var qr_svg = qr.image(qrData, { type: 'png' });
-                qr_svg.pipe(require('fs').createWriteStream(`./src/views/qrCode/${addChildByParent}.png`));
-
+                // qr_svg.pipe(require('fs').createWriteStream(`./src/views/qrCode/${addChildByParent}.png`));
+                qr_svg.pipe(require('fs').createWriteStream(os.tmpdir() + `/${addChildByParent}.png`));
                 var svg_string = qr.imageSync(qrData, { type: 'png' });
 
-                let attachments = [
-                    {
-                        path: `./src/views/qrCode/${addChildByParent}.png`
-                    }
-                ]
+                // const file = path.join(tmp, "file.ext");
+
+                let attachments = [{
+                    path: os.tmpdir() + `/${addChildByParent}.png`
+                }]
 
                 let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/qrCodeEmail.ejs", { data: "url" }, { async: true });
                 let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "QR Code", text: messageHtml, attachments: attachments });
@@ -539,6 +576,7 @@ module.exports = {
     resendOTP,
     newPassword,
     resetPassword,
+    getParentProfile,
     addChild,
     childList,
     deleteChild,

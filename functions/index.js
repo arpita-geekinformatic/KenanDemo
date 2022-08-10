@@ -162,6 +162,16 @@ app.post('/resetPassword', async (req, res, next) => {
   }
 })
 
+//  get profile by id  //
+app.post('/getParentProfile', async (req, res, next) => {
+  try{
+    let result = await parentController.getParentProfile(res, req.headers);
+    return result;
+  } catch (error) {
+    next (error)
+  }
+})
+
 //  add Child  //
 app.post('/addChild', async (req, res, next) => {
   try {
