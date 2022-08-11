@@ -250,6 +250,15 @@ app.post('/childGiftList', async (req, res, next) => {
   }
 });
 
+//  delete child gift data by Id  //
+app.post('/deleteChildGiftById/:id', async (req, res, next) => {
+  try {
+    let result = await parentController.deleteChildGiftById(res, req.headers, req.params);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+});
 
 
 

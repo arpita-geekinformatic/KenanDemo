@@ -327,6 +327,17 @@ const childGiftListById = async (childId, parentId) => {
     }
 }
 
+//  delete Child Gift By Id  //
+const deleteChildGiftById = async (giftId) => {
+    try {
+        await db.collection("childGifts").doc(giftId).update({isDeleted : true});
+        return true;
+
+    } catch (error) {
+        throw error
+    }
+}
+
 
 
 
@@ -350,4 +361,5 @@ module.exports = {
     giftTypeDropdown,
     addGift,
     childGiftListById,
+    deleteChildGiftById,
 }

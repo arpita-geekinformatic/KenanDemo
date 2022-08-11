@@ -641,6 +641,29 @@ const childGiftList = async (res, headers, bodyData) => {
     }
 }
 
+//  delete Child Gift By Id  //
+const deleteChildGiftById = async (res, headers, paramData) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+        if (!paramData.id) {
+            return response.failure(res, 200, message.GIFT_ID_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        let deleteChildGiftById = await parentService.deleteChildGiftById(paramData.id);
+        return response.success(res, 200, message.GIFT_DELETED_SUCCESSFULLY);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
 
 module.exports = {
     signUp,
@@ -662,4 +685,5 @@ module.exports = {
     giftTypeDropdown,
     addGift,
     childGiftList,
+    deleteChildGiftById,
 }
