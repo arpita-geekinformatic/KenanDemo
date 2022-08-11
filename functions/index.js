@@ -230,10 +230,20 @@ app.post('/giftTypeDropdown', async(req, res, next) =>{
   }
 })
 
-//  child device app dropdown  //
+//  add gift to child  //
 app.post('/addGift', async (req, res, next) => {
   try {
     let result = await parentController.addGift(res, req.headers, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+});
+
+//  child gift list by Id  //
+app.post('/childGiftList', async (req, res, next) => {
+  try {
+    let result = await parentController.childGiftList(res, req.headers, req.body);
     return result;
   } catch (error) {
     next(error)

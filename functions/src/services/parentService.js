@@ -294,7 +294,38 @@ const giftTypeDropdown = async () => {
     }
 }
 
+//  add Gift for child  //
+const addGift = async (giftData) => {
+    try {
+        let addGift = await db.collection("childGifts").add(giftData);
+        return true;
 
+    } catch (error) {
+        throw error
+    }
+}
+
+//  child Gift List By Id  //
+const childGiftListById = async (childId, parentId) => {
+    try {
+        let childGiftList = await db.collection("childGifts").where("childId", "==", childId).where("parentId", "==", parentId).where("isDeleted", "==", false).get();
+
+        let childGiftListArr = [];
+        childGiftList.forEach(doc => {
+            let giftData = {}
+            giftData.childGiftId = doc.id;
+            giftData.giftIcon = doc.data().giftIcon;
+            giftData.giftName = doc.data().giftName;
+            giftData.points = doc.data().points;
+
+            childGiftListArr.push(giftData);
+        })
+        return childGiftListArr;
+
+    } catch (error) {
+        throw error
+    }
+}
 
 
 
@@ -317,4 +348,6 @@ module.exports = {
     getDeviceAppsIdByPackageName,
     updateDeviceAppsById,
     giftTypeDropdown,
+    addGift,
+    childGiftListById,
 }

@@ -30,6 +30,7 @@ const GIFT_NAME_REQUIRED = "Gift name is required.";
 const GIFT_ICON_REQUIRED = "Gift icon is required.";
 const GIFT_TYPE_REQUIRED = "Gift type is required.";
 const POINTS_REQUIRED = "Point is required.";
+const GIFT_ADDED_SUCCESSFULLY = "Gift added successfully.";
 
 
 
@@ -97,7 +98,9 @@ module.exports = {
   GIFT_ICON_REQUIRED,
   GIFT_TYPE_REQUIRED,
   POINTS_REQUIRED,
+  GIFT_ADDED_SUCCESSFULLY,
 
+  
   
   TOKEN_EXPIRED,
   UNAUTHORIZED,

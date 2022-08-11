@@ -586,9 +586,12 @@ const addGift = async (res, headers, bodyData) => {
         if (!bodyData.childId) {
             return response.failure(res, 200, message.CHILD_ID_REQUIRED);
         }
-        if (!bodyData.giftType) {
-            return response.failure(res, 200, message.GIFT_TYPE_REQUIRED);
+        if (!bodyData.giftName) {
+            return response.failure(res, 200, message.GIFT_NAME_REQUIRED);
         }
+        // if (!bodyData.giftIcon) {
+        //     return response.failure(res, 200, message.GIFT_ICON_REQUIRED);
+        // }
         if (!bodyData.points) {
             return response.failure(res, 200, message.POINTS_REQUIRED);
         }
@@ -602,19 +605,41 @@ const addGift = async (res, headers, bodyData) => {
         let giftData = {
             childId: bodyData.childId,
             parentId: parentRes.firestore_parentId,
-            giftType: bodyData.giftType,
-            points: bodyData.points
+            giftName: bodyData.giftName,
+            giftIcon: bodyData.giftIcon || '',
+            points: parseInt(bodyData.points),
+            isDeleted: false
         }
 
-
-
-
-        return response.success(res, 200, message.APP_USAGE_UPDATED);
+        let addGift = await parentService.addGift(giftData);
+        return response.success(res, 200, message.GIFT_ADDED_SUCCESSFULLY);
     } catch (error) {
         return response.failure(res, 400, error);
     }
 }
 
+//  child Gift List by Id  //
+const childGiftList = async (res, headers, bodyData) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+        if (!bodyData.childId) {
+            return response.failure(res, 200, message.CHILD_ID_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        let childGiftListById = await parentService.childGiftListById(bodyData.childId, parentRes.firestore_parentId);
+        return response.data(res, childGiftListById, 200, message.SUCCESS);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
 
 
 module.exports = {
@@ -636,4 +661,5 @@ module.exports = {
     addAppUsage,
     giftTypeDropdown,
     addGift,
+    childGiftList,
 }
