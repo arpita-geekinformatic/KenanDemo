@@ -373,11 +373,12 @@ const addChild = async (res, bodyData, headers) => {
             newData.childId = addChildByParent;
 
             if (bodyData.email && (bodyData.email != '')) {
-        
+
                 // send mail to child with QR code  //
                 let qrData = parentRes.firestore_parentId + '_' + addChildByParent;
 
                 var qr_svg = qr.image(qrData, { type: 'png' });
+                console.log(">>>>>> qr_svg : ", qr_svg);
                 // qr_svg.pipe(require('fs').createWriteStream(`./src/views/qrCode/${addChildByParent}.png`));
                 qr_svg.pipe(require('fs').createWriteStream(os.tmpdir() + `/${addChildByParent}.png`));
                 var svg_string = qr.imageSync(qrData, { type: 'png' });
@@ -556,6 +557,63 @@ const addAppUsage = async (res, headers, bodyData) => {
     }
 }
 
+//  gift Type Dropdown  //
+const giftTypeDropdown = async (res, headers) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        let giftTypeDropdown = await parentService.giftTypeDropdown();
+        return response.data(res, giftTypeDropdown, 200, message.SUCCESS);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+//  add Gift for child  //
+const addGift = async (res, headers, bodyData) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+        if (!bodyData.childId) {
+            return response.failure(res, 200, message.CHILD_ID_REQUIRED);
+        }
+        if (!bodyData.giftType) {
+            return response.failure(res, 200, message.GIFT_TYPE_REQUIRED);
+        }
+        if (!bodyData.points) {
+            return response.failure(res, 200, message.POINTS_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+
+        let giftData = {
+            childId: bodyData.childId,
+            parentId: parentRes.firestore_parentId,
+            giftType: bodyData.giftType,
+            points: bodyData.points
+        }
+
+
+
+
+        return response.success(res, 200, message.APP_USAGE_UPDATED);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
 
 
 
@@ -576,4 +634,6 @@ module.exports = {
     getChildByParent,
     childDeviceAppList,
     addAppUsage,
+    giftTypeDropdown,
+    addGift,
 }

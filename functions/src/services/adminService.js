@@ -29,10 +29,22 @@ const createAdminProfile = async (newData) => {
     }
 }
 
+//  add Gift Type  //
+const addGiftType = async (newData) => {
+    try{
+        let addGift = await db.collection("giftTypes").add(newData);
+        return true;
+
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 
 
 module.exports = {
     findAdmin,
     createAdminProfile,
+    addGiftType,
 }

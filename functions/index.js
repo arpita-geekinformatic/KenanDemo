@@ -13,33 +13,14 @@ const parentController = require("./src/controller/parent");
 const childController = require("./src/controller/child");
 const response = require("./src/utils/response");
 const cors = require("cors");
-
-// const path = require('path')
-// const uuid = require('uuid').v4;
-// const storage = multer.diskStorage({
-//   destination: function (req, file, callback) {
-//     callback(null, process.cwd() + "/src/uploads/")
-//   },
-//   filename: function (req, file, callback) {
-//     var fileName = path.parse(file.originalname).name;
-//     callback(null, uuid() + `-` + Date.now() + path.extname(file.originalname))
-//   }
-// })
-// const upload = multer({
-//   storage,
-//   limits: {
-//     fileSize: '4MB'
-//   },
-// });
+let os = require('os');
+const fs = require('fs');
 
 
-// //use multer for files parser (directory is public) 
-// const upload = multer({ dest: 'temp/' });
-// //key of files could be any
+// const upload = multer({ dest: os.tmpdir() + `/`});
 // app.use(upload.any());
-// // to load files from public directory
 // app.use(express.static('public'));
-
+app.use(cors({ origin: '*' }))
 
 // const fileUpload = require('express-fileupload');
 // enable files upload
@@ -54,15 +35,22 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 
-// app.post('/upload', upload.any(), async (req, res, next) => {
-//   try {
-//     console.log("******** req.file : ", req.file);
-//     console.log("******** req.files : ", req.files);
-//     res.send("file upload");
-//   } catch (error) {
-//     next(error);
-//   }
-// })
+
+
+app.post('/upload', async (req, res, next) => {
+  try {
+    console.log("******** req.body : ", req.body);
+    console.log("******** req.files : ", req.files);
+
+    const b64 = req.body.toString('base64');
+
+    console.log(">>>>>>>>>>>>>  img : ", b64);
+
+    return res.send("file upload");
+  } catch (error) {
+    next(error);
+  }
+})
 
 
 
@@ -232,11 +220,33 @@ app.post('/addAppUsage', async (req, res, next) => {
   }
 });
 
+//  gift type dropdown  //
+app.post('/giftTypeDropdown', async(req, res, next) =>{
+  try{
+    let result = await parentController.giftTypeDropdown(res, req.headers);
+    return result;
+  }catch (error) {
+    next(error)
+  }
+})
+
+//  child device app dropdown  //
+app.post('/addGift', async (req, res, next) => {
+  try {
+    let result = await parentController.addGift(res, req.headers, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+});
+
+
+
+
 
 
 
 //   CHILD APP API   //
-
 //  scan QR code  //
 app.post("/scanQrCode", async (req, res, next) => {
   try {
@@ -289,6 +299,17 @@ app.post('/createAdmin', async (req, res, next) => {
     next(error)
   }
 })
+
+//  add gift type for parent  //
+app.post('/addGiftType', async (req, res, next) => {
+  try {
+    let result = await adminController.addGiftType(res, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 
 

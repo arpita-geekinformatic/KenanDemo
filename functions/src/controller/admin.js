@@ -40,19 +40,33 @@ const createAdmin = async (res, bodyData) => {
   }
 }
 
+//  add Gift Type for parent  //
+const addGiftType = async (res, bodyData) => {
+  try {
+    if (!bodyData.name) {
+      return response.failure(res, 200, message.GIFT_NAME_REQUIRED);
+    }
+    // if (!bodyData.icon) {
+    //   return response.failure(res, 200, message.GIFT_ICON_REQUIRED);
+    // }
 
-//  addImage  //
-// const addImage = async (res, file) => {
-//   try {
+    let giftData = {
+      name: bodyData.name,
+      icon: bodyData.icon || ""
+    }
+
+    let addGiftType = await adminService.addGiftType(giftData);
+    return response.success(res, 200, message.SUCCESS);
+  } catch (error) {
+    return response.failure(res, 400, error)
+  }
+}
 
 
-//   } catch (error) {
-//     return response.failure(res, 400, error);
-//   }
-// }
+
 
 
 module.exports = {
   createAdmin,
-  // addImage,
+  addGiftType,
 }

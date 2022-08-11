@@ -26,6 +26,10 @@ const REQUIRE_PACKAGE_NAME = "Package name is required.";
 const REQUIRE_APP_STATUS = "App status is required.";
 const REQUIRE_SCHEDULE = "App schedule is required.";
 const APP_USAGE_UPDATED = "Application usage updated successfully.";
+const GIFT_NAME_REQUIRED = "Gift name is required.";
+const GIFT_ICON_REQUIRED = "Gift icon is required.";
+const GIFT_TYPE_REQUIRED = "Gift type is required.";
+const POINTS_REQUIRED = "Point is required.";
 
 
 
@@ -89,7 +93,10 @@ module.exports = {
   REQUIRE_APP_STATUS,
   REQUIRE_SCHEDULE,
   APP_USAGE_UPDATED,
-  
+  GIFT_NAME_REQUIRED,
+  GIFT_ICON_REQUIRED,
+  GIFT_TYPE_REQUIRED,
+  POINTS_REQUIRED,
 
   
   TOKEN_EXPIRED,
