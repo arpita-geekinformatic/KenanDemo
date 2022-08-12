@@ -310,7 +310,7 @@ const childDetails = async (res, headers) => {
             return response.failure(res, 200, message.INVALID_TOKEN);
         }
 
-        return response.data(res, childData, 400, message.SUCCESS);
+        return response.data(res, childData, 200, message.SUCCESS);
     } catch (error) {
         return response.failure(res, 400, error);
     }

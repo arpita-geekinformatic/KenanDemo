@@ -12,57 +12,34 @@ admin.initializeApp({
   storageBucket: "gs://kenandemo-bdb1d.appspot.com"
 });
 
-// Cloud storage
+// Cloud storage bucket
 const bucket = admin.storage().bucket();
 
-const uploadImage = async (res, req) => {
-  console.log("******  req : ", req.files);
+
+//  upload image to firebase and get public url  //
+const uploadFile = async (filePath) => {
   const ref = admin.storage().bucket();
 
-  const file = req.files[0];
-  const name =new Date() + '-' + file.name;
+  // Upload the File
+  const destination = `uploads/${Date.now()}.png`;
 
-  const metadata = {
-    contentType: file.type
-  }
-
-  const task = ref.child(name).put(file, metadata);
-  task
-  .then(snapshot => snapshot.ref.getDownloadUrl())
-  .then(url => {
-    console.log(">>>>> url : ",url)
+  const storage = await ref.upload(filePath, {
+    public: true,
+    destination: destination,
   })
-
+    .then(() => {
+      const file = ref.file(destination);
+      return file.getSignedUrl({
+        action: 'read',
+        expires: '03-25-2030'
+      }).then(signedUrls => {
+        // signedUrls[0] contains the file's public URL
+        console.log(">>>>>>>>>>>>>>>>> ", signedUrls[0]);
+        return signedUrls[0]
+      });
+    });
+  return storage
 }
-
-
-//  uploadImage  //
-const fileUpload = async (res, req) => {
-  console.log("?????????? req.file : ", req.files);
-  if (req.files.length == 0) {
-    return response.success(res, 200, "No files found");
-  }
-
-  const blob = bucket.file(req.file.filename);
-  console.log(">>>>>>>>>>. blob : ", blob);
-
-  const blobWriter = blob.createWriteStream({
-    metadata: {
-      contentType: req.file.mimetype
-    }
-  })
-  blobWriter.on('error', (err) => {
-    console.log("*********** err : ", err)
-  })
-  blobWriter.on('finish', () => {
-    console.log(">>>>>>>>> finish : ")
-    // return response.success(res, 200, "File uploaded.");
-  })
-  console.log(">>>>>>>>>>. blobWriter : ", blobWriter);
-  blobWriter.end(req.file.buffer)
-
-}
-
 
 // to verify firebase token
 const firebaseVerifyToken = async (token) => {
@@ -137,8 +114,7 @@ const firebaseUnsubscribeTopicNotification = async (registrationTokens, topic) =
 
 
 module.exports = {
-  uploadImage,
-  fileUpload,
+  uploadFile,
   firebaseVerifyToken,
   firebaseUser,
   // createUser,

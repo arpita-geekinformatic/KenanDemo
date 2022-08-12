@@ -15,42 +15,27 @@ const response = require("./src/utils/response");
 const cors = require("cors");
 let os = require('os');
 const fs = require('fs');
-
+var Buffer = require('buffer/').Buffer;
+const ejs = require("ejs");
 
 // const upload = multer({ dest: os.tmpdir() + `/`});
 // app.use(upload.any());
 // app.use(express.static('public'));
-app.use(cors({ origin: '*' }))
-
 // const fileUpload = require('express-fileupload');
 // enable files upload
 // app.use(fileUpload({ createParentPath: true }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ limit: "20mb" }));
+app.use(cors({ origin: '*' }));
 const { getFirestore, Timestamp, FieldValue, } = require("firebase-admin/firestore");
 const { error } = require("firebase-functions/logger");
 const db = getFirestore();
 db.settings({ ignoreUndefinedProperties: true });
 const dotenv = require('dotenv');
 dotenv.config();
+const MailerUtilities = require("./src/utils/MailerUtilities");
+const message = require("./src/utils/message");
 
-
-
-
-app.post('/upload', async (req, res, next) => {
-  try {
-    console.log("******** req.body : ", req.body);
-    console.log("******** req.files : ", req.files);
-
-    const b64 = req.body.toString('base64');
-
-    console.log(">>>>>>>>>>>>>  img : ", b64);
-
-    return res.send("file upload");
-  } catch (error) {
-    next(error);
-  }
-})
 
 
 
@@ -221,11 +206,11 @@ app.post('/addAppUsage', async (req, res, next) => {
 });
 
 //  gift type dropdown  //
-app.post('/giftTypeDropdown', async(req, res, next) =>{
-  try{
+app.post('/giftTypeDropdown', async (req, res, next) => {
+  try {
     let result = await parentController.giftTypeDropdown(res, req.headers);
     return result;
-  }catch (error) {
+  } catch (error) {
     next(error)
   }
 })
@@ -260,6 +245,26 @@ app.post('/deleteChildGiftById/:id', async (req, res, next) => {
   }
 });
 
+
+
+//  upload image to firebase storage and get public url  //
+app.post('/upload', async (req, res, next) => {
+  try {
+
+    let bufferData = Buffer.from(req.body.data, "base64")
+    let path = `/` + Date.now() + `.png`;
+    await fs.createWriteStream(os.tmpdir() + path).write(bufferData);
+
+    //  get file path from temp folder  //
+    let filePath = (os.tmpdir() + path);
+    let uploadFile = await firebaseAdmin.uploadFile(filePath);
+    let data = {url : uploadFile}
+
+    return response.data(res, data, 200, message.SUCCESS);
+  } catch (error) {
+    next(error);
+  }
+})
 
 
 

@@ -214,7 +214,6 @@ const verifyOTP = async (res, bodyData) => {
         newData = { authToken: parentRes.authToken }
         return res.send({ responseCode: 200, status: true, message: message.OTP_VERIFIED, data: newData });
 
-        return response.success(res, 200, message.OTP_VERIFIED);
     } catch (error) {
         return response.failure(res, 400, error);
     }
