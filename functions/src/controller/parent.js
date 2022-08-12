@@ -366,6 +366,8 @@ const addChild = async (res, bodyData, headers) => {
                 deviceId: bodyData.deviceId || "",
                 isDeleted: false,
                 fcmToken: bodyData.fcmToken || "",
+                points: 0,
+                badge: 0
             }
 
             let addChildByParent = await parentService.addChildByParent(newData);

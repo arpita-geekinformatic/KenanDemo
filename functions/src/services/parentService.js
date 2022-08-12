@@ -207,6 +207,8 @@ const getChildDataById = async (childId) => {
         childData.gender = childDetails._fieldsProto.gender ? childDetails._fieldsProto.gender.stringValue : "";
         childData.parentId = childDetails._fieldsProto.parentId ? childDetails._fieldsProto.parentId.stringValue : "";
         childData.photo = childDetails._fieldsProto.photo ? childDetails._fieldsProto.photo.stringValue : "";
+        childData.points = childDetails._fieldsProto.points ? childDetails._fieldsProto.points.integerValue : 0;
+        childData.badge = childDetails._fieldsProto.badge ? childDetails._fieldsProto.badge.integerValue : 0;
 
         return childData;
     } catch (error) {
