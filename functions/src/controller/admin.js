@@ -79,13 +79,13 @@ const adminLogin = async (res, bodyData) => {
 const adminLogout = async (res, headers) => {
   try {
     if (!headers.authorization) {
-      return response.failure(res, 200, message.TOKEN_REQUIRED);
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
     }
 
     const decoded = await KenanUtilities.decryptToken(headers.authorization);
     const adminData = await adminService.findAdminByToken(headers.authorization);
     if (!adminData) {
-      return response.failure(res, 200, message.INVALID_TOKEN,);
+      return response.failure(res, 400, message.INVALID_TOKEN,);
     }
 
     let updatedData = {
@@ -103,12 +103,12 @@ const adminLogout = async (res, headers) => {
 const forgotPassword = async (res, bodyData) => {
   try {
     if (!bodyData.email) {
-      return response.failure(res, 200, message.EMAIL_REQUIRED);
+      return response.failure(res, 400, message.EMAIL_REQUIRED);
     }
 
     const adminData = await adminService.findAdmin(bodyData.email);
     if (!adminData) {
-      return response.failure(res, 200, message.USER_NOT_FOUND,);
+      return response.failure(res, 400, message.USER_NOT_FOUND,);
     }
 
 
@@ -123,13 +123,13 @@ const forgotPassword = async (res, bodyData) => {
 const userList = async (res, headers, queryData) => {
   try {
     if (!headers.authorization) {
-      return response.failure(res, 200, message.TOKEN_REQUIRED);
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
     }
 
     const decoded = await KenanUtilities.decryptToken(headers.authorization);
     const adminData = await adminService.findAdminByToken(headers.authorization);
     if (!adminData) {
-      return response.failure(res, 200, message.INVALID_TOKEN,);
+      return response.failure(res, 400, message.INVALID_TOKEN,);
     }
 
     let limit = queryData.limit ? parseInt(queryData.limit) : 10;
@@ -153,20 +153,109 @@ const userList = async (res, headers, queryData) => {
 const parentDetails = async (res, headers, paramData) => {
   try {
     if (!headers.authorization) {
-      return response.failure(res, 200, message.TOKEN_REQUIRED);
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
     }
     if (!paramData.id) {
-      return response.failure(res, 200, message.USER_ID_REQUIRED);
+      return response.failure(res, 400, message.USER_ID_REQUIRED);
     }
 
     const decoded = await KenanUtilities.decryptToken(headers.authorization);
     const adminData = await adminService.findAdminByToken(headers.authorization);
     if (!adminData) {
-      return response.failure(res, 200, message.INVALID_TOKEN,);
+      return response.failure(res, 400, message.INVALID_TOKEN,);
     }
 
     const parentDetails = await adminService.parentdetailsById(paramData.id);
+    if (!parentDetails) {
+      return response.failure(res, 400, message.USER_NOT_FOUND);
+    }
+
     return response.data(res, parentDetails, 200, message.SUCCESS)
+  } catch (error) {
+    return response.failure(res, 400, error);
+  }
+}
+
+//  update Parent Details by ID  //
+const updateParent = async (res, headers, bodyData) => {
+  try {
+    if (!headers.authorization) {
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+    if (!bodyData.id) {
+      return response.failure(res, 400, message.USER_ID_REQUIRED);
+    }
+
+    const decoded = await KenanUtilities.decryptToken(headers.authorization);
+    const adminData = await adminService.findAdminByToken(headers.authorization);
+    if (!adminData) {
+      return response.failure(res, 400, message.INVALID_TOKEN,);
+    }
+
+    const parentDetails = await adminService.parentdetailsById(bodyData.id);
+    if (!parentDetails) {
+      return response.failure(res, 400, message.USER_NOT_FOUND);
+    }
+
+    let updatedData = {
+      name: bodyData.name || parentDetails.name,
+      isActive: bodyData.status ? ((bodyData.status == 'active') ? true : false) : parentDetails.isActive
+    }
+
+    let updateParentById = await adminService.updateParentById(bodyData.id, updatedData)
+    return response.success(res, 200, message.SUCCESS);
+
+  } catch (error) {
+    return response.failure(res, 400, error);
+  }
+}
+
+//  delete Parent details by ID  //
+const deleteParent = async (res, headers, paramData) => {
+  try {
+    if (!headers.authorization) {
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+    if (!paramData.id) {
+      return response.failure(res, 400, message.USER_ID_REQUIRED);
+    }
+
+    const decoded = await KenanUtilities.decryptToken(headers.authorization);
+    const adminData = await adminService.findAdminByToken(headers.authorization);
+    if (!adminData) {
+      return response.failure(res, 400, message.INVALID_TOKEN,);
+    }
+
+    const parentDetails = await adminService.parentdetailsById(paramData.id);
+    if (!parentDetails) {
+      return response.failure(res, 400, message.USER_NOT_FOUND);
+    }
+
+    let updatedParentData = {
+      childId: [],
+      isDeleted: true,
+      fcmToken: ''
+    }
+    let updateParentById = await adminService.updateParentById(paramData.id, updatedParentData)
+
+    const childListByParentId = await adminService.deleteChildsByParentsId(paramData.id);
+
+    let connectdChildList = childListByParentId.filter(child => { return (child.deviceId != '') });
+    console.log(">>>>>>>>>>>>>>  connectdChildList : ", connectdChildList);
+
+
+    let allChildEmailArr = [];
+    let allChildDeviceIdArr = [];
+    for (let child of connectdChildList) {
+      allChildEmailArr.push(child.email);
+      allChildDeviceIdArr.push(child.deviceId)
+    }
+    console.log("*********** allChildEmailArr : ", allChildEmailArr);
+    console.log("??????????? allChildDeviceIdArr : ", allChildDeviceIdArr);
+
+
+    return response.data(res, childListByParentId, 200, message.SUCCESS)
+    // return response.success(res, 200, message.SUCCESS);
   } catch (error) {
     return response.failure(res, 400, error);
   }
@@ -176,10 +265,10 @@ const parentDetails = async (res, headers, paramData) => {
 const addGiftType = async (res, bodyData) => {
   try {
     if (!bodyData.name) {
-      return response.failure(res, 200, message.GIFT_NAME_REQUIRED);
+      return response.failure(res, 400, message.GIFT_NAME_REQUIRED);
     }
     // if (!bodyData.icon) {
-    //   return response.failure(res, 200, message.GIFT_ICON_REQUIRED);
+    //   return response.failure(res, 400, message.GIFT_ICON_REQUIRED);
     // }
 
     let giftData = {
@@ -205,5 +294,7 @@ module.exports = {
   forgotPassword,
   userList,
   parentDetails,
+  updateParent,
+  deleteParent,
   addGiftType,
 }

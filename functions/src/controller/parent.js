@@ -340,6 +340,7 @@ const getParentProfile = async (res, headers) => {
 //  add Child  //
 const addChild = async (res, bodyData, headers) => {
     try {
+        console.log(">>>>>>>>>>. bodyData : ", bodyData);
         if (!headers.authorization) {
             return response.failure(res, 200, message.TOKEN_REQUIRED);
         }
@@ -361,7 +362,7 @@ const addChild = async (res, bodyData, headers) => {
                 age: bodyData.age || 0,
                 email: bodyData.email || "",
                 gender: bodyData.gender || "",
-                photo: "",
+                photo: bodyData.photo || "",
                 parentId: parentRes.firestore_parentId,
                 deviceId: bodyData.deviceId || "",
                 isDeleted: false,

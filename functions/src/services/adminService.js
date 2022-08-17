@@ -124,9 +124,50 @@ const parentdetailsById = async (parentId) => {
         parentData.name = parentDetails._fieldsProto.name ? parentDetails._fieldsProto.name.stringValue : "";
         parentData.email = parentDetails._fieldsProto.email ? parentDetails._fieldsProto.email.stringValue : "";
         parentData.isActive = parentDetails._fieldsProto.isActive ? parentDetails._fieldsProto.isActive.booleanValue : false;
+        parentData.childId = parentDetails._fieldsProto.childId ? parentDetails._fieldsProto.childId.arrayValue : [];
 
 
         return parentData;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  update Parent By Id  //
+const updateParentById = async (parentId, newData) => {
+    try {
+        let updateAdmin = await db.collection("parents").doc(parentId).update(newData);
+        return true;
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  delete all childs by parent Id  //
+const deleteChildsByParentsId = async (parentId) => {
+    try {
+        let childData = await db.collection('childs').where("parentId", "==", parentId).where("isDeleted", "==", false).select('name', 'parentId', 'email', 'deviceId').get();
+
+        let childArr = [];
+        childData.forEach(doc => {
+            let childDetails = doc.data();
+            childDetails.childId = doc.id;
+            childArr.push(childDetails);
+        });
+
+        const batch = db.batch();
+        await childData.forEach((element) => {
+            batch.update(element.ref, {
+                isDeleted: true,
+                parentId: '',
+                deviceId: ''
+            });
+        });
+        await batch.commit();
+
+        return childArr;
+
     } catch (error) {
         throw error;
     }
@@ -154,5 +195,7 @@ module.exports = {
     userList,
     totalUserCount,
     parentdetailsById,
+    updateParentById,
+    deleteChildsByParentsId,
     addGiftType,
 }

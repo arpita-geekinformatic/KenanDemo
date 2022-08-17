@@ -376,6 +376,27 @@ app.get('/parents/:id', async (req, res, next) => {
   }
 })
 
+//  update parent details by ID  //
+app.put('/parents', async (req, res, next) => {
+  try {
+    let result = await adminController.updateParent(res, req.headers, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+//  delete parent details by ID  //
+app.delete('/parents/:id', async (req, res, next) => {
+  try {
+    let result = await adminController.deleteParent(res, req.headers, req.params);
+    return result;
+
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 //  add gift type for parent  //
 app.post('/addGiftType', async (req, res, next) => {
