@@ -35,6 +35,22 @@ const generateChildToken = (childId, deviceId) => {
   }
 }
 
+//  generateAdminToken  //
+const generateAdminToken = (name, email, id) =>{
+  try {
+    const payload = {
+      name: name,
+      email: email,
+      id: id,
+    };
+    const token = JWT.sign(payload, JWT_SECRET, {});
+
+    return token;
+  } catch (error) {
+    return error;
+  }
+}
+
 //  decrypt auth token //
 const decryptToken = (token) => {
   try {
@@ -98,6 +114,7 @@ const genNumericCode = (length) => {
 module.exports = {
   generateToken,
   generateChildToken,
+  generateAdminToken,
   decryptToken,
   mapToValues,
   cryptPassword,

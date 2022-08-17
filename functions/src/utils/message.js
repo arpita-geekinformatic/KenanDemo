@@ -33,6 +33,8 @@ const POINTS_REQUIRED = "Point is required.";
 const GIFT_ADDED_SUCCESSFULLY = "Gift added successfully.";
 const GIFT_ID_REQUIRED = "Gift Id is required.";
 const GIFT_DELETED_SUCCESSFULLY = "Gift deleted successfully.";
+const LOGOUT = 'Logout successfully.';
+const USER_ID_REQUIRED = 'User Id required.';
 
 
 
@@ -77,7 +79,8 @@ module.exports = {
   GIFT_ADDED_SUCCESSFULLY,
   GIFT_ID_REQUIRED,
   GIFT_DELETED_SUCCESSFULLY,
-
+  LOGOUT,
+  USER_ID_REQUIRED,
   
   TOKEN_EXPIRED,
   UNAUTHORIZED,

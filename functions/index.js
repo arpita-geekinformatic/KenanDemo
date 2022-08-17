@@ -24,6 +24,8 @@ const ejs = require("ejs");
 // const fileUpload = require('express-fileupload');
 // enable files upload
 // app.use(fileUpload({ createParentPath: true }));
+
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json({ limit: "20mb" }));
 app.use(cors({ origin: '*' }));
@@ -258,7 +260,7 @@ app.post('/upload', async (req, res, next) => {
     //  get file path from temp folder  //
     let filePath = (os.tmpdir() + path);
     let uploadFile = await firebaseAdmin.uploadFile(filePath);
-    let data = {url : uploadFile}
+    let data = { url: uploadFile }
 
     return response.data(res, data, 200, message.SUCCESS);
   } catch (error) {
@@ -323,6 +325,57 @@ app.post('/createAdmin', async (req, res, next) => {
     next(error)
   }
 })
+
+//  login admin  //
+app.post('/adminLogin', async (req, res, next) => {
+  try {
+    let result = await adminController.adminLogin(res, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+//  logout admin  //
+app.post('/adminLogout', async (req, res, next) => {
+  try {
+    let result = await adminController.adminLogout(res, req.headers);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+//  forgot password  //
+app.post('/auth/forgotPassword', async (req, res, next) => {
+  try {
+    let result = await adminController.forgotPassword(res, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+// user list  //
+app.get('/userList', async (req, res, next) => {
+  try {
+    let result = await adminController.userList(res, req.headers, req.query);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+//  get parent details by ID //
+app.get('/parents/:id', async (req, res, next) => {
+  try {
+    let result = await adminController.parentDetails(res, req.headers, req.params);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 //  add gift type for parent  //
 app.post('/addGiftType', async (req, res, next) => {
