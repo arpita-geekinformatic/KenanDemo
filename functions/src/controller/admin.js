@@ -240,9 +240,7 @@ const deleteParent = async (res, headers, paramData) => {
 
     const childListByParentId = await adminService.deleteChildsByParentsId(paramData.id);
 
-    let connectdChildList = childListByParentId.filter(child => { return (child.deviceId != '') });
-    console.log(">>>>>>>>>>>>>>  connectdChildList : ", connectdChildList);
-
+    let connectdChildList = await childListByParentId.filter(child => { return (child.deviceId != '') });
 
     let allChildEmailArr = [];
     let allChildDeviceIdArr = [];
@@ -252,7 +250,14 @@ const deleteParent = async (res, headers, paramData) => {
     }
     console.log("*********** allChildEmailArr : ", allChildEmailArr);
     console.log("??????????? allChildDeviceIdArr : ", allChildDeviceIdArr);
+    //  remove chield ID and parent Id from devices  //
+    let deleteConnectedChieldDevice = await adminService.deleteConnectedChieldDevice(allChildDeviceIdArr)
 
+    //>>>>>>>>>>>>>>>
+    let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/accountDeleteEmail.ejs", { async: true });
+    let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: allChildEmailArr, subject: "Kenan Account", text: messageHtml});
+
+    //>>>>>>>>>>>>>>>
 
     return response.data(res, childListByParentId, 200, message.SUCCESS)
     // return response.success(res, 200, message.SUCCESS);

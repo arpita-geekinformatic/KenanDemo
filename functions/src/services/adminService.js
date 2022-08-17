@@ -173,6 +173,23 @@ const deleteChildsByParentsId = async (parentId) => {
     }
 }
 
+//  delete Connected Chield Device  //
+const deleteConnectedChieldDevice = async (allChildDeviceIdArr) => {
+    try {
+        let updatedData = {
+            childId: '',
+            parentId: ''
+        }
+        for(let deviceId of allChildDeviceIdArr){
+            await db.collection('devices').where('deviceId', '==', deviceId).update(updatedData)
+        }
+
+        return true;
+    } catch (error) {
+        throw error;
+    }
+}
+
 //  add Gift Type  //
 const addGiftType = async (newData) => {
     try {
