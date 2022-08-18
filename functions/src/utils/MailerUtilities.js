@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 
+//  send mail to single user //
 const sendSendgridMail = async (data) => {
     console.log("inside function")
     var options = {

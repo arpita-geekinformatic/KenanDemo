@@ -167,21 +167,26 @@ const deleteChildsByParentsId = async (parentId) => {
         await batch.commit();
 
         return childArr;
-
     } catch (error) {
         throw error;
     }
 }
 
 //  delete Connected Chield Device  //
-const deleteConnectedChieldDevice = async (allChildDeviceIdArr) => {
+const deleteConnectedChildDevice = async (allChildDeviceIdArr) => {
     try {
         let updatedData = {
             childId: '',
             parentId: ''
         }
-        for(let deviceId of allChildDeviceIdArr){
-            await db.collection('devices').where('deviceId', '==', deviceId).update(updatedData)
+
+        for (let deviceId of allChildDeviceIdArr) {
+            const batch = db.batch();
+            let deviceData = await db.collection('devices').where('deviceId', '==', deviceId).get();
+            await deviceData.forEach((element) => {
+                batch.update(element.ref, updatedData)
+            })
+            await batch.commit();
         }
 
         return true;
@@ -214,5 +219,6 @@ module.exports = {
     parentdetailsById,
     updateParentById,
     deleteChildsByParentsId,
+    deleteConnectedChildDevice,
     addGiftType,
 }
