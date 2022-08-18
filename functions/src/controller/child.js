@@ -14,7 +14,6 @@ var deviceKeys = ["deviceId", "deviceName", "parentId", "childId", "versionCode"
 //  scan Qr Code  //
 const scanQrCode = async (res, bodyData) => {
     try {
-        console.log(">>>>>>>>>> bodyData : ", bodyData);
         if (!bodyData.parentId) {
             return response.failure(res, 200, message.PARENT_ID_REQUIRED);
         }
@@ -102,7 +101,7 @@ const scanQrCode = async (res, bodyData) => {
         //  subscribe child topic with parent  // 
         const registrationTokens = [isParentExists.fcmToken];
         let topic = `child_${bodyData.childId}`;
-        let topicMsg = await firebaseAdmin.firebaseSubscribeTopicNotification(registrationTokens, topic);
+        let subscribeTopic = await firebaseAdmin.firebaseSubscribeTopicNotification(registrationTokens, topic);
 
         let finaldata = {
             parentId: bodyData.parentId,

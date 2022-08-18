@@ -10,8 +10,32 @@ const notificationType = {
 
 
 
+const sendAppUsageNotification = async (bodyData, updateData, topic) => {
+    try {
+        const message = {
+            data: {
+                title: `Your app usage has been changed by parent.`,
+                body: `Your app usage has been changed by parent.`,
+                notificationType: `visible`,
+                packageName: `${bodyData.packageName}`,
+                status: `${updateData.status}`,
+                scheduledBy: `${bodyData.scheduledBy}`,
+                eachDaySchedule: `${updateData.eachDaySchedule}`,
+                everyDaySchedule: `${updateData.everyDaySchedule}`
+            },
+            topic: topic
+        };
+        await firebaseAdmin.firebaseSendTopicNotification(message);
+
+        return true;
+    } catch (error) {
+        throw error;
+    }
+}
 
 
 
+module.exports = {
+    sendAppUsageNotification,
 
-module.exports = {}
+}

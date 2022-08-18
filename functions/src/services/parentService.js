@@ -264,10 +264,26 @@ const getDeviceAppsIdByPackageName = async (deviceId, packageName) => {
     }
 }
 
+//  getDeviceAppsIdByPackageNameAndId  //
+const getDeviceAppsIdByPackageNameAndId = async (deviceId, packageName) => {
+    try {
+        let deviceAppData = await db.collection("deviceApps").where("firestoreDeviceId", "==", deviceId).where("packageName", "==", packageName).get();
+
+        let firestoreDeviceAppId;
+        deviceAppData.forEach(doc => {
+            firestoreDeviceAppId = doc.id;
+        });
+        console.log(">>>>>>>... firestoreDeviceAppId : ", firestoreDeviceAppId);
+        return firestoreDeviceAppId
+    } catch (error) {
+        throw error
+    }
+}
+
 //  update Device Apps By ID   //
 const updateDeviceAppsById = async (deviceAppId, updatedData) => {
     try {
-        let deviceAppData = await db.collection("deviceApps").doc(deviceAppId).update(updatedData).get();
+        let deviceAppData = await db.collection("deviceApps").doc(deviceAppId).update(updatedData);
         return true
 
     } catch (error) {
@@ -359,6 +375,7 @@ module.exports = {
     deleteChildById,
     childDeviceAppList,
     getDeviceAppsIdByPackageName,
+    getDeviceAppsIdByPackageNameAndId,
     updateDeviceAppsById,
     giftTypeDropdown,
     addGift,

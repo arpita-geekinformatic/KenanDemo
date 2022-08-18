@@ -340,7 +340,6 @@ const getParentProfile = async (res, headers) => {
 //  add Child  //
 const addChild = async (res, bodyData, headers) => {
     try {
-        console.log(">>>>>>>>>>. bodyData : ", bodyData);
         if (!headers.authorization) {
             return response.failure(res, 200, message.TOKEN_REQUIRED);
         }
@@ -528,6 +527,7 @@ const addAppUsage = async (res, headers, bodyData) => {
         }
 
         let childRes = await parentService.getChildDataById(bodyData.childId);
+        let topic = `child_${bodyData.childId}`;
 
         if (bodyData.scheduledBy == 'everyDay') {
             let updateData = {
@@ -537,9 +537,14 @@ const addAppUsage = async (res, headers, bodyData) => {
                 everyDaySchedule: bodyData.everyDaySchedule
             }
 
-            let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageName(childRes.deviceId, bodyData.packageName);
+            // let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageName(childRes.deviceId, bodyData.packageName);
+            let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageNameAndId(childRes.deviceId, bodyData.packageName);
             let updateDeviceAppsById = await parentService.updateDeviceAppsById(getDeviceAppsIdByPackageName, updateData);
+
+            //  send notification to child device  //
+            let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, topic);
         }
+
         if (bodyData.scheduledBy == 'eachDay') {
             let updateData = {
                 status: parseInt(bodyData.status),
@@ -548,8 +553,12 @@ const addAppUsage = async (res, headers, bodyData) => {
                 everyDaySchedule: ""
             }
 
-            let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageName(childRes.deviceId, bodyData.packageName);
+            // let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageName(childRes.deviceId, bodyData.packageName);
+            let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageNameAndId(childRes.deviceId, bodyData.packageName);
             let updateDeviceAppsById = await parentService.updateDeviceAppsById(getDeviceAppsIdByPackageName, updateData);
+
+            //  send notification to child device  //
+            let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, topic);
         }
 
         return response.success(res, 200, message.APP_USAGE_UPDATED);
