@@ -35,7 +35,8 @@ const GIFT_ID_REQUIRED = "Gift Id is required.";
 const GIFT_DELETED_SUCCESSFULLY = "Gift deleted successfully.";
 const LOGOUT = 'Logout successfully.';
 const USER_ID_REQUIRED = 'User Id required.';
-
+const TYPE_IS_REQUIRED = 'Type is required.';
+const APP_USED_TIME_REQUIRED = 'App used time is required.';
 
 
 const TOKEN_EXPIRED = "Token Expired";
@@ -81,6 +82,9 @@ module.exports = {
   GIFT_DELETED_SUCCESSFULLY,
   LOGOUT,
   USER_ID_REQUIRED,
+  TYPE_IS_REQUIRED,
+  APP_USED_TIME_REQUIRED,
+  
   
   TOKEN_EXPIRED,
   UNAUTHORIZED,

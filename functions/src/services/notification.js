@@ -10,6 +10,8 @@ const notificationType = {
 
 
 
+//  CHILD NOTIFICATION  //
+//  send app usage change notification  //
 const sendAppUsageNotification = async (bodyData, updateData, topic) => {
     try {
         const message = {
@@ -26,7 +28,29 @@ const sendAppUsageNotification = async (bodyData, updateData, topic) => {
             topic: topic
         };
         await firebaseAdmin.firebaseSendTopicNotification(message);
+        return true;
+    } catch (error) {
+        throw error;
+    }
+}
 
+//  send device usage change notification  //
+const sendDeviceUsageNotification = async (bodyData, updateData, topic) => {
+    try {
+        const message = {
+            data: {
+                title: `Your device usage has been changed by parent.`,
+                body: `Your device usage has been changed by parent.`,
+                notificationType: `visible`,
+                // packageName: `${bodyData.packageName}`,
+                // status: `${updateData.status}`,
+                scheduledBy: `${bodyData.scheduledBy}`,
+                eachDaySchedule: `${updateData.eachDaySchedule}`,
+                everyDaySchedule: `${updateData.everyDaySchedule}`
+            },
+            topic: topic
+        };
+        await firebaseAdmin.firebaseSendTopicNotification(message);
         return true;
     } catch (error) {
         throw error;
@@ -37,5 +61,5 @@ const sendAppUsageNotification = async (bodyData, updateData, topic) => {
 
 module.exports = {
     sendAppUsageNotification,
-
+    sendDeviceUsageNotification,
 }

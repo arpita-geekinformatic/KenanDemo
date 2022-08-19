@@ -71,7 +71,10 @@ const scanQrCode = async (res, bodyData) => {
                 manufacturer: "",
                 model: "",
                 parentId: bodyData.parentId,
-                versionCode: ""
+                versionCode: "",
+                scheduledBy: "",
+                eachDaySchedule: [],
+                everyDaySchedule: "",
             }
             let addDeviceData = await childService.addDeviceData(newData);
         }
@@ -80,7 +83,10 @@ const scanQrCode = async (res, bodyData) => {
             let newdDeviceData = {
                 childId: bodyData.childId,
                 parentId: bodyData.parentId,
-                fcmToken: bodyData.FcmToken
+                fcmToken: bodyData.FcmToken,
+                scheduledBy: "",
+                eachDaySchedule: [],
+                everyDaySchedule: "",
             }
             let updateNewDeviceDataById = await childService.updateDeviceDataById(isDeviceExists.firestoreDevicePathId, newdDeviceData);
         }
@@ -137,8 +143,13 @@ const addDeviceApps = async (res, reqBodyData) => {
             console.log("======  If device doesn't exists");
 
             //  Insert data in Devices   //
-            let reqData = bodyData;
+            const reqData = bodyData;
             delete bodyData.apps;
+
+            reqData.scheduledBy = "";
+            reqData.eachDaySchedule = [];
+            reqData.everyDaySchedule = "";
+
             let addDeviceData = await childService.addDeviceData(reqData);
             let getDeviceDataByFirestoreId = await childService.getDeviceDataByFirestoreId(addDeviceData)
             firestoreDevicePathId = getDeviceDataByFirestoreId._ref._path.segments[1];
@@ -290,7 +301,11 @@ const addDeviceApps = async (res, reqBodyData) => {
             })
         }
 
-        return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data: { deviceId: firestoreDevicePathId } });
+        let data = {
+            firestore_deviceId: firestoreDevicePathId,
+            deviceId: reqBodyData.deviceId
+        }
+        return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data });
     } catch (error) {
         return response.failure(res, 400, error);
     }
@@ -304,17 +319,21 @@ const childDetails = async (res, headers) => {
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
-        let childData = await childService.getChildDataById(decoded.childId);
+        const childData = await childService.getChildDataById(decoded.childId);
         if (!childData) {
             return response.failure(res, 200, message.INVALID_TOKEN);
         }
+
+        let childDeviceData = await childService.isDeviceExists(childData.deviceId);
+        childData.scheduledBy = childDeviceData.scheduledBy || '';
+        childData.eachDaySchedule = childDeviceData.eachDaySchedule || [];
+        childData.everyDaySchedule = childDeviceData.everyDaySchedule || '';
 
         return response.data(res, childData, 200, message.SUCCESS);
     } catch (error) {
         return response.failure(res, 400, error);
     }
 }
-
 
 //  child Device App List for child  //
 const deviceAppListByChild = async (res, headers) => {
@@ -337,6 +356,34 @@ const deviceAppListByChild = async (res, headers) => {
     }
 }
 
+//  update child device and app usage  //
+const updateUsageTime = async (res, headers, bodyData) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
+        }
+        if (!bodyData.packageName) {
+            return response.failure(res, 400, message.REQUIRE_PACKAGE_NAME);
+        }
+        if (!bodyData.appUsedTime) {
+            return response.failure(res, 400, message.APP_USED_TIME_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let childData = await childService.getChildDataById(decoded.childId);
+        if (!childData) {
+            return response.failure(res, 400, message.INVALID_TOKEN);
+        }
+
+
+        const childAppDetails = await childService.childAppDetailsByPackageName(childData.deviceId, bodyData.packageName);
+
+
+
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
 
 
 
@@ -347,4 +394,5 @@ module.exports = {
     scanQrCode,
     childDetails,
     deviceAppListByChild,
+    updateUsageTime,
 }

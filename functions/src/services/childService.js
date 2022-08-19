@@ -5,7 +5,7 @@ const db = getFirestore();
 
 
 
-
+//>>>>>>>>>>>  DEVICES  >>>>>>>>>>>>>>>>>>//
 //  isDeviceExists  //
 const isDeviceExists = async (deviceId) => {
     try {
@@ -49,6 +49,19 @@ const getDeviceDataByFirestoreId = async (firestoreDeviceId) => {
     }
 }
 
+//  update Device Data By Id  //
+const updateDeviceDataById = async (firestoreDevicePathId, updatedData) => {
+    try {
+        let updateDeviceDataById = await db.collection("devices").doc(firestoreDevicePathId).update(updatedData);
+        return true;
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+// >>>>>>>>>>>>>>>>  APPS  >>>>>>>>>>>>>> //
 //  get App By Name and packageName  //
 const getAppByName = async (appName, packageName) => {
     try {
@@ -90,6 +103,8 @@ const updateAppData = async (firestoreAppId, updatedData) => {
     }
 }
 
+
+// >>>>>>>>>>>>>>>  DEVICE APPS  >>>>>>>>>>> //
 //  is Device App Exists  //
 const isDeviceAppExists = async (firestoreDevicePathId, firestoreAppId) => {
     try {
@@ -133,17 +148,39 @@ const updateDeviceAppDataById = async (firestoreDeviceAppId, updatedDeviceAppDat
     }
 }
 
-//  update Device Data By Id  //
-const updateDeviceDataById = async (firestoreDevicePathId, updatedData) => {
+//  get child device apps list (with app image) by device ID  //
+const childDeviceAppList = async (deviceId) => {
     try {
-        let updateDeviceDataById = await db.collection("devices").doc(firestoreDevicePathId).update(updatedData);
-        return true;
+        let deviceApps = await db.collection("deviceApps").where("deviceId", "==", deviceId).get();
+        let deviceAppArr = [];
+        deviceApps.forEach(async (doc) => {
+            await deviceAppArr.push(doc.data());
+        });
 
+        for (const element of deviceAppArr) {
+            let appDetails = await db.collection("apps").doc(element.firestoreAppId).get();
+            let appImage = appDetails._fieldsProto.baseImage.stringValue;
+            let image = appImage.replace(/\n/g, '');
+            element.baseImage = image;
+        }
+        return deviceAppArr
     } catch (error) {
-        throw error;
+        throw error
     }
 }
 
+//  get child App Details By PackageName  //
+const childAppDetailsByPackageName = async (deviceId, packageName) => {
+    try {
+        let childDeviceApp = await db.collection('deviceApps').where('deviceId', '==', deviceId).where('packageName', '==', packageName)
+
+    } catch (error) {
+        throw error
+    }
+}
+
+
+// >>>>>>>>>>>>>>  CHILDS  >>>>>>>>>>>>//
 //  get Child Data By Id  //
 const getChildDataById = async (childId) => {
     try {
@@ -184,6 +221,8 @@ const updateChildDataById = async (childId, updatedData) => {
     }
 }
 
+
+//  >>>>>>>>>>>>  PARENTS  >>>>>>>>>>>>>>> //
 //  get parent data by firebase ID  //
 const getParentDataById = async (parentId) => {
     try {
@@ -210,26 +249,6 @@ const getParentDataById = async (parentId) => {
     }
 }
 
-//  get child device apps list (with app image) by device ID  //
-const childDeviceAppList = async (deviceId) => {
-    try {
-        let deviceApps = await db.collection("deviceApps").where("deviceId", "==", deviceId).get();
-        let deviceAppArr = [];
-        deviceApps.forEach(async (doc) => {
-            await deviceAppArr.push(doc.data());
-        });
-
-        for (const element of deviceAppArr) {
-            let appDetails = await db.collection("apps").doc(element.firestoreAppId).get();
-            let appImage = appDetails._fieldsProto.baseImage.stringValue;
-            let image = appImage.replace(/\n/g, '');
-            element.baseImage = image;
-        }
-        return deviceAppArr
-    } catch (error) {
-        throw error
-    }
-}
 
 
 
@@ -246,6 +265,7 @@ module.exports = {
     addDeviceAppData,
     updateDeviceAppDataById,
     updateDeviceDataById,
+    childAppDetailsByPackageName,
     getChildDataById,
     updateChildDataById,
     getParentDataById,

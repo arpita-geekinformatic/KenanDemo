@@ -313,6 +313,17 @@ app.post('/deviceAppListByChild', async (req, res, next) => {
   }
 });
 
+//  update child device and app usage  //
+app.post('/updateUsageTime', async (req, res, next) => {
+  try {
+    let result = await childController.updateUsageTime(res, req.headers, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+});
+
+
 
 
 //   ADMIN API   //

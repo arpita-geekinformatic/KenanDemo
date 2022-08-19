@@ -267,7 +267,7 @@ const getDeviceAppsIdByPackageName = async (deviceId, packageName) => {
 //  getDeviceAppsIdByPackageNameAndId  //
 const getDeviceAppsIdByPackageNameAndId = async (deviceId, packageName) => {
     try {
-        let deviceAppData = await db.collection("deviceApps").where("firestoreDeviceId", "==", deviceId).where("packageName", "==", packageName).get();
+        let deviceAppData = await db.collection("deviceApps").where("deviceId", "==", deviceId).where("packageName", "==", packageName).get();
 
         let firestoreDeviceAppId;
         deviceAppData.forEach(doc => {
@@ -290,6 +290,24 @@ const updateDeviceAppsById = async (deviceAppId, updatedData) => {
         throw error
     }
 }
+
+//  update Device Data By Id  //
+const updateDeviceDataById = async(deviceId, updatedData) =>  {
+    try {
+
+        const batch = db.batch();
+        let deviceData = await db.collection('devices').where('deviceId', '==', deviceId).get();
+        await deviceData.forEach((element) => {
+            batch.update(element.ref, updatedData)
+        })
+        await batch.commit();
+
+        return true;
+    } catch (error) {
+        throw error
+    }
+}
+
 
 //  gift Type Dropdown  //
 const giftTypeDropdown = async () => {
@@ -377,6 +395,7 @@ module.exports = {
     getDeviceAppsIdByPackageName,
     getDeviceAppsIdByPackageNameAndId,
     updateDeviceAppsById,
+    updateDeviceDataById,
     giftTypeDropdown,
     addGift,
     childGiftListById,

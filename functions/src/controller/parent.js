@@ -510,14 +510,11 @@ const addAppUsage = async (res, headers, bodyData) => {
         if (!bodyData.childId) {
             return response.failure(res, 200, message.CHILD_ID_REQUIRED);
         }
-        if (!bodyData.packageName) {
-            return response.failure(res, 200, message.REQUIRE_PACKAGE_NAME);
-        }
-        if (!bodyData.status) {
-            return response.failure(res, 200, message.REQUIRE_APP_STATUS);
-        }
         if (!bodyData.scheduledBy) {
             return response.failure(res, 200, message.REQUIRE_SCHEDULE);
+        }
+        if (!bodyData.type) {
+            return response.failure(res, 200, message.TYPE_IS_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
@@ -528,40 +525,78 @@ const addAppUsage = async (res, headers, bodyData) => {
 
         let childRes = await parentService.getChildDataById(bodyData.childId);
         let topic = `child_${bodyData.childId}`;
-
-        if (bodyData.scheduledBy == 'everyDay') {
-            let updateData = {
-                status: parseInt(bodyData.status),
-                scheduledBy: bodyData.scheduledBy,
-                eachDaySchedule: [],
-                everyDaySchedule: bodyData.everyDaySchedule
+        
+        //  set app usage  //
+        if (bodyData.type == 'appUsage') {
+            if (!bodyData.packageName) {
+                return response.failure(res, 200, message.REQUIRE_PACKAGE_NAME);
+            }
+            if (!bodyData.status) {
+                return response.failure(res, 200, message.REQUIRE_APP_STATUS);
             }
 
-            // let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageName(childRes.deviceId, bodyData.packageName);
-            let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageNameAndId(childRes.deviceId, bodyData.packageName);
-            let updateDeviceAppsById = await parentService.updateDeviceAppsById(getDeviceAppsIdByPackageName, updateData);
+            if (bodyData.scheduledBy == 'everyDay') {
+                let updateData = {
+                    status: parseInt(bodyData.status),
+                    scheduledBy: bodyData.scheduledBy,
+                    eachDaySchedule: [],
+                    everyDaySchedule: bodyData.everyDaySchedule
+                }
+                let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageNameAndId(childRes.deviceId, bodyData.packageName);
+                let updateDeviceAppsById = await parentService.updateDeviceAppsById(getDeviceAppsIdByPackageName, updateData);
 
-            //  send notification to child device  //
-            let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, topic);
-        }
-
-        if (bodyData.scheduledBy == 'eachDay') {
-            let updateData = {
-                status: parseInt(bodyData.status),
-                scheduledBy: bodyData.scheduledBy,
-                eachDaySchedule: bodyData.eachDaySchedule,
-                everyDaySchedule: ""
+                //  send notification to child device  //
+                let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, topic);
             }
 
-            // let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageName(childRes.deviceId, bodyData.packageName);
-            let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageNameAndId(childRes.deviceId, bodyData.packageName);
-            let updateDeviceAppsById = await parentService.updateDeviceAppsById(getDeviceAppsIdByPackageName, updateData);
+            if (bodyData.scheduledBy == 'eachDay') {
+                let updateData = {
+                    status: parseInt(bodyData.status),
+                    scheduledBy: bodyData.scheduledBy,
+                    eachDaySchedule: bodyData.eachDaySchedule,
+                    everyDaySchedule: ""
+                }
 
-            //  send notification to child device  //
-            let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, topic);
+                // let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageName(childRes.deviceId, bodyData.packageName);
+                let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageNameAndId(childRes.deviceId, bodyData.packageName);
+                let updateDeviceAppsById = await parentService.updateDeviceAppsById(getDeviceAppsIdByPackageName, updateData);
+
+                //  send notification to child device  //
+                let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, topic);
+            }
+
+            return response.data(res,bodyData, 200, message.APP_USAGE_UPDATED);
         }
 
-        return response.success(res, 200, message.APP_USAGE_UPDATED);
+        //  set device usage  //
+        if (bodyData.type == 'deviceUsage') {
+            if (bodyData.scheduledBy == 'everyDay') {
+                let updateData = {
+                    scheduledBy: bodyData.scheduledBy,
+                    eachDaySchedule: [],
+                    everyDaySchedule: bodyData.everyDaySchedule
+                }
+
+                let updateDeviceDataById = await parentService.updateDeviceDataById(childRes.deviceId, updateData)
+                //  send notification to child device  //
+                let deviceUsageNotification = await notificationData.sendDeviceUsageNotification(bodyData, updateData, topic);
+            }
+
+            if (bodyData.scheduledBy == 'eachDay') {
+                let updateData = {
+                    scheduledBy: bodyData.scheduledBy,
+                    eachDaySchedule: bodyData.eachDaySchedule,
+                    everyDaySchedule: ""
+                }
+
+                let updateDeviceDataById = await parentService.updateDeviceDataById(childRes.deviceId, updateData)
+                //  send notification to child device  //
+                let deviceUsageNotification = await notificationData.sendDeviceUsageNotification(bodyData, updateData, topic);
+            }
+
+            return response.data(res,bodyData, 200, message.APP_USAGE_UPDATED);
+        }
+
 
     } catch (error) {
         return response.failure(res, 400, error);
