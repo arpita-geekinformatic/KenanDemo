@@ -41,8 +41,31 @@ const addDeviceData = async (newData) => {
 //  get Device Data By Firestore device Id  //
 const getDeviceDataByFirestoreId = async (firestoreDeviceId) => {
     try {
-        let deviceData = db.collection("devices").doc(firestoreDeviceId).get();
-        return deviceData;
+        let deviceData = await db.collection("devices").doc(firestoreDeviceId).get();
+
+        if (!deviceData._fieldsProto) {
+            return false;
+        }
+
+        let deviceDetails = {
+            firestoreDevicePathId : deviceData._ref._path.segments[1],
+            childId : deviceData._fieldsProto.childId ? deviceData._fieldsProto.childId.stringValue : '',
+            parentId : deviceData._fieldsProto.parentId ? deviceData._fieldsProto.parentId.stringValue : '',
+            model : deviceData._fieldsProto.model ? deviceData._fieldsProto.model.stringValue : '',
+            versionCode : deviceData._fieldsProto.versionCode ? deviceData._fieldsProto.versionCode.stringValue : '',
+            fcmToken : deviceData._fieldsProto.fcmToken ? deviceData._fieldsProto.fcmToken.stringValue : '',
+            listSize : deviceData._fieldsProto.listSize ? deviceData._fieldsProto.listSize.integerValue : 0,
+            eachDaySchedule : deviceData._fieldsProto.eachDaySchedule ? deviceData._fieldsProto.eachDaySchedule.arrayValue : [],
+            everyDaySchedule : deviceData._fieldsProto.everyDaySchedule ? deviceData._fieldsProto.everyDaySchedule.stringValue : '',
+            manufacturer : deviceData._fieldsProto.manufacturer ? deviceData._fieldsProto.manufacturer.stringValue : '',
+            scheduledBy : deviceData._fieldsProto.scheduledBy ? deviceData._fieldsProto.scheduledBy.stringValue : '',
+            deviceId : deviceData._fieldsProto.deviceId ? deviceData._fieldsProto.deviceId.stringValue : '',
+            deviceName : deviceData._fieldsProto.deviceName ? deviceData._fieldsProto.deviceName.stringValue : '',
+            timeSpent : deviceData._fieldsProto.timeSpent ? deviceData._fieldsProto.timeSpent.stringValue : '',
+            remainingTime : deviceData._fieldsProto.remainingTime ? deviceData._fieldsProto.remainingTime.stringValue : '',
+
+        }
+        return deviceDetails;
 
     } catch (error) {
         throw error;
@@ -172,8 +195,16 @@ const childDeviceAppList = async (deviceId) => {
 //  get child App Details By PackageName  //
 const childAppDetailsByPackageName = async (deviceId, packageName) => {
     try {
-        let childDeviceApp = await db.collection('deviceApps').where('deviceId', '==', deviceId).where('packageName', '==', packageName)
+        let childDeviceApp = await db.collection('deviceApps').where('deviceId', '==', deviceId).where('packageName', '==', packageName).get();
 
+        let appDetails = [];
+        let firestoreDeviceAppId;
+        childDeviceApp.forEach(doc => {
+            appDetails.push(doc.data());
+            appDetails[0].firestoreDeviceAppId = doc.id
+        })
+
+        return appDetails[0]
     } catch (error) {
         throw error
     }
