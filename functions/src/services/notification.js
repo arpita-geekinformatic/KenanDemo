@@ -67,8 +67,8 @@ const appRemainingTimeReachedNotification = async (childData, childAppDetails, p
         const message = {
             token: parentData.fcmToken,
             data: {
-                title: `${childData.name} has reached usage limit of app ${childAppDetails.appName}.`,
-                body: `${childData.name} has reached usage limit of app ${childAppDetails.appName}.`,
+                title: `${childData.name} has reached usage time limit of app ${childAppDetails.appName}.`,
+                body: `${childData.name} has reached usage time limit of app ${childAppDetails.appName}.`,
                 notificationType: notificationType.type2,
             }
         }
@@ -107,10 +107,197 @@ const appRemainingTimeReachedNotification = async (childData, childAppDetails, p
     }
 }
 
+//  send device Remaining Time Reached Notification  //
+const deviceRemainingTimeReachedNotification = async (childData, childAppDetails, parentData) => {
+    try {
+        const message = {
+            token: parentData.fcmToken,
+            data: {
+                title: `${childData.name} has reached device usage time limit.`,
+                body: `${childData.name} has reached device usage time limit.`,
+                notificationType: notificationType.type2,
+            }
+        }
+        const notificationResult = await firebaseAdmin.firebaseNotification(message);
+
+        var localDate = new Date();
+        const utcDate = moment.utc(localDate).format();
+        let notificationData = {
+            message: message.data,
+            childDeviceId: childData.deviceId,
+            senderId: childData.childId,
+            senderImage: childData.photo,
+            receiverId: parentData.parentId,
+            receiverImage: parentData.photo,
+            notificationType: notificationType.type2,
+            messageTime: utcDate,
+            isMarked: false,
+        }
+        let saveNotification = await notificationService.addNotification(notificationData);
+
+        let activityLogData = {
+            senderId: childData.childId,
+            senderName: childData.name,
+            receiverId: parentData.parentId,
+            receiverName: parentData.name,
+            actionPerformed_byId: childData.childId,
+            actionPerformed_byName: childData.name,
+            actionDetails: `${childData.name} has  reached device usage time limit.`,
+            createdAt: utcDate,
+        }
+        let saveActivity = await notificationService.addActivityLog(activityLogData);
+
+        return true
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  when only app time limit crossed  //
+const appRemainingTimeCrossedNotification = async (childData, childAppDetails, parentData) => {
+    try {
+        const message = {
+            token: parentData.fcmToken,
+            data: {
+                title: `${childData.name} has crossed usage time limit of app ${childAppDetails.appName}.`,
+                body: `${childData.name} has crossed usage time limit of app ${childAppDetails.appName}.`,
+                notificationType: notificationType.type2,
+            }
+        }
+        const notificationResult = await firebaseAdmin.firebaseNotification(message);
+
+        var localDate = new Date();
+        const utcDate = moment.utc(localDate).format();
+        let notificationData = {
+            message: message.data,
+            childDeviceId: childData.deviceId,
+            senderId: childData.childId,
+            senderImage: childData.photo,
+            receiverId: parentData.parentId,
+            receiverImage: parentData.photo,
+            notificationType: notificationType.type2,
+            messageTime: utcDate,
+            isMarked: false,
+        }
+        let saveNotification = await notificationService.addNotification(notificationData);
+
+        let activityLogData = {
+            senderId: childData.childId,
+            senderName: childData.name,
+            receiverId: parentData.parentId,
+            receiverName: parentData.name,
+            actionPerformed_byId: childData.childId,
+            actionPerformed_byName: childData.name,
+            actionDetails: `${childData.name} has  reached device usage time limit.`,
+            createdAt: utcDate,
+        }
+        let saveActivity = await notificationService.addActivityLog(activityLogData);
+
+        return true
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  when only device time limit crossed  //
+const deviceRemainingTimeCrossedNotification = async (childData, childAppDetails, parentData) => {
+    try {
+        const message = {
+            token: parentData.fcmToken,
+            data: {
+                title: `${childData.name} has crossed device usage time limit.`,
+                body: `${childData.name} has crossed device usage time limit.`,
+                notificationType: notificationType.type2,
+            }
+        }
+        const notificationResult = await firebaseAdmin.firebaseNotification(message);
+
+        var localDate = new Date();
+        const utcDate = moment.utc(localDate).format();
+        let notificationData = {
+            message: message.data,
+            childDeviceId: childData.deviceId,
+            senderId: childData.childId,
+            senderImage: childData.photo,
+            receiverId: parentData.parentId,
+            receiverImage: parentData.photo,
+            notificationType: notificationType.type2,
+            messageTime: utcDate,
+            isMarked: false,
+        }
+        let saveNotification = await notificationService.addNotification(notificationData);
+
+        let activityLogData = {
+            senderId: childData.childId,
+            senderName: childData.name,
+            receiverId: parentData.parentId,
+            receiverName: parentData.name,
+            actionPerformed_byId: childData.childId,
+            actionPerformed_byName: childData.name,
+            actionDetails: `${childData.name} has crossed device usage time limit.`,
+            createdAt: utcDate,
+        }
+        let saveActivity = await notificationService.addActivityLog(activityLogData);
+
+        return true
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  when both time limit crossed  //
+const bothRemainingTimeCrossedNotification = async (childData, childAppDetails, parentData) => {
+    try {
+        const message = {
+            token: parentData.fcmToken,
+            data: {
+                title: `${childData.name} has crossed both device and app ${childAppDetails.appName} usage time limit .`,
+                body: `${childData.name} has crossed device and app ${childAppDetails.appName} usage time limit.`,
+                notificationType: notificationType.type2,
+            }
+        }
+        const notificationResult = await firebaseAdmin.firebaseNotification(message);
+
+        var localDate = new Date();
+        const utcDate = moment.utc(localDate).format();
+        let notificationData = {
+            message: message.data,
+            childDeviceId: childData.deviceId,
+            senderId: childData.childId,
+            senderImage: childData.photo,
+            receiverId: parentData.parentId,
+            receiverImage: parentData.photo,
+            notificationType: notificationType.type2,
+            messageTime: utcDate,
+            isMarked: false,
+        }
+        let saveNotification = await notificationService.addNotification(notificationData);
+
+        let activityLogData = {
+            senderId: childData.childId,
+            senderName: childData.name,
+            receiverId: parentData.parentId,
+            receiverName: parentData.name,
+            actionPerformed_byId: childData.childId,
+            actionPerformed_byName: childData.name,
+            actionDetails: `${childData.name} has crossed device and app ${childAppDetails.appName} usage time limit.`,
+            createdAt: utcDate,
+        }
+        let saveActivity = await notificationService.addActivityLog(activityLogData);
+
+        return true
+    } catch (error) {
+        throw error;
+    }
+}
 
 
 module.exports = {
     sendAppUsageNotification,
     sendDeviceUsageNotification,
     appRemainingTimeReachedNotification,
+    deviceRemainingTimeReachedNotification,
+    appRemainingTimeCrossedNotification,
+    deviceRemainingTimeCrossedNotification,
+    bothRemainingTimeCrossedNotification,
 }
