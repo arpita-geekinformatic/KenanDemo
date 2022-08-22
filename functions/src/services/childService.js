@@ -47,6 +47,19 @@ const getDeviceDataByFirestoreId = async (firestoreDeviceId) => {
             return false;
         }
 
+        let eachDayScheduleArr = [];
+        let eachDayScheduleData = deviceData._fieldsProto.eachDaySchedule ? deviceData._fieldsProto.eachDaySchedule.arrayValue.values : [];
+        if(eachDayScheduleData.length > 0){
+            eachDayScheduleData.forEach(data => {
+                let obj ={
+                    status : data.mapValue.fields.status.booleanValue || false,
+                    day : data.mapValue.fields.day.stringValue || '',
+                    time : data.mapValue.fields.time.stringValue || ''
+                }
+                eachDayScheduleArr.push(obj)
+            })
+        }
+
         let deviceDetails = {
             firestoreDevicePathId : deviceData._ref._path.segments[1],
             childId : deviceData._fieldsProto.childId ? deviceData._fieldsProto.childId.stringValue : '',
@@ -55,7 +68,7 @@ const getDeviceDataByFirestoreId = async (firestoreDeviceId) => {
             versionCode : deviceData._fieldsProto.versionCode ? deviceData._fieldsProto.versionCode.stringValue : '',
             fcmToken : deviceData._fieldsProto.fcmToken ? deviceData._fieldsProto.fcmToken.stringValue : '',
             listSize : deviceData._fieldsProto.listSize ? deviceData._fieldsProto.listSize.integerValue : 0,
-            eachDaySchedule : deviceData._fieldsProto.eachDaySchedule ? deviceData._fieldsProto.eachDaySchedule.arrayValue : [],
+            eachDaySchedule : eachDayScheduleArr,
             everyDaySchedule : deviceData._fieldsProto.everyDaySchedule ? deviceData._fieldsProto.everyDaySchedule.stringValue : '',
             manufacturer : deviceData._fieldsProto.manufacturer ? deviceData._fieldsProto.manufacturer.stringValue : '',
             scheduledBy : deviceData._fieldsProto.scheduledBy ? deviceData._fieldsProto.scheduledBy.stringValue : '',
@@ -232,7 +245,7 @@ const getChildDataById = async (childId) => {
             gender: childDetails._fieldsProto.gender.stringValue,
             name: childDetails._fieldsProto.name.stringValue,
             parentId: childDetails._fieldsProto.parentId.stringValue,
-            photo: childDetails._fieldsProto.photo.stringValue,
+            photo: childDetails._fieldsProto.photo ? childDetails._fieldsProto.photo.stringValue : '',
             authToken: childDetails._fieldsProto.authToken ? childDetails._fieldsProto.authToken.stringValue : '',
         }
         return childData;
@@ -273,6 +286,7 @@ const getParentDataById = async (parentId) => {
             isActive: parentDetails._fieldsProto.isActive ? parentDetails._fieldsProto.isActive.booleanValue : false,
             isDeleted: parentDetails._fieldsProto.isDeleted ? parentDetails._fieldsProto.isDeleted.booleanValue : false,
             fcmToken: parentDetails._fieldsProto.fcmToken ? parentDetails._fieldsProto.fcmToken.stringValue : '',
+            photo: parentDetails._fieldsProto.photo ? parentDetails._fieldsProto.photo.stringValue : '',
         }
         return parentData;
     } catch (error) {

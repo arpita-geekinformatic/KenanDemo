@@ -597,7 +597,6 @@ const addAppUsage = async (res, headers, bodyData) => {
             return response.data(res,bodyData, 200, message.APP_USAGE_UPDATED);
         }
 
-
     } catch (error) {
         return response.failure(res, 400, error);
     }
