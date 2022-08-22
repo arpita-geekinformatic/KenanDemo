@@ -459,18 +459,45 @@ const updateUsageTime = async (res, headers, bodyData) => {
             if ((parseInt(newData.remainingTime) < 0) && (parseInt(newDeviceData.remainingTime) >= 0)) {
                 let appRemainingTimeCrossedNotification = await notificationData.appRemainingTimeCrossedNotification(childData, childAppDetails, parentData);
                 console.log("++++++++++++ appRemainingTimeCrossedNotification : ");
+
+                //  decrease point from child profile  //
+                if (parseInt(bodyData.timeSpent) > 5) {
+                    let decreasePointAmount = parseInt(bodyData.timeSpent) / 5;
+                    console.log("+++++++++  decreasePointAmount : ", decreasePointAmount);
+                    let totalPoint = parseInt(childData.points) - parseInt(decreasePointAmount);
+                    let updatedData = { points: totalPoint }
+                    let updateChildDataById = await childService.updateChildDataById(decoded.childId, updatedData)
+                }
             }
 
             //  when only device time limit crossed  //
             if ((parseInt(newData.remainingTime) >= 0) && (parseInt(newDeviceData.remainingTime) < 0)) {
                 let deviceRemainingTimeCrossedNotification = await notificationData.deviceRemainingTimeCrossedNotification(childData, parentData);
                 console.log("++++++++++++ deviceRemainingTimeCrossedNotification : ");
+
+                //  decrease point from child profile  //
+                if (parseInt(bodyData.timeSpent) > 5) {
+                    let decreasePointAmount = parseInt(bodyData.timeSpent) / 5;
+                    console.log("+++++++++  decreasePointAmount : ", decreasePointAmount);
+                    let totalPoint = parseInt(childData.points) - parseInt(decreasePointAmount);
+                    let updatedData = { points: totalPoint }
+                    let updateChildDataById = await childService.updateChildDataById(decoded.childId, updatedData)
+                }
             }
 
             //  when both time limit crossed  //
             if ((parseInt(newData.remainingTime) < 0) && (parseInt(newDeviceData.remainingTime) < 0)) {
                 let bothRemainingTimeCrossedNotification = await notificationData.bothRemainingTimeCrossedNotification(childData, childAppDetails, parentData);
                 console.log("++++++++++++ bothRemainingTimeCrossedNotification : ");
+
+                //  decrease point from child profile  //
+                if (parseInt(bodyData.timeSpent) > 5) {
+                    let decreasePointAmount = parseInt(bodyData.timeSpent) / 5;
+                    console.log("+++++++++  decreasePointAmount : ", decreasePointAmount);
+                    let totalPoint = parseInt(childData.points) - parseInt(decreasePointAmount);
+                    let updatedData = { points: totalPoint }
+                    let updateChildDataById = await childService.updateChildDataById(decoded.childId, updatedData)
+                }
             }
 
         }
@@ -519,18 +546,15 @@ const updateUsageTime = async (res, headers, bodyData) => {
                 let deviceRemainingTimeCrossedNotification = await notificationData.deviceRemainingTimeCrossedNotification(childData, parentData);
                 console.log("========== deviceRemainingTimeCrossedNotification : ");
                 //  decrease point from child profile  //
-                if(parseInt(bodyData.timeSpent) > 5){
-                    let decreasePointAmount = parseInt(bodyData.timeSpent)/5;
-                    console.log("==========  decreasePointAmount : ",decreasePointAmount);
+                if (parseInt(bodyData.timeSpent) > 5) {
+                    let decreasePointAmount = parseInt(bodyData.timeSpent) / 5;
+                    console.log("==========  decreasePointAmount : ", decreasePointAmount);
                     let totalPoint = parseInt(childData.points) - parseInt(decreasePointAmount);
-                    let updatedData ={ points : totalPoint } 
+                    let updatedData = { points: totalPoint }
                     let updateChildDataById = await childService.updateChildDataById(decoded.childId, updatedData)
                 }
             }
-
         }
-
-
 
         return response.success(res, 200, message.SUCCESS)
     } catch (error) {
