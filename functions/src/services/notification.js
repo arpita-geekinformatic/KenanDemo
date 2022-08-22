@@ -200,7 +200,7 @@ const appRemainingTimeCrossedNotification = async (childData, childAppDetails, p
 }
 
 //  when only device time limit crossed  //
-const deviceRemainingTimeCrossedNotification = async (childData, childAppDetails, parentData) => {
+const deviceRemainingTimeCrossedNotification = async (childData, parentData) => {
     try {
         const message = {
             token: parentData.fcmToken,

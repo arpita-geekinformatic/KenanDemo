@@ -247,6 +247,8 @@ const getChildDataById = async (childId) => {
             parentId: childDetails._fieldsProto.parentId.stringValue,
             photo: childDetails._fieldsProto.photo ? childDetails._fieldsProto.photo.stringValue : '',
             authToken: childDetails._fieldsProto.authToken ? childDetails._fieldsProto.authToken.stringValue : '',
+            points: childDetails._fieldsProto.points ? childDetails._fieldsProto.points.integerValue : 0,
+            badge: childDetails._fieldsProto.badge ? childDetails._fieldsProto.badge.integerValue : 0,
         }
         return childData;
 

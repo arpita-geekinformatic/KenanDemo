@@ -157,7 +157,7 @@ const addDeviceApps = async (res, reqBodyData) => {
             //  Insert data in Apps  //
             let appArr = reqBodyData.apps;
             appArr.forEach(async (element) => {
-                console.log("160 >>>>>>>>>. element.status : ",element.status);
+                console.log("160 >>>>>>>>>. element.status : ", element.status);
                 let getAppByName = await childService.getAppByName(element.appName, element.packageName);
                 let firestoreAppId;
 
@@ -236,7 +236,7 @@ const addDeviceApps = async (res, reqBodyData) => {
             //  Insert new Apps  //
             let appArr = reqBodyData.apps;
             appArr.forEach(async (element) => {
-                console.log("160 >>>>>>>>>. element.status : ",element.status);
+                console.log("160 >>>>>>>>>. element.status : ", element.status);
                 let getAppByName = await childService.getAppByName(element.appName, element.packageName);
                 let firestoreAppId;
 
@@ -463,12 +463,12 @@ const updateUsageTime = async (res, headers, bodyData) => {
 
             //  when only device time limit crossed  //
             if ((parseInt(newData.remainingTime) >= 0) && (parseInt(newDeviceData.remainingTime) < 0)) {
-                let deviceRemainingTimeCrossedNotification = await notificationData.deviceRemainingTimeCrossedNotification(childData, childAppDetails, parentData);
+                let deviceRemainingTimeCrossedNotification = await notificationData.deviceRemainingTimeCrossedNotification(childData, parentData);
                 console.log("++++++++++++ deviceRemainingTimeCrossedNotification : ");
             }
 
             //  when both time limit crossed  //
-            if((parseInt(newData.remainingTime) < 0) && (parseInt(newDeviceData.remainingTime) < 0)){
+            if ((parseInt(newData.remainingTime) < 0) && (parseInt(newDeviceData.remainingTime) < 0)) {
                 let bothRemainingTimeCrossedNotification = await notificationData.bothRemainingTimeCrossedNotification(childData, childAppDetails, parentData);
                 console.log("++++++++++++ bothRemainingTimeCrossedNotification : ");
             }
@@ -507,6 +507,27 @@ const updateUsageTime = async (res, headers, bodyData) => {
             }
             console.log("================ device newData :", newDeviceData);
             let updateChildDeviceDetails = await childService.updateDeviceDataById(deviceDetails.firestoreDevicePathId, newDeviceData);
+
+            //  when device time limit reached  //
+            if (parseInt(newDeviceData.remainingTime == 0)) {
+                let deviceRemainingTimeReachedNotification = await notificationData.deviceRemainingTimeReachedNotification(childData, childAppDetails, parentData);
+                console.log("============= deviceRemainingTimeReachedNotification : ");
+            }
+
+            //  when device time limit crossed  //
+            if ((parseInt(newDeviceData.remainingTime) < 0)) {
+                let deviceRemainingTimeCrossedNotification = await notificationData.deviceRemainingTimeCrossedNotification(childData, parentData);
+                console.log("========== deviceRemainingTimeCrossedNotification : ");
+                //  decrease point from child profile  //
+                if(parseInt(bodyData.timeSpent) > 5){
+                    let decreasePointAmount = parseInt(bodyData.timeSpent)/5;
+                    console.log("==========  decreasePointAmount : ",decreasePointAmount);
+                    let totalPoint = parseInt(childData.points) - parseInt(decreasePointAmount);
+                    let updatedData ={ points : totalPoint } 
+                    let updateChildDataById = await childService.updateChildDataById(decoded.childId, updatedData)
+                }
+            }
+
         }
 
 
