@@ -247,6 +247,15 @@ app.post('/deleteChildGiftById/:id', async (req, res, next) => {
   }
 });
 
+//  notification list //
+app.post('/parentNotificationList', async(req, res, next) => {
+  try{
+    let result = await parentController.parentNotificationList(res, req.headers);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
 
 
 
@@ -301,6 +310,16 @@ app.post('/updateUsageTime', async (req, res, next) => {
     next(error)
   }
 });
+
+//  notification list //
+app.post('/childNotificationList', async(req, res, next) => {
+  try{
+    let result = await childController.childNotificationList(res, req.headers);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
 
 
 

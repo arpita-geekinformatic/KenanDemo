@@ -292,7 +292,7 @@ const updateDeviceAppsById = async (deviceAppId, updatedData) => {
 }
 
 //  update Device Data By Id  //
-const updateDeviceDataById = async(deviceId, updatedData) =>  {
+const updateDeviceDataById = async (deviceId, updatedData) => {
     try {
 
         const batch = db.batch();
@@ -366,7 +366,7 @@ const childGiftListById = async (childId, parentId) => {
 //  delete Child Gift By Id  //
 const deleteChildGiftById = async (giftId) => {
     try {
-        await db.collection("childGifts").doc(giftId).update({isDeleted : true});
+        await db.collection("childGifts").doc(giftId).update({ isDeleted: true });
         return true;
 
     } catch (error) {
@@ -374,6 +374,24 @@ const deleteChildGiftById = async (giftId) => {
     }
 }
 
+//  notification List  //
+const notificationList = async (receiverId) => {
+    try {
+        let notificationData = await db.collection("notifications").where("receiverId", "==", receiverId).where("isDeleted", "==", false).get();
+
+        let notificationListArr = [];
+        notificationData.forEach(doc => {
+            let notificationDetails =  doc.data()
+            notificationDetails.notificationId = doc.id;
+          
+            notificationListArr.push(notificationDetails);
+        })
+        return notificationListArr;
+
+    } catch (error) {
+        throw error
+    }
+}
 
 
 
@@ -400,4 +418,5 @@ module.exports = {
     addGift,
     childGiftListById,
     deleteChildGiftById,
+    notificationList,
 }

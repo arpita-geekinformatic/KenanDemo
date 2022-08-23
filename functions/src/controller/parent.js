@@ -709,6 +709,25 @@ const deleteChildGiftById = async (res, headers, paramData) => {
     }
 }
 
+//  notification list  //
+const parentNotificationList = async (res, headers) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
+        }
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 400, message.INVALID_TOKEN);
+        }
+
+        let notificationList = await parentService.notificationList(parentRes.firestore_parentId);
+        return response.data(res, notificationList, 200, message.SUCCESS)
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
 
 module.exports = {
     signUp,
@@ -731,4 +750,5 @@ module.exports = {
     addGift,
     childGiftList,
     deleteChildGiftById,
+    parentNotificationList,
 }

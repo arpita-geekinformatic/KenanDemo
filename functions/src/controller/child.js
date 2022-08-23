@@ -452,6 +452,15 @@ const updateUsageTime = async (res, headers, bodyData) => {
                     let updateChildDataById = await childService.updateChildDataById(decoded.childId, updatedData)
                 }
             }
+
+            let resultData = {
+                status: childAppDetails.status,
+                timeSpent: `${totalAppTimeSpent}`,
+                scheduledBy: childAppDetails.scheduledBy || '',
+                everyDaySchedule: childAppDetails.everyDaySchedule || '',
+                eachDaySchedule: childAppDetails.eachDaySchedule || []
+            }
+            return response.data(res, resultData, 200, message.SUCCESS)
         }
 
         //  if only device usage is restricted by parent  //
@@ -510,6 +519,14 @@ const updateUsageTime = async (res, headers, bodyData) => {
                 }
             }
 
+            let resultData = {
+                status: childAppDetails.status,
+                timeSpent: `${totalAppTimeSpent}`,
+                scheduledBy: childAppDetails.scheduledBy || '',
+                everyDaySchedule: childAppDetails.everyDaySchedule || '',
+                eachDaySchedule: childAppDetails.eachDaySchedule || []
+            }
+            return response.data(res, resultData, 200, message.SUCCESS)
         }
 
         //  if both device usage and app usage is restricted by parent  //
@@ -617,6 +634,15 @@ const updateUsageTime = async (res, headers, bodyData) => {
                     let updateChildDataById = await childService.updateChildDataById(decoded.childId, updatedData)
                 }
             }
+
+            let resultData = {
+                status: childAppDetails.status,
+                timeSpent: `${totalAppTimeSpent}`,
+                scheduledBy: childAppDetails.scheduledBy || '',
+                everyDaySchedule: childAppDetails.everyDaySchedule || '',
+                eachDaySchedule: childAppDetails.eachDaySchedule || []
+            }
+            return response.data(res, resultData, 200, message.SUCCESS)
         }
 
         //  if nothing was restricted by parent  //
@@ -639,15 +665,40 @@ const updateUsageTime = async (res, headers, bodyData) => {
             console.log("639 ++++  newDeviceData :", newDeviceData);
             let updateChildDeviceDetails = await childService.updateDeviceDataById(deviceDetails.firestoreDevicePathId, newDeviceData);
 
+            let resultData = {
+                status: childAppDetails.status,
+                timeSpent: `${totalAppTimeSpent}`,
+                scheduledBy: childAppDetails.scheduledBy || '',
+                everyDaySchedule: childAppDetails.everyDaySchedule || '',
+                eachDaySchedule: childAppDetails.eachDaySchedule || []
+            }
+            return response.data(res, resultData, 200, message.SUCCESS)
         }
 
-        return response.success(res, 200, message.SUCCESS)
+        // return response.success(res, 200, message.SUCCESS)
     } catch (error) {
         return response.failure(res, 400, error);
     }
 }
 
+//  child Notification List //
+const childNotificationList = async (res, headers) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
+        }
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let childData = await childService.getChildDataById(decoded.childId);
+        if (!childData) {
+            return response.failure(res, 400, message.INVALID_TOKEN);
+        };
 
+        let notificationList = await childService.notificationList(childData.childId);
+        return response.data(res, notificationList, 200, message.SUCCESS)
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
 
 
 
@@ -657,4 +708,5 @@ module.exports = {
     childDetails,
     deviceAppListByChild,
     updateUsageTime,
+    childNotificationList,
 }

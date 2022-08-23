@@ -297,7 +297,25 @@ const getParentDataById = async (parentId) => {
 }
 
 
+//  >>>>>>>>>>>  NOTIFICATION  >>>>>>>>>>>  //
+//  notification List  //
+const notificationList =  async (receiverId) => {
+    try {
+        let notificationData = await db.collection("notifications").where("receiverId", "==", receiverId).where("isDeleted", "==", false).get();
 
+        let notificationListArr = [];
+        notificationData.forEach(doc => {
+            let notificationDetails =  doc.data()
+            notificationDetails.notificationId = doc.id;
+          
+            notificationListArr.push(notificationDetails);
+        })
+        return notificationListArr;
+
+    } catch (error) {
+        throw error
+    }
+}
 
 
 
@@ -317,4 +335,5 @@ module.exports = {
     updateChildDataById,
     getParentDataById,
     childDeviceAppList,
+    notificationList,
 }

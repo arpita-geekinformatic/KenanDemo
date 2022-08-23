@@ -20,11 +20,6 @@ const sendAppUsageNotification = async (bodyData, updateData, topic, childData, 
                 title: `Your app usage has been changed by parent.`,
                 body: `Your app usage has been changed by parent.`,
                 notificationType: `visible`,
-                packageName: `${bodyData.packageName}`,
-                status: `${updateData.status}`,
-                scheduledBy: `${bodyData.scheduledBy}`,
-                eachDaySchedule: `${updateData.eachDaySchedule}`,
-                everyDaySchedule: `${updateData.everyDaySchedule}`
             },
             topic: topic
         };
@@ -73,11 +68,6 @@ const sendDeviceUsageNotification = async (bodyData, updateData, topic, childDat
                 title: `Your device usage has been changed by parent.`,
                 body: `Your device usage has been changed by parent.`,
                 notificationType: `visible`,
-                // packageName: `${bodyData.packageName}`,
-                // status: `${updateData.status}`,
-                scheduledBy: `${bodyData.scheduledBy}`,
-                eachDaySchedule: `${updateData.eachDaySchedule}`,
-                everyDaySchedule: `${updateData.everyDaySchedule}`
             },
             topic: topic
         };
