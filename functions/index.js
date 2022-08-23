@@ -249,27 +249,6 @@ app.post('/deleteChildGiftById/:id', async (req, res, next) => {
 
 
 
-//  upload image to firebase storage and get public url  //
-app.post('/upload', async (req, res, next) => {
-  try {
-
-    let bufferData = Buffer.from(req.body.data, "base64")
-    let path = `/` + Date.now() + `.png`;
-    await fs.createWriteStream(os.tmpdir() + path).write(bufferData);
-
-    //  get file path from temp folder  //
-    let filePath = (os.tmpdir() + path);
-    let uploadFile = await firebaseAdmin.uploadFile(filePath);
-    let data = { url: uploadFile }
-
-    return response.data(res, data, 200, message.SUCCESS);
-  } catch (error) {
-    next(error);
-  }
-})
-
-
-
 
 
 //   CHILD APP API   //
@@ -322,6 +301,30 @@ app.post('/updateUsageTime', async (req, res, next) => {
     next(error)
   }
 });
+
+
+
+
+//   COMMON API  //
+//  upload image to firebase storage and get public url  //
+app.post('/upload', async (req, res, next) => {
+  try {
+
+    let bufferData = Buffer.from(req.body.data, "base64")
+    let path = `/` + Date.now() + `.png`;
+    await fs.createWriteStream(os.tmpdir() + path).write(bufferData);
+
+    //  get file path from temp folder  //
+    let filePath = (os.tmpdir() + path);
+    let uploadFile = await firebaseAdmin.uploadFile(filePath);
+    let data = { url: uploadFile }
+
+    return response.data(res, data, 200, message.SUCCESS);
+  } catch (error) {
+    next(error);
+  }
+})
+
 
 
 

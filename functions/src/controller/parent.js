@@ -22,15 +22,15 @@ const tmp = os.tmpdir();
 const signUp = async (res, bodyData) => {
     try {
         if (!bodyData.email) {
-            return response.failure(res, 200, message.EMAIL_REQUIRED);
+            return response.failure(res, 400, message.EMAIL_REQUIRED);
         }
         if (!bodyData.password) {
-            return response.failure(res, 200, message.PASSWORD_REQUIRED);
+            return response.failure(res, 400, message.PASSWORD_REQUIRED);
         }
 
         let isParentExists = await parentService.isParentExists(bodyData.email);
         if (isParentExists) {
-            return response.failure(res, 200, message.USER_EXISTS);
+            return response.failure(res, 400, message.USER_EXISTS);
         }
         let hashedPassword = await KenanUtilities.cryptPassword(bodyData.password);
 
@@ -95,23 +95,23 @@ const acountAcctivation = async (res, parentId) => {
 const login = async (res, bodyData) => {
     try {
         if (!bodyData.email) {
-            return response.failure(res, 200, message.EMAIL_REQUIRED);
+            return response.failure(res, 400, message.EMAIL_REQUIRED);
         }
         if (!bodyData.password) {
-            return response.failure(res, 200, message.PASSWORD_REQUIRED);
+            return response.failure(res, 400, message.PASSWORD_REQUIRED);
         }
 
         const parentData = await parentService.getParentDataByEmail(bodyData.email);
         if (!parentData) {
-            return response.failure(res, 200, message.USER_NOT_FOUND,);
+            return response.failure(res, 400, message.USER_NOT_FOUND,);
         }
         if (!parentData.isActive) {
-            return response.failure(res, 200, message.INACTIVE_ACCOUNT,);
+            return response.failure(res, 400, message.INACTIVE_ACCOUNT,);
         }
 
         const match = await KenanUtilities.VerifyPassword(bodyData.password, parentData.password);
         if (!match) {
-            return response.failure(res, 200, message.INVALID_PASSWORD);
+            return response.failure(res, 400, message.INVALID_PASSWORD);
         }
 
         const authToken = await KenanUtilities.generateToken(parentData.email, parentData.firestore_parentId);
@@ -136,13 +136,13 @@ const login = async (res, bodyData) => {
 const logOut = async (res, headers) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId, { authToken: "" })
@@ -156,15 +156,15 @@ const logOut = async (res, headers) => {
 const forgotPassword = async (res, bodyData) => {
     try {
         if (!bodyData.email) {
-            return response.failure(res, 200, message.EMAIL_REQUIRED);
+            return response.failure(res, 400, message.EMAIL_REQUIRED);
         }
 
         const parentData = await parentService.getParentDataByEmail(bodyData.email);
         if (!parentData) {
-            return response.failure(res, 200, message.USER_NOT_FOUND,);
+            return response.failure(res, 400, message.USER_NOT_FOUND,);
         }
         if (!parentData.isActive) {
-            return response.failure(res, 200, message.INACTIVE_ACCOUNT,);
+            return response.failure(res, 400, message.INACTIVE_ACCOUNT,);
         }
 
         let randomOTP = KenanUtilities.genNumericCode(4);
@@ -190,15 +190,15 @@ const forgotPassword = async (res, bodyData) => {
 const verifyOTP = async (res, bodyData) => {
     try {
         if (!bodyData.otp) {
-            return response.failure(res, 200, message.OTP_REQUIRED);
+            return response.failure(res, 400, message.OTP_REQUIRED);
         }
         if (!bodyData.email) {
-            return response.failure(res, 200, message.EMAIL_REQUIRED);
+            return response.failure(res, 400, message.EMAIL_REQUIRED);
         }
 
         const parentRes = await parentService.getParentDataByOTP(bodyData);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_OTP);
+            return response.failure(res, 400, message.INVALID_OTP);
         }
 
         // Check if otp is expired or not ( otp valid for 1 minutes)
@@ -207,7 +207,7 @@ const verifyOTP = async (res, bodyData) => {
         let otpExpireTime = moment(date);
 
         if (currentDateTime.diff(otpExpireTime, 'm') > 10) {
-            return response.failure(res, 200, message.OTP_EXPIRED);
+            return response.failure(res, 400, message.OTP_EXPIRED);
         }
 
         let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId, { otpVerified: true });
@@ -223,12 +223,12 @@ const verifyOTP = async (res, bodyData) => {
 const resendOTP = async (res, bodyData) => {
     try {
         if (!bodyData.email) {
-            return response.failure(res, 200, message.EMAIL_REQUIRED);
+            return response.failure(res, 400, message.EMAIL_REQUIRED);
         }
 
         const parentRes = await parentService.getParentDataByEmail(bodyData.email);
         if (!parentRes) {
-            return response.failure(res, 200, message.USER_NOT_FOUND);
+            return response.failure(res, 400, message.USER_NOT_FOUND);
         }
         let randomOTP = KenanUtilities.genNumericCode(4);
         let expiredDate = moment().add(10, 'm');
@@ -253,16 +253,16 @@ const resendOTP = async (res, bodyData) => {
 const newPassword = async (res, bodyData, headers) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
         if (!bodyData.newPassword) {
-            return response.failure(res, 200, message.NEW_PASSWORD_REQUIRED);
+            return response.failure(res, 400, message.NEW_PASSWORD_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         let hashedPassword = await KenanUtilities.cryptPassword(bodyData.newPassword);
@@ -278,24 +278,24 @@ const newPassword = async (res, bodyData, headers) => {
 const resetPassword = async (res, bodyData, headers) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
         if (!bodyData.password) {
-            return response.failure(res, 200, message.PASSWORD_REQUIRED);
+            return response.failure(res, 400, message.PASSWORD_REQUIRED);
         }
         if (!bodyData.newPassword) {
-            return response.failure(res, 200, message.NEW_PASSWORD_REQUIRED);
+            return response.failure(res, 400, message.NEW_PASSWORD_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         const match = await KenanUtilities.VerifyPassword(bodyData.password, parentRes.password);
         if (!match) {
-            return response.failure(res, 200, message.INVALID_PASSWORD);
+            return response.failure(res, 400, message.INVALID_PASSWORD);
         }
 
         let hashedPassword = await KenanUtilities.cryptPassword(bodyData.newPassword);
@@ -311,13 +311,13 @@ const resetPassword = async (res, bodyData, headers) => {
 const getParentProfile = async (res, headers) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         // let parentDetails = {
@@ -341,16 +341,16 @@ const getParentProfile = async (res, headers) => {
 const addChild = async (res, bodyData, headers) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
         if (!bodyData.name) {
-            return response.failure(res, 200, message.KID_NAME_REQUIRED);
+            return response.failure(res, 400, message.KID_NAME_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         let childData = await parentService.getChildByParent(bodyData.name, parentRes.firestore_parentId);
@@ -405,13 +405,13 @@ const addChild = async (res, bodyData, headers) => {
 const childList = async (res, headers) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         let childList = await parentService.getChildList(parentRes.firestore_parentId)
@@ -425,21 +425,21 @@ const childList = async (res, headers) => {
 const deleteChild = async (res, headers, paramData) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
         if (!paramData.id) {
-            return response.failure(res, 200, message.CHILD_ID_REQUIRED);
+            return response.failure(res, 400, message.CHILD_ID_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         let childData = await parentService.getChildDataById(paramData.id);
         if (!childData) {
-            return response.failure(res, 200, message.INVALID_CHILD_ID);
+            return response.failure(res, 400, message.INVALID_CHILD_ID);
         }
 
         let deleteChildById = await parentService.deleteChildById(paramData.id);
@@ -453,22 +453,22 @@ const deleteChild = async (res, headers, paramData) => {
 const getChildByParent = async (res, headers, paramData) => {
     try {
         if (!paramData.id) {
-            return response.failure(res, 200, message.CHILD_ID_REQUIRED);
+            return response.failure(res, 400, message.CHILD_ID_REQUIRED);
         }
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         let childProfileDetails = await parentService.getChildDataById(paramData.id);
 
         if (!childProfileDetails) {
-            return response.failure(res, 200, message.INVALID_CHILD_ID);
+            return response.failure(res, 400, message.INVALID_CHILD_ID);
         }
 
         return response.data(res, childProfileDetails, 200, message.SUCCESS);
@@ -481,16 +481,16 @@ const getChildByParent = async (res, headers, paramData) => {
 const childDeviceAppList = async (res, headers, bodyData) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
         if (!bodyData.deviceId) {
-            return response.failure(res, 200, message.REQUIRE_CHILD_DEVICE_ID);
+            return response.failure(res, 400, message.REQUIRE_CHILD_DEVICE_ID);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         let childDeviceAppList = await parentService.childDeviceAppList(bodyData.deviceId)
@@ -505,22 +505,22 @@ const childDeviceAppList = async (res, headers, bodyData) => {
 const addAppUsage = async (res, headers, bodyData) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
         if (!bodyData.childId) {
-            return response.failure(res, 200, message.CHILD_ID_REQUIRED);
+            return response.failure(res, 400, message.CHILD_ID_REQUIRED);
         }
         if (!bodyData.scheduledBy) {
-            return response.failure(res, 200, message.REQUIRE_SCHEDULE);
+            return response.failure(res, 400, message.REQUIRE_SCHEDULE);
         }
         if (!bodyData.type) {
-            return response.failure(res, 200, message.TYPE_IS_REQUIRED);
+            return response.failure(res, 400, message.TYPE_IS_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         let childRes = await parentService.getChildDataById(bodyData.childId);
@@ -529,7 +529,7 @@ const addAppUsage = async (res, headers, bodyData) => {
         //  set app usage  //
         if (bodyData.type == 'appUsage') {
             if (!bodyData.packageName) {
-                return response.failure(res, 200, message.REQUIRE_PACKAGE_NAME);
+                return response.failure(res, 400, message.REQUIRE_PACKAGE_NAME);
             }
             if (!([0, 1].includes(parseInt(bodyData.status)))) {
                 return response.failure(res, 400, message.REQUIRE_APP_STATUS);
@@ -606,13 +606,13 @@ const addAppUsage = async (res, headers, bodyData) => {
 const giftTypeDropdown = async (res, headers) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         let giftTypeDropdown = await parentService.giftTypeDropdown();
@@ -626,25 +626,25 @@ const giftTypeDropdown = async (res, headers) => {
 const addGift = async (res, headers, bodyData) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
         if (!bodyData.childId) {
-            return response.failure(res, 200, message.CHILD_ID_REQUIRED);
+            return response.failure(res, 400, message.CHILD_ID_REQUIRED);
         }
         if (!bodyData.giftName) {
-            return response.failure(res, 200, message.GIFT_NAME_REQUIRED);
+            return response.failure(res, 400, message.GIFT_NAME_REQUIRED);
         }
         // if (!bodyData.giftIcon) {
-        //     return response.failure(res, 200, message.GIFT_ICON_REQUIRED);
+        //     return response.failure(res, 400, message.GIFT_ICON_REQUIRED);
         // }
         if (!bodyData.points) {
-            return response.failure(res, 200, message.POINTS_REQUIRED);
+            return response.failure(res, 400, message.POINTS_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         let giftData = {
@@ -667,16 +667,16 @@ const addGift = async (res, headers, bodyData) => {
 const childGiftList = async (res, headers, bodyData) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
         if (!bodyData.childId) {
-            return response.failure(res, 200, message.CHILD_ID_REQUIRED);
+            return response.failure(res, 400, message.CHILD_ID_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         let childGiftListById = await parentService.childGiftListById(bodyData.childId, parentRes.firestore_parentId);
@@ -690,16 +690,16 @@ const childGiftList = async (res, headers, bodyData) => {
 const deleteChildGiftById = async (res, headers, paramData) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
         if (!paramData.id) {
-            return response.failure(res, 200, message.GIFT_ID_REQUIRED);
+            return response.failure(res, 400, message.GIFT_ID_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         let deleteChildGiftById = await parentService.deleteChildGiftById(paramData.id);

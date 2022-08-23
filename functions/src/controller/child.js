@@ -15,29 +15,29 @@ var deviceKeys = ["deviceId", "deviceName", "parentId", "childId", "versionCode"
 const scanQrCode = async (res, bodyData) => {
     try {
         if (!bodyData.parentId) {
-            return response.failure(res, 200, message.PARENT_ID_REQUIRED);
+            return response.failure(res, 400, message.PARENT_ID_REQUIRED);
         }
         if (!bodyData.childId) {
-            return response.failure(res, 200, message.CHILD_ID_REQUIRED);
+            return response.failure(res, 400, message.CHILD_ID_REQUIRED);
         }
         if (!bodyData.deviceId) {
-            return response.failure(res, 200, message.REQUIRE_CHILD_DEVICE_ID);
+            return response.failure(res, 400, message.REQUIRE_CHILD_DEVICE_ID);
         }
         // if (!bodyData.password) {
-        //     return response.failure(res, 200, message.PASSWORD_REQUIRED);
+        //     return response.failure(res, 400, message.PASSWORD_REQUIRED);
         // }
         if (!bodyData.FcmToken) {
-            return response.failure(res, 200, message.REQUIRE_FCM);
+            return response.failure(res, 400, message.REQUIRE_FCM);
         }
 
         let isParentExists = await childService.getParentDataById(bodyData.parentId);
         if (!isParentExists) {
-            return response.failure(res, 200, message.INVALID_PARENT_ID);
+            return response.failure(res, 400, message.INVALID_PARENT_ID);
         }
 
         let isChildExists = await childService.getChildDataById(bodyData.childId);
         if (!isChildExists) {
-            return response.failure(res, 200, message.INVALID_CHILD_ID);
+            return response.failure(res, 400, message.INVALID_CHILD_ID);
         }
 
         //  check is child already connected to other device or not  //
@@ -130,7 +130,7 @@ const scanQrCode = async (res, bodyData) => {
 const addDeviceApps = async (res, reqBodyData) => {
     try {
         if (!reqBodyData.deviceId) {
-            return response.failure(res, 200, message.REQUIRE_CHILD_DEVICE_ID);
+            return response.failure(res, 400, message.REQUIRE_CHILD_DEVICE_ID);
         }
 
         console.log("======= call 1");
@@ -317,13 +317,13 @@ const addDeviceApps = async (res, reqBodyData) => {
 const childDetails = async (res, headers) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         const childData = await childService.getChildDataById(decoded.childId);
         if (!childData) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         let childDeviceData = await childService.isDeviceExists(childData.deviceId);
@@ -341,13 +341,13 @@ const childDetails = async (res, headers) => {
 const deviceAppListByChild = async (res, headers) => {
     try {
         if (!headers.authorization) {
-            return response.failure(res, 200, message.TOKEN_REQUIRED);
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let childData = await childService.getChildDataById(decoded.childId);
         if (!childData) {
-            return response.failure(res, 200, message.INVALID_TOKEN);
+            return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
         let childDeviceAppList = await childService.childDeviceAppList(childData.deviceId)
