@@ -525,14 +525,14 @@ const addAppUsage = async (res, headers, bodyData) => {
 
         let childRes = await parentService.getChildDataById(bodyData.childId);
         let topic = `child_${bodyData.childId}`;
-        
+
         //  set app usage  //
         if (bodyData.type == 'appUsage') {
             if (!bodyData.packageName) {
                 return response.failure(res, 200, message.REQUIRE_PACKAGE_NAME);
             }
-            if (!bodyData.status) {
-                return response.failure(res, 200, message.REQUIRE_APP_STATUS);
+            if (!([0,1].includes(parseInt(bodyData.status)))) {
+                return response.failure(res, 400, message.REQUIRE_APP_STATUS);
             }
 
             if (bodyData.scheduledBy == 'everyDay') {
@@ -565,7 +565,7 @@ const addAppUsage = async (res, headers, bodyData) => {
                 let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, topic);
             }
 
-            return response.data(res,bodyData, 200, message.APP_USAGE_UPDATED);
+            return response.data(res, bodyData, 200, message.APP_USAGE_UPDATED);
         }
 
         //  set device usage  //
@@ -594,7 +594,7 @@ const addAppUsage = async (res, headers, bodyData) => {
                 let deviceUsageNotification = await notificationData.sendDeviceUsageNotification(bodyData, updateData, topic);
             }
 
-            return response.data(res,bodyData, 200, message.APP_USAGE_UPDATED);
+            return response.data(res, bodyData, 200, message.APP_USAGE_UPDATED);
         }
 
     } catch (error) {
