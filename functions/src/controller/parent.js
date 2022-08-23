@@ -531,7 +531,7 @@ const addAppUsage = async (res, headers, bodyData) => {
             if (!bodyData.packageName) {
                 return response.failure(res, 200, message.REQUIRE_PACKAGE_NAME);
             }
-            if (!([0,1].includes(parseInt(bodyData.status)))) {
+            if (!([0, 1].includes(parseInt(bodyData.status)))) {
                 return response.failure(res, 400, message.REQUIRE_APP_STATUS);
             }
 
@@ -546,7 +546,7 @@ const addAppUsage = async (res, headers, bodyData) => {
                 let updateDeviceAppsById = await parentService.updateDeviceAppsById(getDeviceAppsIdByPackageName, updateData);
 
                 //  send notification to child device  //
-                let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, topic);
+                let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, topic, childRes, parentRes);
             }
 
             if (bodyData.scheduledBy == 'eachDay') {
@@ -562,7 +562,7 @@ const addAppUsage = async (res, headers, bodyData) => {
                 let updateDeviceAppsById = await parentService.updateDeviceAppsById(getDeviceAppsIdByPackageName, updateData);
 
                 //  send notification to child device  //
-                let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, topic);
+                let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, topic, childRes, parentRes);
             }
 
             return response.data(res, bodyData, 200, message.APP_USAGE_UPDATED);
@@ -579,7 +579,7 @@ const addAppUsage = async (res, headers, bodyData) => {
 
                 let updateDeviceDataById = await parentService.updateDeviceDataById(childRes.deviceId, updateData)
                 //  send notification to child device  //
-                let deviceUsageNotification = await notificationData.sendDeviceUsageNotification(bodyData, updateData, topic);
+                let deviceUsageNotification = await notificationData.sendDeviceUsageNotification(bodyData, updateData, topic, childRes, parentRes);
             }
 
             if (bodyData.scheduledBy == 'eachDay') {
@@ -591,7 +591,7 @@ const addAppUsage = async (res, headers, bodyData) => {
 
                 let updateDeviceDataById = await parentService.updateDeviceDataById(childRes.deviceId, updateData)
                 //  send notification to child device  //
-                let deviceUsageNotification = await notificationData.sendDeviceUsageNotification(bodyData, updateData, topic);
+                let deviceUsageNotification = await notificationData.sendDeviceUsageNotification(bodyData, updateData, topic, childRes, parentRes);
             }
 
             return response.data(res, bodyData, 200, message.APP_USAGE_UPDATED);

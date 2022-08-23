@@ -13,7 +13,7 @@ const notificationType = {
 
 //   CHILD NOTIFICATION   //
 //  send app usage change notification  //
-const sendAppUsageNotification = async (bodyData, updateData, topic) => {
+const sendAppUsageNotification = async (bodyData, updateData, topic, childData, parentData) => {
     try {
         const message = {
             data: {
@@ -29,6 +29,36 @@ const sendAppUsageNotification = async (bodyData, updateData, topic) => {
             topic: topic
         };
         await firebaseAdmin.firebaseSendTopicNotification(message);
+
+        var localDate = new Date();
+        const utcDate = moment.utc(localDate).format();
+        let notificationData = {
+            message: message.data,
+            childDeviceId: childData.deviceId,
+            senderId: parentData.firestore_parentId,
+            senderImage:  parentData.photo || '',
+            receiverId:childData.childId,
+            receiverImage: childData.photo,
+            notificationType: notificationType.type2,
+            messageTime: utcDate,
+            isMarked: false,
+            isDeleted: false
+        }
+        let saveNotification = await notificationService.addNotification(notificationData);
+
+        let activityLogData = {
+            senderId: parentData.firestore_parentId,
+            senderName: parentData.name || '',
+            receiverId: childData.childId,
+            receiverName: childData.name || '',
+            actionPerformed_byId: parentData.firestore_parentId,
+            actionPerformed_byName: parentData.name || '',
+            actionDetails: `App usage of child ${childData.name} has been changed by parent.`,
+            createdAt: utcDate,
+            isDeleted: false
+        }
+        let saveActivity = await notificationService.addActivityLog(activityLogData);
+
         return true;
     } catch (error) {
         throw error;
@@ -36,7 +66,7 @@ const sendAppUsageNotification = async (bodyData, updateData, topic) => {
 }
 
 //  send device usage change notification  //
-const sendDeviceUsageNotification = async (bodyData, updateData, topic) => {
+const sendDeviceUsageNotification = async (bodyData, updateData, topic, childData, parentData) => {
     try {
         const message = {
             data: {
@@ -52,6 +82,36 @@ const sendDeviceUsageNotification = async (bodyData, updateData, topic) => {
             topic: topic
         };
         await firebaseAdmin.firebaseSendTopicNotification(message);
+
+        var localDate = new Date();
+        const utcDate = moment.utc(localDate).format();
+        let notificationData = {
+            message: message.data,
+            childDeviceId: childData.deviceId,
+            senderId: parentData.firestore_parentId,
+            senderImage: parentData.photo || '',
+            receiverId: childData.childId,
+            receiverImage: childData.photo,
+            notificationType: notificationType.type2,
+            messageTime: utcDate,
+            isMarked: false,
+            isDeleted: false
+        }
+        let saveNotification = await notificationService.addNotification(notificationData);
+
+        let activityLogData = {
+            senderId: parentData.firestore_parentId,
+            senderName: parentData.name || '',
+            receiverId: childData.childId,
+            receiverName: childData.name || '',
+            actionPerformed_byId: parentData.firestore_parentId,
+            actionPerformed_byName: parentData.name || '',
+            actionDetails: `Device usage of child ${childData.name} has been changed by parent.`,
+            createdAt: utcDate,
+            isDeleted: false
+        }
+        let saveActivity = await notificationService.addActivityLog(activityLogData);
+
         return true;
     } catch (error) {
         throw error;
@@ -86,6 +146,7 @@ const appRemainingTimeReachedNotification = async (childData, childAppDetails, p
             notificationType: notificationType.type2,
             messageTime: utcDate,
             isMarked: false,
+            isDeleted: false
         }
         let saveNotification = await notificationService.addNotification(notificationData);
 
@@ -98,6 +159,7 @@ const appRemainingTimeReachedNotification = async (childData, childAppDetails, p
             actionPerformed_byName: childData.name,
             actionDetails: `${childData.name} has reached usage limit of app ${childAppDetails.appName}.`,
             createdAt: utcDate,
+            isDeleted: false
         }
         let saveActivity = await notificationService.addActivityLog(activityLogData);
 
@@ -132,6 +194,7 @@ const deviceRemainingTimeReachedNotification = async (childData, childAppDetails
             notificationType: notificationType.type2,
             messageTime: utcDate,
             isMarked: false,
+            isDeleted: false
         }
         let saveNotification = await notificationService.addNotification(notificationData);
 
@@ -144,6 +207,7 @@ const deviceRemainingTimeReachedNotification = async (childData, childAppDetails
             actionPerformed_byName: childData.name,
             actionDetails: `${childData.name} has  reached device usage time limit.`,
             createdAt: utcDate,
+            isDeleted: false
         }
         let saveActivity = await notificationService.addActivityLog(activityLogData);
 
@@ -178,6 +242,7 @@ const appRemainingTimeCrossedNotification = async (childData, childAppDetails, p
             notificationType: notificationType.type2,
             messageTime: utcDate,
             isMarked: false,
+            isDeleted: false
         }
         let saveNotification = await notificationService.addNotification(notificationData);
 
@@ -188,8 +253,9 @@ const appRemainingTimeCrossedNotification = async (childData, childAppDetails, p
             receiverName: parentData.name,
             actionPerformed_byId: childData.childId,
             actionPerformed_byName: childData.name,
-            actionDetails: `${childData.name} has  reached device usage time limit.`,
+            actionDetails: `${childData.name} has crossed usage time limit of app ${childAppDetails.appName}.`,
             createdAt: utcDate,
+            isDeleted: false
         }
         let saveActivity = await notificationService.addActivityLog(activityLogData);
 
@@ -224,6 +290,7 @@ const deviceRemainingTimeCrossedNotification = async (childData, parentData) => 
             notificationType: notificationType.type2,
             messageTime: utcDate,
             isMarked: false,
+            isDeleted: false
         }
         let saveNotification = await notificationService.addNotification(notificationData);
 
@@ -236,6 +303,7 @@ const deviceRemainingTimeCrossedNotification = async (childData, parentData) => 
             actionPerformed_byName: childData.name,
             actionDetails: `${childData.name} has crossed device usage time limit.`,
             createdAt: utcDate,
+            isDeleted: false
         }
         let saveActivity = await notificationService.addActivityLog(activityLogData);
 
@@ -252,7 +320,7 @@ const bothRemainingTimeCrossedNotification = async (childData, childAppDetails, 
             token: parentData.fcmToken,
             data: {
                 title: `${childData.name} has crossed both device and app ${childAppDetails.appName} usage time limit .`,
-                body: `${childData.name} has crossed device and app ${childAppDetails.appName} usage time limit.`,
+                body: `${childData.name} has crossed both device and app ${childAppDetails.appName} usage time limit.`,
                 notificationType: notificationType.type2,
             }
         }
@@ -270,6 +338,7 @@ const bothRemainingTimeCrossedNotification = async (childData, childAppDetails, 
             notificationType: notificationType.type2,
             messageTime: utcDate,
             isMarked: false,
+            isDeleted: false
         }
         let saveNotification = await notificationService.addNotification(notificationData);
 
@@ -280,8 +349,9 @@ const bothRemainingTimeCrossedNotification = async (childData, childAppDetails, 
             receiverName: parentData.name,
             actionPerformed_byId: childData.childId,
             actionPerformed_byName: childData.name,
-            actionDetails: `${childData.name} has crossed device and app ${childAppDetails.appName} usage time limit.`,
+            actionDetails: `${childData.name} has crossed both device and app ${childAppDetails.appName} usage time limit.`,
             createdAt: utcDate,
+            isDeleted: false
         }
         let saveActivity = await notificationService.addActivityLog(activityLogData);
 
