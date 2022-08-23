@@ -369,69 +369,107 @@ const updateUsageTime = async (res, headers, bodyData) => {
         if (!childData) {
             return response.failure(res, 400, message.INVALID_TOKEN);
         };
+        if (!bodyData.packageName) {
+            return response.failure(res, 400, message.REQUIRE_PACKAGE_NAME);
+        };
+        if (!bodyData.startTime) {
+            return response.failure(res, 400, message.START_TIME_REQUIRED);
+        };
+        if (!bodyData.endTime) {
+            return response.failure(res, 400, message.END_TIME_REQUIRED);
+        };
         if (!bodyData.type) {
             return response.failure(res, 400, message.TYPE_IS_REQUIRED)
         };
-        let parentData = await childService.getParentDataById(childData.parentId);
+
+        const parentData = await childService.getParentDataById(childData.parentId);
+        const childAppDetails = await childService.childAppDetailsByPackageName(childData.deviceId, bodyData.packageName);
+        const deviceDetails = await childService.getDeviceDataByFirestoreId(childAppDetails.firestoreDeviceId);
+        const pointSettings = 5;
 
         const dayName = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][new Date().getDay()];
         const day = new Date().getDay();
+        let totalAppTimeSpent = childAppDetails.timeSpent || '0';
+        let usageStartTime = new Date(parseInt(bodyData.startTime));
+        let usageEndTime = new Date(parseInt(bodyData.endTime));
+        let timeSpent = usageEndTime.getMinutes() - usageStartTime.getMinutes();
+        let appRemainingTime = '0';
+        let deviceRemainingTime = '0';
+        let totalTimeSpent = deviceDetails.timeSpent || '0';
 
         //  update both app and device usage time  //
-        if (bodyData.type == 'appUsage') {
-            if (!bodyData.packageName) {
-                return response.failure(res, 400, message.REQUIRE_PACKAGE_NAME);
-            }
-            if (!bodyData.timeSpent) {
-                return response.failure(res, 400, message.TIME_SPENT_REQUIRED);
-            }
-
-            //   calculate and update app remaining time  // 
-            const childAppDetails = await childService.childAppDetailsByPackageName(childData.deviceId, bodyData.packageName);
-            // console.log(">>>>>>>>>>>>>>> childAppDetails : ", childAppDetails);
-            let appRemainingTime = '00';
-            let totalAppTimeSpent = childAppDetails.timeSpent || '00';
+        //  if only app usage is restricted by parent  //
+        if ((childAppDetails.scheduledBy != '') && (deviceDetails.scheduledBy == '')) {
+            console.log("405 >>>>  totalAppTimeSpent : ", totalAppTimeSpent, "  >>>> timeSpent : ", timeSpent);
 
             if (childAppDetails.scheduledBy == 'eachDay') {
                 let dateDetails = await childAppDetails.eachDaySchedule.filter(element => { return (element.day == dayName) });
                 if (dateDetails.length > 0) {
                     let scheduledTime = dateDetails[0].time;
-                    totalAppTimeSpent = parseInt(totalAppTimeSpent) + parseInt(bodyData.timeSpent);
+                    totalAppTimeSpent = parseInt(totalAppTimeSpent) + parseInt(timeSpent);
                     appRemainingTime = parseInt(scheduledTime) - parseInt(totalAppTimeSpent);
                 }
             }
 
             if (childAppDetails.scheduledBy == 'everyDay') {
                 let scheduledTime = childAppDetails.everyDaySchedule;
-                totalAppTimeSpent = parseInt(totalAppTimeSpent) + parseInt(bodyData.timeSpent);
+                totalAppTimeSpent = parseInt(totalAppTimeSpent) + parseInt(timeSpent);
                 appRemainingTime = parseInt(scheduledTime) - parseInt(totalAppTimeSpent);
             }
 
-            let newData = {
+            let newAppData = {
                 timeSpent: `${totalAppTimeSpent}`,
                 remainingTime: `${appRemainingTime}`
             }
-            console.log(">>>>>>>>>>>>>>> app newData :", newData);
-            let updateChildAppDetails = await childService.updateDeviceAppDataById(childAppDetails.firestoreDeviceAppId, newData);
+            console.log("426 >>>>>  newAppData :", newAppData);
+            let updateChildAppDetails = await childService.updateDeviceAppDataById(childAppDetails.firestoreDeviceAppId, newAppData);
 
-            //  calculate and update device remaining time  //
-            let deviceDetails = await childService.getDeviceDataByFirestoreId(childAppDetails.firestoreDeviceId);
-            // console.log(">>>>>>>>>>>>>>>>> deviceDetails : ", deviceDetails);
-            let deviceRemainingTime = '00';
-            let totalTimeSpent = deviceDetails.timeSpent || '00';
+            totalTimeSpent = parseInt(totalTimeSpent) + parseInt(timeSpent);
+            let newDeviceData = {
+                timeSpent: `${totalTimeSpent}`,
+                remainingTime: `${deviceRemainingTime}`
+            }
+            console.log("434 >>>>>>  newDeviceData :", newDeviceData);
+            let updateChildDeviceDetails = await childService.updateDeviceDataById(deviceDetails.firestoreDevicePathId, newDeviceData);
+
+            //  send notification to parent about usage time  //
+            //  when app time limit reached  //
+            if (parseInt(newAppData.remainingTime) == 0) {
+                let appRemainingTimeReachedNotification = await notificationData.appRemainingTimeReachedNotification(childData, childAppDetails, parentData);
+                console.log("441 >>>>>  appRemainingTimeReachedNotification : ");
+            }
+            //  when app time limit crossed  //
+            if (parseInt(newAppData.remainingTime) < 0) {
+                let appRemainingTimeCrossedNotification = await notificationData.appRemainingTimeCrossedNotification(childData, childAppDetails, parentData);
+                console.log("446 >>>>  appRemainingTimeCrossedNotification : ");
+
+                //  decrease point from child profile  //
+                if (parseInt(timeSpent) > pointSettings) {
+                    let decreasePointAmount = parseInt(timeSpent) / pointSettings;
+                    console.log("+++++++++  decreasePointAmount : ", decreasePointAmount);
+                    let totalPoint = parseInt(childData.points) - parseInt(decreasePointAmount);
+                    let updatedData = { points: totalPoint }
+                    let updateChildDataById = await childService.updateChildDataById(decoded.childId, updatedData)
+                }
+            }
+        }
+
+        //  if only device usage is restricted by parent  //
+        if ((childAppDetails.scheduledBy == '') && (deviceDetails.scheduledBy != '')) {
+            console.log("461 ====  totalAppTimeSpent : ", totalAppTimeSpent, "  ==== timeSpent : ", timeSpent);
 
             if (deviceDetails.scheduledBy == 'eachDay') {
                 let dateDetails = await deviceDetails.eachDaySchedule.filter(element => { return (element.day == dayName) });
                 if (dateDetails.length > 0) {
                     let scheduledTime = dateDetails[0].time;
-                    totalTimeSpent = parseInt(totalTimeSpent) + parseInt(bodyData.timeSpent)
+                    totalTimeSpent = parseInt(totalTimeSpent) + parseInt(timeSpent)
                     deviceRemainingTime = parseInt(scheduledTime) - parseInt(totalTimeSpent);
                 }
             }
 
             if (deviceDetails.scheduledBy == 'everyDay') {
                 let scheduledTime = deviceDetails.everyDaySchedule;
-                totalTimeSpent = parseInt(totalTimeSpent) + parseInt(bodyData.timeSpent);
+                totalTimeSpent = parseInt(totalTimeSpent) + parseInt(timeSpent);
                 deviceRemainingTime = parseInt(scheduledTime) - parseInt(totalTimeSpent);
             }
 
@@ -439,60 +477,32 @@ const updateUsageTime = async (res, headers, bodyData) => {
                 timeSpent: `${totalTimeSpent}`,
                 remainingTime: `${deviceRemainingTime}`
             }
-            console.log(">>>>>>>>>>>>>>>> device newData :", newDeviceData);
+            console.log("482 ====  newDeviceData :", newDeviceData);
             let updateChildDeviceDetails = await childService.updateDeviceDataById(deviceDetails.firestoreDevicePathId, newDeviceData);
 
+            totalAppTimeSpent = parseInt(totalAppTimeSpent) + parseInt(timeSpent);
+            let newAppData = {
+                timeSpent: `${totalAppTimeSpent}`,
+                remainingTime: `${appRemainingTime}`
+            }
+            console.log("490 ====  newAppData :", newAppData);
+            let updateChildAppDetails = await childService.updateDeviceAppDataById(childAppDetails.firestoreDeviceAppId, newAppData);
 
             //  send notification to parent about usage time  //
-            //  when app time limit reached  //
-            if ((parseInt(newData.remainingTime) == 0) && (parseInt(newDeviceData.remainingTime > 0))) {
-                let appRemainingTimeReachedNotification = await notificationData.appRemainingTimeReachedNotification(childData, childAppDetails, parentData);
-                console.log("++++++++++++ appRemainingTimeReachedNotification : ");
-            }
             //  when device time limit reached  //
-            if (parseInt(newDeviceData.remainingTime == 0) && (parseInt(newData.remainingTime) > 0)) {
+            if (parseInt(newDeviceData.remainingTime) == 0) {
                 let deviceRemainingTimeReachedNotification = await notificationData.deviceRemainingTimeReachedNotification(childData, childAppDetails, parentData);
-                console.log("++++++++++++ deviceRemainingTimeReachedNotification : ");
-            }
-
-            //  when only app time limit crossed  //
-            if ((parseInt(newData.remainingTime) < 0) && (parseInt(newDeviceData.remainingTime) >= 0)) {
-                let appRemainingTimeCrossedNotification = await notificationData.appRemainingTimeCrossedNotification(childData, childAppDetails, parentData);
-                console.log("++++++++++++ appRemainingTimeCrossedNotification : ");
-
-                //  decrease point from child profile  //
-                if (parseInt(bodyData.timeSpent) > 5) {
-                    let decreasePointAmount = parseInt(bodyData.timeSpent) / 5;
-                    console.log("+++++++++  decreasePointAmount : ", decreasePointAmount);
-                    let totalPoint = parseInt(childData.points) - parseInt(decreasePointAmount);
-                    let updatedData = { points: totalPoint }
-                    let updateChildDataById = await childService.updateChildDataById(decoded.childId, updatedData)
-                }
+                console.log("497 ====  deviceRemainingTimeReachedNotification : ");
             }
 
             //  when only device time limit crossed  //
-            if ((parseInt(newData.remainingTime) >= 0) && (parseInt(newDeviceData.remainingTime) < 0)) {
+            if (parseInt(newDeviceData.remainingTime) < 0) {
                 let deviceRemainingTimeCrossedNotification = await notificationData.deviceRemainingTimeCrossedNotification(childData, parentData);
-                console.log("++++++++++++ deviceRemainingTimeCrossedNotification : ");
+                console.log("503 ====  deviceRemainingTimeCrossedNotification : ");
 
                 //  decrease point from child profile  //
-                if (parseInt(bodyData.timeSpent) > 5) {
-                    let decreasePointAmount = parseInt(bodyData.timeSpent) / 5;
-                    console.log("+++++++++  decreasePointAmount : ", decreasePointAmount);
-                    let totalPoint = parseInt(childData.points) - parseInt(decreasePointAmount);
-                    let updatedData = { points: totalPoint }
-                    let updateChildDataById = await childService.updateChildDataById(decoded.childId, updatedData)
-                }
-            }
-
-            //  when both time limit crossed  //
-            if ((parseInt(newData.remainingTime) < 0) && (parseInt(newDeviceData.remainingTime) < 0)) {
-                let bothRemainingTimeCrossedNotification = await notificationData.bothRemainingTimeCrossedNotification(childData, childAppDetails, parentData);
-                console.log("++++++++++++ bothRemainingTimeCrossedNotification : ");
-
-                //  decrease point from child profile  //
-                if (parseInt(bodyData.timeSpent) > 5) {
-                    let decreasePointAmount = parseInt(bodyData.timeSpent) / 5;
+                if (parseInt(timeSpent) > pointSettings) {
+                    let decreasePointAmount = parseInt(timeSpent) / pointSettings;
                     console.log("+++++++++  decreasePointAmount : ", decreasePointAmount);
                     let totalPoint = parseInt(childData.points) - parseInt(decreasePointAmount);
                     let updatedData = { points: totalPoint }
@@ -502,29 +512,44 @@ const updateUsageTime = async (res, headers, bodyData) => {
 
         }
 
-        //  update only device usage time  //
-        if (bodyData.type == 'deviceUsage') {
-            if (!bodyData.timeSpent) {
-                return response.failure(res, 400, message.TIME_SPENT_REQUIRED);
+        //  if both device usage and app usage is restricted by parent  //
+        if ((childAppDetails.scheduledBy != '') && (deviceDetails.scheduledBy != '')) {
+            console.log("519 <<<<  totalAppTimeSpent : ", totalAppTimeSpent, "  <<<< timeSpent : ", timeSpent);
+
+            if (childAppDetails.scheduledBy == 'eachDay') {
+                let dateDetails = await childAppDetails.eachDaySchedule.filter(element => { return (element.day == dayName) });
+                if (dateDetails.length > 0) {
+                    let scheduledTime = dateDetails[0].time;
+                    totalAppTimeSpent = parseInt(totalAppTimeSpent) + parseInt(timeSpent);
+                    appRemainingTime = parseInt(scheduledTime) - parseInt(totalAppTimeSpent);
+                }
             }
 
-            let deviceDetails = await childService.isDeviceExists(childData.deviceId);
-            let deviceRemainingTime = '00';
-            let totalTimeSpent = deviceDetails.timeSpent || '00';
-            // console.log("================= deviceDetails : ",deviceDetails);
+            if (childAppDetails.scheduledBy == 'everyDay') {
+                let scheduledTime = childAppDetails.everyDaySchedule;
+                totalAppTimeSpent = parseInt(totalAppTimeSpent) + parseInt(timeSpent);
+                appRemainingTime = parseInt(scheduledTime) - parseInt(totalAppTimeSpent);
+            }
+
+            let newAppData = {
+                timeSpent: `${totalAppTimeSpent}`,
+                remainingTime: `${appRemainingTime}`
+            }
+            console.log("540 <<<<  newAppData :", newAppData);
+            let updateChildAppDetails = await childService.updateDeviceAppDataById(childAppDetails.firestoreDeviceAppId, newAppData);
 
             if (deviceDetails.scheduledBy == 'eachDay') {
                 let dateDetails = await deviceDetails.eachDaySchedule.filter(element => { return (element.day == dayName) });
                 if (dateDetails.length > 0) {
                     let scheduledTime = dateDetails[0].time;
-                    totalTimeSpent = parseInt(totalTimeSpent) + parseInt(bodyData.timeSpent)
+                    totalTimeSpent = parseInt(totalTimeSpent) + parseInt(timeSpent)
                     deviceRemainingTime = parseInt(scheduledTime) - parseInt(totalTimeSpent);
                 }
             }
 
             if (deviceDetails.scheduledBy == 'everyDay') {
                 let scheduledTime = deviceDetails.everyDaySchedule;
-                totalTimeSpent = parseInt(totalTimeSpent) + parseInt(bodyData.timeSpent);
+                totalTimeSpent = parseInt(totalTimeSpent) + parseInt(timeSpent);
                 deviceRemainingTime = parseInt(scheduledTime) - parseInt(totalTimeSpent);
             }
 
@@ -532,28 +557,88 @@ const updateUsageTime = async (res, headers, bodyData) => {
                 timeSpent: `${totalTimeSpent}`,
                 remainingTime: `${deviceRemainingTime}`
             }
-            console.log("================ device newData :", newDeviceData);
+            console.log("563 <<<<  newDeviceData :", newDeviceData);
             let updateChildDeviceDetails = await childService.updateDeviceDataById(deviceDetails.firestoreDevicePathId, newDeviceData);
 
-            //  when device time limit reached  //
-            if (parseInt(newDeviceData.remainingTime == 0)) {
-                let deviceRemainingTimeReachedNotification = await notificationData.deviceRemainingTimeReachedNotification(childData, childAppDetails, parentData);
-                console.log("============= deviceRemainingTimeReachedNotification : ");
+            //  send notification to parent about usage time  //
+            //  when app time limit reached  //
+            if ((parseInt(newAppData.remainingTime) == 0) && (parseInt(newDeviceData.remainingTime > 0))) {
+                let appRemainingTimeReachedNotification = await notificationData.appRemainingTimeReachedNotification(childData, childAppDetails, parentData);
+                console.log("569 <<<<  appRemainingTimeReachedNotification : ");
             }
 
-            //  when device time limit crossed  //
-            if ((parseInt(newDeviceData.remainingTime) < 0)) {
-                let deviceRemainingTimeCrossedNotification = await notificationData.deviceRemainingTimeCrossedNotification(childData, parentData);
-                console.log("========== deviceRemainingTimeCrossedNotification : ");
+            //  when only app time limit crossed  //
+            if ((parseInt(newAppData.remainingTime) < 0) && (parseInt(newDeviceData.remainingTime) >= 0)) {
+                let appRemainingTimeCrossedNotification = await notificationData.appRemainingTimeCrossedNotification(childData, childAppDetails, parentData);
+                console.log("574 <<<<  appRemainingTimeCrossedNotification : ");
+
                 //  decrease point from child profile  //
-                if (parseInt(bodyData.timeSpent) > 5) {
-                    let decreasePointAmount = parseInt(bodyData.timeSpent) / 5;
-                    console.log("==========  decreasePointAmount : ", decreasePointAmount);
+                if (parseInt(timeSpent) > pointSettings) {
+                    let decreasePointAmount = parseInt(timeSpent) / pointSettings;
+                    console.log("579 <<<<  decreasePointAmount : ", decreasePointAmount);
                     let totalPoint = parseInt(childData.points) - parseInt(decreasePointAmount);
                     let updatedData = { points: totalPoint }
                     let updateChildDataById = await childService.updateChildDataById(decoded.childId, updatedData)
                 }
             }
+
+            //  when device time limit reached  //
+            if ((parseInt(newDeviceData.remainingTime) == 0) && (parseInt(newAppData.remainingTime) > 0)) {
+                let deviceRemainingTimeReachedNotification = await notificationData.deviceRemainingTimeReachedNotification(childData, childAppDetails, parentData);
+                console.log("590 <<<<  deviceRemainingTimeReachedNotification : ");
+            }
+
+            //  when only device time limit crossed  //
+            if ((parseInt(newDeviceData.remainingTime) < 0) && (parseInt(newAppData.remainingTime) >= 0)) {
+                let deviceRemainingTimeCrossedNotification = await notificationData.deviceRemainingTimeCrossedNotification(childData, parentData);
+                console.log("596 <<<<  deviceRemainingTimeCrossedNotification : ");
+
+                //  decrease point from child profile  //
+                if (parseInt(timeSpent) > pointSettings) {
+                    let decreasePointAmount = parseInt(timeSpent) / pointSettings;
+                    console.log("601 <<<<  decreasePointAmount : ", decreasePointAmount);
+                    let totalPoint = parseInt(childData.points) - parseInt(decreasePointAmount);
+                    let updatedData = { points: totalPoint }
+                    let updateChildDataById = await childService.updateChildDataById(decoded.childId, updatedData)
+                }
+            }
+
+            //  when both time limit crossed  //
+            if ((parseInt(newAppData.remainingTime) < 0) && (parseInt(newDeviceData.remainingTime) < 0)) {
+                let bothRemainingTimeCrossedNotification = await notificationData.bothRemainingTimeCrossedNotification(childData, childAppDetails, parentData);
+                console.log("611 <<<<  bothRemainingTimeCrossedNotification : ");
+
+                //  decrease point from child profile  //
+                if (parseInt(timeSpent) > pointSettings) {
+                    let decreasePointAmount = parseInt(timeSpent) / pointSettings;
+                    console.log("616 <<<<  decreasePointAmount : ", decreasePointAmount);
+                    let totalPoint = parseInt(childData.points) - parseInt(decreasePointAmount);
+                    let updatedData = { points: totalPoint }
+                    let updateChildDataById = await childService.updateChildDataById(decoded.childId, updatedData)
+                }
+            }
+        }
+
+        //  if nothing was restricted by parent  //
+        if ((childAppDetails.scheduledBy == '') && (deviceDetails.scheduledBy == '')) {
+            console.log("624 ++++  totalAppTimeSpent : ", totalAppTimeSpent, "  ++++ timeSpent : ", timeSpent);
+
+            totalAppTimeSpent = parseInt(totalAppTimeSpent) + parseInt(timeSpent);
+            let newAppData = {
+                timeSpent: `${totalAppTimeSpent}`,
+                remainingTime: `${appRemainingTime}`
+            }
+            console.log("631 ++++  newAppData :", newAppData);
+            let updateChildAppDetails = await childService.updateDeviceAppDataById(childAppDetails.firestoreDeviceAppId, newAppData);
+
+            totalTimeSpent = parseInt(totalTimeSpent) + parseInt(timeSpent);
+            let newDeviceData = {
+                timeSpent: `${totalTimeSpent}`,
+                remainingTime: `${deviceRemainingTime}`
+            }
+            console.log("639 ++++  newDeviceData :", newDeviceData);
+            let updateChildDeviceDetails = await childService.updateDeviceDataById(deviceDetails.firestoreDevicePathId, newDeviceData);
+
         }
 
         return response.success(res, 200, message.SUCCESS)

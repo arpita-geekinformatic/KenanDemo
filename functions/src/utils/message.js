@@ -37,6 +37,8 @@ const LOGOUT = 'Logout successfully.';
 const USER_ID_REQUIRED = 'User Id required.';
 const TYPE_IS_REQUIRED = 'Type is required.';
 const TIME_SPENT_REQUIRED = 'Time spent is required.';
+const START_TIME_REQUIRED = 'Start time required.';
+const END_TIME_REQUIRED = 'End time required.';
 
 
 const TOKEN_EXPIRED = "Token Expired";
@@ -84,6 +86,8 @@ module.exports = {
   USER_ID_REQUIRED,
   TYPE_IS_REQUIRED,
   TIME_SPENT_REQUIRED,
+  START_TIME_REQUIRED,
+  END_TIME_REQUIRED,
   
   
   TOKEN_EXPIRED,
