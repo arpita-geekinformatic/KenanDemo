@@ -377,16 +377,36 @@ const deleteChildGiftById = async (giftId) => {
 //  notification List  //
 const notificationList = async (receiverId) => {
     try {
-        let notificationData = await db.collection("notifications").where("receiverId", "==", receiverId).where("isDeleted", "==", false).get();
+        let notificationData = await db.collection("notifications").where("receiverId", "==", receiverId).where("isDeleted", "==", false).orderBy('messageTime', 'desc').get();
 
         let notificationListArr = [];
         notificationData.forEach(doc => {
-            let notificationDetails =  doc.data()
+            let notificationDetails = doc.data()
             notificationDetails.notificationId = doc.id;
-          
+
             notificationListArr.push(notificationDetails);
         })
         return notificationListArr;
+
+    } catch (error) {
+        throw error
+    }
+}
+
+//  all Parent Notification Delete  //
+const allParentNotificationDelete = async (receiverId) => {
+    try {
+        // Get a new write batch >>>>>>  update multiple data using batch
+        const batch = db.batch();
+        const sfRef = await db.collection('notifications').where("receiverId", "==", receiverId).orderBy('messageTime', 'desc').get();
+
+        await sfRef.forEach((element) => {
+            batch.update(element.ref, {
+                isDeleted: true,
+            });
+        });
+        await batch.commit();
+        return true;
 
     } catch (error) {
         throw error
@@ -419,4 +439,5 @@ module.exports = {
     childGiftListById,
     deleteChildGiftById,
     notificationList,
+    allParentNotificationDelete,
 }

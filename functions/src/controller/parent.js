@@ -728,6 +728,28 @@ const parentNotificationList = async (res, headers) => {
     }
 }
 
+//  all Parent Notification Delete  //
+const allParentNotificationDelete = async (res, headers) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
+        }
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 400, message.INVALID_TOKEN);
+        }
+
+        //create DB batch to update multiple data
+        let deleteAllNotification = await parentService.allParentNotificationDelete(parentRes.firestore_parentId);
+
+        let notificationList = await parentService.notificationList(parentRes.firestore_parentId);
+        return response.data(res, notificationList, 200, message.SUCCESS);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
 
 module.exports = {
     signUp,
@@ -751,4 +773,5 @@ module.exports = {
     childGiftList,
     deleteChildGiftById,
     parentNotificationList,
+    allParentNotificationDelete,
 }

@@ -257,6 +257,16 @@ app.post('/parentNotificationList', async (req, res, next) => {
   }
 })
 
+//  all notification delete  //
+app.post('/allParentNotificationDelete', async (req, res, next) => {
+  try {
+    let result = await parentController.allParentNotificationDelete(res, req.headers);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 
 
