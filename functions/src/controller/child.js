@@ -700,6 +700,54 @@ const childNotificationList = async (res, headers) => {
     }
 }
 
+//  notification Delete By Id  //
+const notificationDeleteById = async (res, headers, paramData) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
+        }
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let childData = await childService.getChildDataById(decoded.childId);
+        if (!childData) {
+            return response.failure(res, 400, message.INVALID_TOKEN);
+        };
+        if (!paramData.id) {
+            return response.failure(res, 400, message.NOTIFICATION_ID_REQUIRED);
+        }
+
+        let notificationDeleteById = await childService.notificationDeleteById(paramData.id);
+        let notificationList = await childService.notificationList(childData.childId);
+
+        return response.data(res, notificationList, 200, message.SUCCESS);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+//  all Child Notification Delete  //
+const allChildNotificationDelete = async (res, headers) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
+        }
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let childData = await childService.getChildDataById(decoded.childId);
+        if (!childData) {
+            return response.failure(res, 400, message.INVALID_TOKEN);
+        };
+
+        //create DB batch to update multiple data
+        let deleteAllNotification = await childService.allChildNotificationDelete(childData.childId);
+
+        let notificationList = await childService.notificationList(childData.childId);
+        return response.data(res, notificationList, 200, message.SUCCESS);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+
+
 
 
 module.exports = {
@@ -709,4 +757,6 @@ module.exports = {
     deviceAppListByChild,
     updateUsageTime,
     childNotificationList,
+    notificationDeleteById,
+    allChildNotificationDelete,
 }

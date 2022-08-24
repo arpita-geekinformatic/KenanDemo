@@ -248,8 +248,8 @@ app.post('/deleteChildGiftById/:id', async (req, res, next) => {
 });
 
 //  notification list //
-app.post('/parentNotificationList', async(req, res, next) => {
-  try{
+app.post('/parentNotificationList', async (req, res, next) => {
+  try {
     let result = await parentController.parentNotificationList(res, req.headers);
     return result;
   } catch (error) {
@@ -312,9 +312,29 @@ app.post('/updateUsageTime', async (req, res, next) => {
 });
 
 //  notification list //
-app.post('/childNotificationList', async(req, res, next) => {
-  try{
+app.post('/childNotificationList', async (req, res, next) => {
+  try {
     let result = await childController.childNotificationList(res, req.headers);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+//  notification delete by ID  //
+app.post('/childNotificationDelete/:id', async (req, res, next) => {
+  try {
+    let result = await childController.notificationDeleteById(res, req.headers, req.params);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+//  all notification delete  //
+app.post('/allChildNotificationDelete', async (req, res, next) => {
+  try {
+    let result = await childController.allChildNotificationDelete(res, req.headers);
     return result;
   } catch (error) {
     next(error)

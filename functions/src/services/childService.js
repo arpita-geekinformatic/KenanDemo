@@ -49,33 +49,33 @@ const getDeviceDataByFirestoreId = async (firestoreDeviceId) => {
 
         let eachDayScheduleArr = [];
         let eachDayScheduleData = deviceData._fieldsProto.eachDaySchedule ? deviceData._fieldsProto.eachDaySchedule.arrayValue.values : [];
-        if(eachDayScheduleData.length > 0){
+        if (eachDayScheduleData.length > 0) {
             eachDayScheduleData.forEach(data => {
-                let obj ={
-                    status : data.mapValue.fields.status.booleanValue || false,
-                    day : data.mapValue.fields.day.stringValue || '',
-                    time : data.mapValue.fields.time.stringValue || ''
+                let obj = {
+                    status: data.mapValue.fields.status.booleanValue || false,
+                    day: data.mapValue.fields.day.stringValue || '',
+                    time: data.mapValue.fields.time.stringValue || ''
                 }
                 eachDayScheduleArr.push(obj)
             })
         }
 
         let deviceDetails = {
-            firestoreDevicePathId : deviceData._ref._path.segments[1],
-            childId : deviceData._fieldsProto.childId ? deviceData._fieldsProto.childId.stringValue : '',
-            parentId : deviceData._fieldsProto.parentId ? deviceData._fieldsProto.parentId.stringValue : '',
-            model : deviceData._fieldsProto.model ? deviceData._fieldsProto.model.stringValue : '',
-            versionCode : deviceData._fieldsProto.versionCode ? deviceData._fieldsProto.versionCode.stringValue : '',
-            fcmToken : deviceData._fieldsProto.fcmToken ? deviceData._fieldsProto.fcmToken.stringValue : '',
-            listSize : deviceData._fieldsProto.listSize ? deviceData._fieldsProto.listSize.integerValue : 0,
-            eachDaySchedule : eachDayScheduleArr,
-            everyDaySchedule : deviceData._fieldsProto.everyDaySchedule ? deviceData._fieldsProto.everyDaySchedule.stringValue : '',
-            manufacturer : deviceData._fieldsProto.manufacturer ? deviceData._fieldsProto.manufacturer.stringValue : '',
-            scheduledBy : deviceData._fieldsProto.scheduledBy ? deviceData._fieldsProto.scheduledBy.stringValue : '',
-            deviceId : deviceData._fieldsProto.deviceId ? deviceData._fieldsProto.deviceId.stringValue : '',
-            deviceName : deviceData._fieldsProto.deviceName ? deviceData._fieldsProto.deviceName.stringValue : '',
-            timeSpent : deviceData._fieldsProto.timeSpent ? deviceData._fieldsProto.timeSpent.stringValue : '',
-            remainingTime : deviceData._fieldsProto.remainingTime ? deviceData._fieldsProto.remainingTime.stringValue : '',
+            firestoreDevicePathId: deviceData._ref._path.segments[1],
+            childId: deviceData._fieldsProto.childId ? deviceData._fieldsProto.childId.stringValue : '',
+            parentId: deviceData._fieldsProto.parentId ? deviceData._fieldsProto.parentId.stringValue : '',
+            model: deviceData._fieldsProto.model ? deviceData._fieldsProto.model.stringValue : '',
+            versionCode: deviceData._fieldsProto.versionCode ? deviceData._fieldsProto.versionCode.stringValue : '',
+            fcmToken: deviceData._fieldsProto.fcmToken ? deviceData._fieldsProto.fcmToken.stringValue : '',
+            listSize: deviceData._fieldsProto.listSize ? deviceData._fieldsProto.listSize.integerValue : 0,
+            eachDaySchedule: eachDayScheduleArr,
+            everyDaySchedule: deviceData._fieldsProto.everyDaySchedule ? deviceData._fieldsProto.everyDaySchedule.stringValue : '',
+            manufacturer: deviceData._fieldsProto.manufacturer ? deviceData._fieldsProto.manufacturer.stringValue : '',
+            scheduledBy: deviceData._fieldsProto.scheduledBy ? deviceData._fieldsProto.scheduledBy.stringValue : '',
+            deviceId: deviceData._fieldsProto.deviceId ? deviceData._fieldsProto.deviceId.stringValue : '',
+            deviceName: deviceData._fieldsProto.deviceName ? deviceData._fieldsProto.deviceName.stringValue : '',
+            timeSpent: deviceData._fieldsProto.timeSpent ? deviceData._fieldsProto.timeSpent.stringValue : '',
+            remainingTime: deviceData._fieldsProto.remainingTime ? deviceData._fieldsProto.remainingTime.stringValue : '',
 
         }
         return deviceDetails;
@@ -299,15 +299,15 @@ const getParentDataById = async (parentId) => {
 
 //  >>>>>>>>>>>  NOTIFICATION  >>>>>>>>>>>  //
 //  notification List  //
-const notificationList =  async (receiverId) => {
+const notificationList = async (receiverId) => {
     try {
-        let notificationData = await db.collection("notifications").where("receiverId", "==", receiverId).where("isDeleted", "==", false).get();
+        let notificationData = await db.collection("notifications").where("receiverId", "==", receiverId).where("isDeleted", "==", false).orderBy('messageTime', 'desc').get();
 
         let notificationListArr = [];
         notificationData.forEach(doc => {
-            let notificationDetails =  doc.data()
+            let notificationDetails = doc.data()
             notificationDetails.notificationId = doc.id;
-          
+
             notificationListArr.push(notificationDetails);
         })
         return notificationListArr;
@@ -316,6 +316,37 @@ const notificationList =  async (receiverId) => {
         throw error
     }
 }
+
+//  notification Delete By Id  //
+const notificationDeleteById = async (notificationId) => {
+    try {
+        let deleteNotification = await db.collection('notifications').doc(notificationId).update({ isDeleted: true });
+        return true
+    } catch (error) {
+        throw error
+    }
+}
+
+//  all Child Notification Delete  //
+const allChildNotificationDelete = async (receiverId) => {
+    try {
+        // Get a new write batch >>>>>>  update multiple data using batch
+        const batch = db.batch();
+        const sfRef = await db.collection('notifications').where("receiverId", "==", receiverId).orderBy('messageTime', 'desc').get();
+
+        await sfRef.forEach((element) => {
+            batch.update(element.ref, {
+                isDeleted: true,
+            });
+        });
+        await batch.commit();
+        return true;
+
+    } catch (error) {
+        throw error
+    }
+}
+
 
 
 
@@ -336,4 +367,6 @@ module.exports = {
     getParentDataById,
     childDeviceAppList,
     notificationList,
+    notificationDeleteById,
+    allChildNotificationDelete,
 }
