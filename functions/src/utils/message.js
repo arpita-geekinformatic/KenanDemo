@@ -40,6 +40,7 @@ const TIME_SPENT_REQUIRED = 'Time spent is required.';
 const START_TIME_REQUIRED = 'Start time required.';
 const END_TIME_REQUIRED = 'End time required.';
 const NOTIFICATION_ID_REQUIRED = 'Notification Id is required.';
+const PROFILE_UPDATED = 'Profile updated successfully.';
 
 
 const TOKEN_EXPIRED = "Token Expired";
@@ -90,6 +91,7 @@ module.exports = {
   START_TIME_REQUIRED,
   END_TIME_REQUIRED,
   NOTIFICATION_ID_REQUIRED,
+  PROFILE_UPDATED,
   
   
   TOKEN_EXPIRED,

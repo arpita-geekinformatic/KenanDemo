@@ -147,6 +147,16 @@ app.post('/getParentProfile', async (req, res, next) => {
   }
 })
 
+//  update parent profile //
+app.post('/updateParentProfile', async (req, res, next) => {
+  try {
+    let result = await parentController.updateParentProfile(res, req.headers, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
 //  add Child  //
 app.post('/addChild', async (req, res, next) => {
   try {

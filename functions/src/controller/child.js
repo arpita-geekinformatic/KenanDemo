@@ -458,7 +458,8 @@ const updateUsageTime = async (res, headers, bodyData) => {
                 timeSpent: `${totalAppTimeSpent}`,
                 scheduledBy: childAppDetails.scheduledBy || '',
                 everyDaySchedule: childAppDetails.everyDaySchedule || '',
-                eachDaySchedule: childAppDetails.eachDaySchedule || []
+                eachDaySchedule: childAppDetails.eachDaySchedule || [],
+                packageName: bodyData.packageName,
             }
             return response.data(res, resultData, 200, message.SUCCESS)
         }
@@ -524,7 +525,8 @@ const updateUsageTime = async (res, headers, bodyData) => {
                 timeSpent: `${totalAppTimeSpent}`,
                 scheduledBy: childAppDetails.scheduledBy || '',
                 everyDaySchedule: childAppDetails.everyDaySchedule || '',
-                eachDaySchedule: childAppDetails.eachDaySchedule || []
+                eachDaySchedule: childAppDetails.eachDaySchedule || [],
+                packageName: bodyData.packageName,
             }
             return response.data(res, resultData, 200, message.SUCCESS)
         }
@@ -640,7 +642,8 @@ const updateUsageTime = async (res, headers, bodyData) => {
                 timeSpent: `${totalAppTimeSpent}`,
                 scheduledBy: childAppDetails.scheduledBy || '',
                 everyDaySchedule: childAppDetails.everyDaySchedule || '',
-                eachDaySchedule: childAppDetails.eachDaySchedule || []
+                eachDaySchedule: childAppDetails.eachDaySchedule || [],
+                packageName: bodyData.packageName,
             }
             return response.data(res, resultData, 200, message.SUCCESS)
         }
@@ -670,7 +673,8 @@ const updateUsageTime = async (res, headers, bodyData) => {
                 timeSpent: `${totalAppTimeSpent}`,
                 scheduledBy: childAppDetails.scheduledBy || '',
                 everyDaySchedule: childAppDetails.everyDaySchedule || '',
-                eachDaySchedule: childAppDetails.eachDaySchedule || []
+                eachDaySchedule: childAppDetails.eachDaySchedule || [],
+                packageName: bodyData.packageName,
             }
             return response.data(res, resultData, 200, message.SUCCESS)
         }

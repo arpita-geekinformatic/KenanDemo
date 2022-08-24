@@ -94,6 +94,9 @@ const getParentDataById = async (parentId) => {
             isActive: parentDetails._fieldsProto.isActive ? parentDetails._fieldsProto.isActive.booleanValue : false,
             isDeleted: parentDetails._fieldsProto.isDeleted ? parentDetails._fieldsProto.isDeleted.booleanValue : false,
             fcmToken: parentDetails._fieldsProto.fcmToken ? parentDetails._fieldsProto.fcmToken.stringValue : '',
+            childId: parentDetails._fieldsProto.childId ? parentDetails._fieldsProto.childId.arrayValue.values : [],
+            isBlocked: parentDetails._fieldsProto.isBlocked ? parentDetails._fieldsProto.isBlocked.booleanValue : false,
+            photo: parentDetails._fieldsProto.photo ? parentDetails._fieldsProto.photo.stringValue : '',
         }
         return parentData;
     } catch (error) {

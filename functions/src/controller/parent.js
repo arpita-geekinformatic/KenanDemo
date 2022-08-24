@@ -124,7 +124,7 @@ const login = async (res, bodyData) => {
         const updatePatrentData = await parentService.updateParentDataById(parentData.firestore_parentId, newData);
 
         delete parentData.password
-        return response.data(res, parentData,200,message.SUCCESS )
+        return response.data(res, parentData, 200, message.SUCCESS)
     } catch (error) {
         return response.failure(res, 400, error);
     }
@@ -319,6 +319,32 @@ const getParentProfile = async (res, headers) => {
         }
 
         return response.data(res, parentRes, 200, message.SUCCESS);
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+//  update Parent Profile  //
+const updateParentProfile = async (res, headers, bodyData) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentRes = await parentService.findParentByToken(headers.authorization);
+        if (!parentRes) {
+            return response.failure(res, 400, message.INVALID_TOKEN);
+        }
+
+        let updatedData = {
+            photo: bodyData.photo || parentRes.photo,
+            fcmToken: bodyData.fcmToken || parentRes.fcmToken
+        }
+        let updateParentProfile = await parentService.updateParentDataById(parentRes.firestore_parentId, updatedData)
+
+        let parentDetails =  await parentService.getParentDataById(parentRes.firestore_parentId)
+        return response.data(res, parentDetails, 200, message.PROFILE_UPDATED)
 
     } catch (error) {
         return response.failure(res, 400, error);
@@ -750,6 +776,7 @@ module.exports = {
     newPassword,
     resetPassword,
     getParentProfile,
+    updateParentProfile,
     addChild,
     childList,
     deleteChild,
