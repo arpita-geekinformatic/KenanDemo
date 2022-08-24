@@ -40,9 +40,11 @@ const signUp = async (res, bodyData) => {
             password: hashedPassword,
             isActive: false,
             isDeleted: false,
+            isBlocked: false,
             authToken: "",
             fcmToken: bodyData.fcmToken || "",
-            childId: []
+            childId: [],
+            photo: '',
         }
         let createParentProfile = await parentService.createParentProfile(newData);
 
@@ -101,7 +103,7 @@ const login = async (res, bodyData) => {
             return response.failure(res, 400, message.PASSWORD_REQUIRED);
         }
 
-        const parentData = await parentService.getParentDataByEmail(bodyData.email);
+        let parentData = await parentService.getParentDataByEmail(bodyData.email);
         if (!parentData) {
             return response.failure(res, 400, message.USER_NOT_FOUND,);
         }
@@ -117,16 +119,12 @@ const login = async (res, bodyData) => {
         const authToken = await KenanUtilities.generateToken(parentData.email, parentData.firestore_parentId);
         parentData.authToken = authToken;
         let newData = {
-            name: parentData.name,
-            email: parentData.email,
-            childId: parentData.childId,
-            isActive: parentData.isActive,
-            isDeleted: parentData.isDeleted,
             authToken: authToken,
         }
         const updatePatrentData = await parentService.updateParentDataById(parentData.firestore_parentId, newData);
 
-        return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data: newData });
+        delete parentData.password
+        return response.data(res, parentData,200,message.SUCCESS )
     } catch (error) {
         return response.failure(res, 400, error);
     }
@@ -320,16 +318,6 @@ const getParentProfile = async (res, headers) => {
             return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
-        // let parentDetails = {
-        //     name : parentRes.name,
-        //     name : parentRes.name,
-        //     name : parentRes.name,
-        //     name : parentRes.name,
-        //     name : parentRes.name,
-        //     name : parentRes.name,
-        //     name : parentRes.name,
-        //     name : parentRes.name,
-        // }
         return response.data(res, parentRes, 200, message.SUCCESS);
 
     } catch (error) {

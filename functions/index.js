@@ -137,7 +137,7 @@ app.post('/resetPassword', async (req, res, next) => {
   }
 })
 
-//  get profile by id  //
+//  get profile details  //
 app.post('/getParentProfile', async (req, res, next) => {
   try {
     let result = await parentController.getParentProfile(res, req.headers);

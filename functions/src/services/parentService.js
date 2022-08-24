@@ -45,7 +45,21 @@ const getParentDataByEmail = async (email) => {
             parentArr.push(doc.data())
             parentArr[0].firestore_parentId = doc.id
         })
-        return parentArr[0];
+
+        let parentDetails = {
+            firestore_parentId : parentArr[0].firestore_parentId,
+            name : parentArr[0].name || '',
+            email : parentArr[0].email,
+            isActive : parentArr[0].isActive,
+            childId : parentArr[0].childId,
+            isBlocked : parentArr[0].isBlocked,
+            authToken : parentArr[0].authToken || '',
+            fcmToken : parentArr[0].fcmToken || '',
+            photo: parentArr[0].photo || '',
+            password : parentArr[0].password,
+        }
+        return parentDetails;
+
     } catch (error) {
         throw error;
     }
@@ -111,7 +125,20 @@ const findParentByToken = async (authToken) => {
             parentArr.push(doc.data())
             parentArr[0].firestore_parentId = doc.id
         })
-        return parentArr[0];
+       
+        let parentDetails = {
+            firestore_parentId : parentArr[0].firestore_parentId,
+            name : parentArr[0].name || '',
+            email : parentArr[0].email,
+            isActive : parentArr[0].isActive,
+            childId : parentArr[0].childId,
+            isBlocked : parentArr[0].isBlocked,
+            authToken : parentArr[0].authToken || '',
+            fcmToken : parentArr[0].fcmToken || '',
+            photo: parentArr[0].photo || '',
+        }
+
+        return parentDetails;
     } catch (error) {
         throw error;
     }
