@@ -105,7 +105,7 @@ const login = async (res, bodyData) => {
 
         let parentData = await parentService.getParentDataByEmail(bodyData.email);
         if (!parentData) {
-            return response.failure(res, 400, message.USER_NOT_FOUND,);
+            return response.failure(res, 200, message.USER_NOT_FOUND,);
         }
         if (!parentData.isActive) {
             return response.failure(res, 400, message.INACTIVE_ACCOUNT,);
@@ -159,7 +159,7 @@ const forgotPassword = async (res, bodyData) => {
 
         const parentData = await parentService.getParentDataByEmail(bodyData.email);
         if (!parentData) {
-            return response.failure(res, 400, message.USER_NOT_FOUND,);
+            return response.failure(res, 200, message.USER_NOT_FOUND,);
         }
         if (!parentData.isActive) {
             return response.failure(res, 400, message.INACTIVE_ACCOUNT,);
@@ -226,7 +226,7 @@ const resendOTP = async (res, bodyData) => {
 
         const parentRes = await parentService.getParentDataByEmail(bodyData.email);
         if (!parentRes) {
-            return response.failure(res, 400, message.USER_NOT_FOUND);
+            return response.failure(res, 200, message.USER_NOT_FOUND);
         }
         let randomOTP = KenanUtilities.genNumericCode(4);
         let expiredDate = moment().add(10, 'm');
