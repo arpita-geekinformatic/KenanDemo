@@ -330,7 +330,6 @@ const updateParentProfile = async (res, headers, bodyData) => {
         if (!headers.authorization) {
             return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
-
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
