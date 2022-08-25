@@ -908,7 +908,6 @@ const allChildNotificationDelete = async (res, headers) => {
 
 
 
-
 module.exports = {
     addDeviceApps,
     scanQrCode,
