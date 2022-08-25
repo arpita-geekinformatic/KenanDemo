@@ -43,6 +43,9 @@ const END_TIME_REQUIRED = 'End time required.';
 const NOTIFICATION_ID_REQUIRED = 'Notification Id is required.';
 const PROFILE_UPDATED = 'Profile updated successfully.';
 const LANGUAGE_REQUIRED = 'Language is required.';
+const SOMETHING_WRONG = 'Something went wrong please try again later.';
+const GIFT_ID_INVALID = 'Invalid gift Id.';
+const NOT_ENOUGH_POINTs = 'You do not have enough points to redeem this gift.';
 
 
 const TOKEN_EXPIRED = "Token Expired";
@@ -96,7 +99,11 @@ module.exports = {
   NOTIFICATION_ID_REQUIRED,
   PROFILE_UPDATED,
   LANGUAGE_REQUIRED,
-  
+  SOMETHING_WRONG,
+  GIFT_ID_INVALID,
+  NOT_ENOUGH_POINTs,
+
+
   TOKEN_EXPIRED,
   UNAUTHORIZED,
   APP_UNINSTALLED,

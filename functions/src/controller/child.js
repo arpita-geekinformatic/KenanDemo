@@ -905,6 +905,108 @@ const allChildNotificationDelete = async (res, headers) => {
     }
 }
 
+//  gift List  //
+const giftList = async (res, headers) => {
+    try {
+        if (!headers.lang) {
+            return response.failure(res, 400, message.LANGUAGE_REQUIRED);
+        }
+
+        if (!headers.authorization) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.TOKEN_REQUIRED);
+            }
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
+        }
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let childData = await childService.getChildDataById(decoded.childId);
+        if (!childData) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.INVALID_TOKEN);
+            }
+            return response.failure(res, 400, message.INVALID_TOKEN);
+        };
+
+        const giftList = await childService.giftList(decoded.childId);
+
+        if (headers.lang == 'ar') {
+            return response.data(res, giftList, 200, arabicMessage.SUCCESS);
+        } else {
+            return response.data(res, giftList, 200, message.SUCCESS);
+        }
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+//  redeem Gift  //
+const redeemGift = async (res, headers, paramData) => {
+    try {
+        if (!headers.lang) {
+            return response.failure(res, 400, message.LANGUAGE_REQUIRED);
+        }
+
+        if (!paramData.id) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.GIFT_ID_REQUIRED);
+            }
+            return response.failure(res, 400, message.GIFT_ID_REQUIRED);
+        }
+        if (!headers.authorization) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.TOKEN_REQUIRED);
+            }
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
+        }
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let childData = await childService.getChildDataById(decoded.childId);
+        if (!childData) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.INVALID_TOKEN);
+            }
+            return response.failure(res, 400, message.INVALID_TOKEN);
+        };
+
+        let parentData = await childService.getParentDataById(childData.parentId);
+        if (!parentData) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.SOMETHING_WRONG);
+            }
+            return response.failure(res, 400, message.SOMETHING_WRONG);
+        }
+
+        let giftDetails = await childService.giftDetailsById(paramData.id);
+        if (!giftDetails) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.GIFT_ID_INVALID);
+            }
+            return response.failure(res, 400, message.GIFT_ID_INVALID);
+        }
+
+        console.log(">>>>> childData.points : ", childData.points, "  >>>>> giftDetails.points : ", giftDetails.points);
+        if (parseInt(childData.points) < parseInt(giftDetails.points)) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.NOT_ENOUGH_POINTs);
+            }
+            return response.failure(res, 400, message.NOT_ENOUGH_POINTs);
+        }
+
+        //  send notification to parent of redeem gift  //
+
+
+
+        
+
+        if (headers.lang == 'ar') {
+            return response.data(res, giftDetails, 200, arabicMessage.SUCCESS);
+        } else {
+            return response.data(res, giftDetails, 200, message.SUCCESS);
+        }
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
 
 
 
@@ -917,4 +1019,6 @@ module.exports = {
     childNotificationList,
     notificationDeleteById,
     allChildNotificationDelete,
+    giftList,
+    redeemGift,
 }

@@ -349,6 +349,55 @@ const allChildNotificationDelete = async (receiverId) => {
 
 
 
+//  >>>>>>>>>>  CHILD GIFTS  >>>>>>>>>>>>  //
+//  gift List  //
+const giftList = async (childId) => {
+    try {
+        let giftData = await db.collection("childGifts").where("childId", "==", childId).where("isDeleted", "==", false).orderBy('points', 'asc').get();
+
+        let giftArr = [];
+        giftData.forEach(doc => {
+            let giftDetails = doc.data()
+            giftDetails.giftId = doc.id;
+
+            giftArr.push(giftDetails);
+        })
+        return giftArr;
+
+    } catch (error) {
+        throw error
+    }
+}
+
+//  gift Details By Id  //
+const giftDetailsById = async (giftId) => {
+    try {
+        let giftDetails = await db.collection('childGifts').doc(giftId).get();
+
+        if (!giftDetails._fieldsProto) {
+            return false;
+        }
+        if (giftDetails._fieldsProto.isDeleted.booleanValue) {
+            return false;
+        }
+
+        let giftData = {
+            giftId: giftDetails._ref._path.segments[1],
+            childId: giftDetails._fieldsProto.childId ? giftDetails._fieldsProto.childId.stringValue : '',
+            giftIcon: giftDetails._fieldsProto.giftIcon ? giftDetails._fieldsProto.giftIcon.stringValue : '',
+            giftName: giftDetails._fieldsProto.giftName ? giftDetails._fieldsProto.giftName.stringValue : '',
+            parentId: giftDetails._fieldsProto.parentId ? giftDetails._fieldsProto.parentId.stringValue : '',
+            points: giftDetails._fieldsProto.points ? giftDetails._fieldsProto.points.integerValue : 0,
+        }
+        return giftData;
+
+    } catch (error) {
+        throw error
+    }
+}
+
+
+
 
 module.exports = {
     isDeviceExists,
@@ -369,4 +418,6 @@ module.exports = {
     notificationList,
     notificationDeleteById,
     allChildNotificationDelete,
+    giftList,
+    giftDetailsById,
 }

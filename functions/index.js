@@ -372,6 +372,26 @@ app.post('/allChildNotificationDelete', async (req, res, next) => {
   }
 })
 
+//  all gift list  //
+app.post('/giftListChild', async (req, res, next) => {
+  try {
+    let result = await childController.giftList(res, req.headers);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+//  Redeem gift by id  //
+app.post('/redeemGift/:id', async (req, res, next) => {
+  try {
+    let result = await childController.redeemGift(res, req.headers, req.params);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 
 
