@@ -50,7 +50,7 @@ app.get("/testing", (req, res) => {
 //  parent sign up  //
 app.post("/signUp", async (req, res, next) => {
   try {
-    let result = await parentController.signUp(res, req.body);
+    let result = await parentController.signUp(res, req.body, req.headers);
     return result;
   } catch (error) {
     next(error);
@@ -70,7 +70,7 @@ app.get("/acountAcctivation/:activationLink", async (req, res, next) => {
 //  parent login   //
 app.post("/login", async (req, res, next) => {
   try {
-    let result = await parentController.login(res, req.body);
+    let result = await parentController.login(res, req.body, req.headers);
     return result;
   } catch (error) {
     next(error);
@@ -90,7 +90,7 @@ app.post('/logout', async (req, res, next) => {
 //  parent forgot password  //
 app.post('/forgotPassword', async (req, res, next) => {
   try {
-    let result = await parentController.forgotPassword(res, req.body);
+    let result = await parentController.forgotPassword(res, req.body, req.headers);
     return result;
   } catch (error) {
     next(error)
@@ -100,7 +100,7 @@ app.post('/forgotPassword', async (req, res, next) => {
 //  verify OTP  //
 app.post('/verifyOTP', async (req, res, next) => {
   try {
-    let result = await parentController.verifyOTP(res, req.body);
+    let result = await parentController.verifyOTP(res, req.body, req.headers);
     return result;
   } catch (error) {
     next(error)
@@ -110,7 +110,7 @@ app.post('/verifyOTP', async (req, res, next) => {
 //  resend OTP  //
 app.post('/resendOTP', async (req, res, next) => {
   try {
-    let result = await parentController.resendOTP(res, req.body);
+    let result = await parentController.resendOTP(res, req.body, req.headers);
     return result;
   } catch (error) {
     next(error)

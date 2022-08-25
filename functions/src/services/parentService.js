@@ -139,6 +139,7 @@ const findParentByToken = async (authToken) => {
             authToken : parentArr[0].authToken || '',
             fcmToken : parentArr[0].fcmToken || '',
             photo: parentArr[0].photo || '',
+            password: parentArr[0].password || '',
         }
 
         return parentDetails;
