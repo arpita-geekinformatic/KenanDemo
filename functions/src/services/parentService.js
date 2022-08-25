@@ -444,6 +444,16 @@ const allParentNotificationDelete = async (receiverId) => {
     }
 }
 
+//  notification Delete By Id  //
+const notificationDeleteById = async (notificationId) => {
+    try {
+        let deleteNotification = await db.collection('notifications').doc(notificationId).update({ isDeleted: true });
+        return true
+    } catch (error) {
+        throw error
+    }
+}
+
 
 
 module.exports = {
@@ -471,4 +481,5 @@ module.exports = {
     deleteChildGiftById,
     notificationList,
     allParentNotificationDelete,
+    notificationDeleteById,
 }

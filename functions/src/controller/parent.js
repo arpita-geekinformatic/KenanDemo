@@ -1200,6 +1200,49 @@ const allParentNotificationDelete = async (res, headers) => {
 }
 
 
+//  notification Delete By Id  //
+const notificationDeleteById = async (res, headers, paramData) => {
+    try {
+        if (!headers.lang) {
+            return response.failure(res, 400, message.LANGUAGE_REQUIRED);
+        }
+
+        if (!headers.authorization) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.TOKEN_REQUIRED);
+            }
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
+        }
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentData = await parentService.getParentDataById(decoded.id);
+        if (!parentData) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.INVALID_TOKEN);
+            }
+            return response.failure(res, 400, message.INVALID_TOKEN);
+        };
+        if (!paramData.id) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.NOTIFICATION_ID_REQUIRED);
+            }
+            return response.failure(res, 400, message.NOTIFICATION_ID_REQUIRED);
+        }
+
+        let notificationDeleteById = await parentService.notificationDeleteById(paramData.id);
+        let notificationList = await parentService.notificationList(decoded.id);
+
+        if (headers.lang == 'ar') {
+            return response.data(res, notificationList, 200, arabicMessage.SUCCESS);
+        } else {
+            return response.data(res, notificationList, 200, message.SUCCESS);
+        }
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+
+
 module.exports = {
     signUp,
     acountAcctivation,
@@ -1224,4 +1267,5 @@ module.exports = {
     deleteChildGiftById,
     parentNotificationList,
     allParentNotificationDelete,
+    notificationDeleteById,
 }
