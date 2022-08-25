@@ -1,6 +1,7 @@
 const childService = require("../services/childService");
 const response = require("../utils/response");
 const message = require("../utils/message");
+const arabicMessage = require("../utils/arabicMessage");
 const notificationData = require("../services/notification");
 const differenceBy = require("lodash/differenceBy");
 const KenanUtilities = require("../utils/KenanUtilities");
@@ -12,31 +13,53 @@ var deviceKeys = ["deviceId", "deviceName", "parentId", "childId", "versionCode"
 
 
 //  scan Qr Code  //
-const scanQrCode = async (res, bodyData) => {
+const scanQrCode = async (res, bodyData, headers) => {
     try {
+        if (!headers.lang) {
+            return response.failure(res, 400, message.LANGUAGE_REQUIRED);
+        }
+
         if (!bodyData.parentId) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.PARENT_ID_REQUIRED);
+            }
             return response.failure(res, 400, message.PARENT_ID_REQUIRED);
         }
         if (!bodyData.childId) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.CHILD_ID_REQUIRED);
+            }
             return response.failure(res, 400, message.CHILD_ID_REQUIRED);
         }
         if (!bodyData.deviceId) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.REQUIRE_CHILD_DEVICE_ID);
+            }
             return response.failure(res, 400, message.REQUIRE_CHILD_DEVICE_ID);
         }
         // if (!bodyData.password) {
         //     return response.failure(res, 400, message.PASSWORD_REQUIRED);
         // }
         if (!bodyData.FcmToken) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.REQUIRE_FCM);
+            }
             return response.failure(res, 400, message.REQUIRE_FCM);
         }
 
         let isParentExists = await childService.getParentDataById(bodyData.parentId);
         if (!isParentExists) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.INVALID_PARENT_ID);
+            }
             return response.failure(res, 400, message.INVALID_PARENT_ID);
         }
 
         let isChildExists = await childService.getChildDataById(bodyData.childId);
         if (!isChildExists) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.INVALID_CHILD_ID);
+            }
             return response.failure(res, 400, message.INVALID_CHILD_ID);
         }
 
@@ -119,17 +142,28 @@ const scanQrCode = async (res, bodyData) => {
             parentName: isParentExists.name,
             authToken: authToken,
         };
-        return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data: finaldata });
 
+        if (headers.lang == 'ar') {
+            return response.data(res, finaldata, 200, arabicMessage.SUCCESS)
+        } else {
+            return response.data(res, finaldata, 200, message.SUCCESS)
+        }
     } catch (error) {
         return response.failure(res, 400, error);
     }
 }
 
 //  add Child  // 
-const addDeviceApps = async (res, reqBodyData) => {
+const addDeviceApps = async (res, reqBodyData, headers) => {
     try {
+        if (!headers.lang) {
+            return response.failure(res, 400, message.LANGUAGE_REQUIRED);
+        }
+
         if (!reqBodyData.deviceId) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.REQUIRE_CHILD_DEVICE_ID);
+            }
             return response.failure(res, 400, message.REQUIRE_CHILD_DEVICE_ID);
         }
 
@@ -307,7 +341,12 @@ const addDeviceApps = async (res, reqBodyData) => {
             firestore_deviceId: firestoreDevicePathId,
             deviceId: reqBodyData.deviceId
         }
-        return res.send({ responseCode: 200, status: true, message: message.SUCCESS, data });
+
+        if (headers.lang == 'ar') {
+            return response.data(res, data, 200, arabicMessage.SUCCESS)
+        } else {
+            return response.data(res, data, 200, message.SUCCESS)
+        }
     } catch (error) {
         return response.failure(res, 400, error);
     }
@@ -316,13 +355,23 @@ const addDeviceApps = async (res, reqBodyData) => {
 //  get child details  //
 const childDetails = async (res, headers) => {
     try {
+        if (!headers.lang) {
+            return response.failure(res, 400, message.LANGUAGE_REQUIRED);
+        }
+
         if (!headers.authorization) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.TOKEN_REQUIRED);
+            }
             return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         const childData = await childService.getChildDataById(decoded.childId);
         if (!childData) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.INVALID_TOKEN);
+            }
             return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
@@ -331,7 +380,11 @@ const childDetails = async (res, headers) => {
         childData.eachDaySchedule = childDeviceData.eachDaySchedule || [];
         childData.everyDaySchedule = childDeviceData.everyDaySchedule || '';
 
-        return response.data(res, childData, 200, message.SUCCESS);
+        if (headers.lang == 'ar') {
+            return response.data(res, childData, 200, arabicMessage.SUCCESS);
+        } else {
+            return response.data(res, childData, 200, message.SUCCESS);
+        }
     } catch (error) {
         return response.failure(res, 400, error);
     }
@@ -340,19 +393,33 @@ const childDetails = async (res, headers) => {
 //  child Device App List for child  //
 const deviceAppListByChild = async (res, headers) => {
     try {
+        if (!headers.lang) {
+            return response.failure(res, 400, message.LANGUAGE_REQUIRED);
+        }
+
         if (!headers.authorization) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.TOKEN_REQUIRED);
+            }
             return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
 
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let childData = await childService.getChildDataById(decoded.childId);
         if (!childData) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.INVALID_TOKEN);
+            }
             return response.failure(res, 400, message.INVALID_TOKEN);
         }
 
-        let childDeviceAppList = await childService.childDeviceAppList(childData.deviceId)
-        return response.data(res, childDeviceAppList, 200, message.SUCCESS);
+        let childDeviceAppList = await childService.childDeviceAppList(childData.deviceId);
 
+        if (headers.lang == 'ar') {
+            return response.data(res, childDeviceAppList, 200, arabicMessage.SUCCESS);
+        } else {
+            return response.data(res, childDeviceAppList, 200, message.SUCCESS);
+        }
     } catch (error) {
         return response.failure(res, 400, error);
     }
@@ -361,24 +428,46 @@ const deviceAppListByChild = async (res, headers) => {
 //  update child device and app usage  //
 const updateUsageTime = async (res, headers, bodyData) => {
     try {
+        if (!headers.lang) {
+            return response.failure(res, 400, message.LANGUAGE_REQUIRED);
+        }
+
         if (!headers.authorization) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.TOKEN_REQUIRED);
+            }
             return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let childData = await childService.getChildDataById(decoded.childId);
         if (!childData) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.INVALID_TOKEN);
+            }
             return response.failure(res, 400, message.INVALID_TOKEN);
         };
         if (!bodyData.packageName) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.REQUIRE_PACKAGE_NAME);
+            }
             return response.failure(res, 400, message.REQUIRE_PACKAGE_NAME);
         };
         if (!bodyData.startTime) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.START_TIME_REQUIRED);
+            }
             return response.failure(res, 400, message.START_TIME_REQUIRED);
         };
         if (!bodyData.endTime) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.END_TIME_REQUIRED);
+            }
             return response.failure(res, 400, message.END_TIME_REQUIRED);
         };
         if (!bodyData.type) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.TYPE_IS_REQUIRED);
+            }
             return response.failure(res, 400, message.TYPE_IS_REQUIRED)
         };
 
@@ -461,7 +550,12 @@ const updateUsageTime = async (res, headers, bodyData) => {
                 eachDaySchedule: childAppDetails.eachDaySchedule || [],
                 packageName: bodyData.packageName,
             }
-            return response.data(res, resultData, 200, message.SUCCESS)
+
+            if (headers.lang == 'ar') {
+                return response.data(res, resultData, 200, arabicMessage.SUCCESS)
+            } else {
+                return response.data(res, resultData, 200, message.SUCCESS)
+            }
         }
 
         //  if only device usage is restricted by parent  //
@@ -528,7 +622,12 @@ const updateUsageTime = async (res, headers, bodyData) => {
                 eachDaySchedule: childAppDetails.eachDaySchedule || [],
                 packageName: bodyData.packageName,
             }
-            return response.data(res, resultData, 200, message.SUCCESS)
+
+            if (headers.lang == 'ar') {
+                return response.data(res, resultData, 200, arabicMessage.SUCCESS)
+            } else {
+                return response.data(res, resultData, 200, message.SUCCESS)
+            }
         }
 
         //  if both device usage and app usage is restricted by parent  //
@@ -645,7 +744,12 @@ const updateUsageTime = async (res, headers, bodyData) => {
                 eachDaySchedule: childAppDetails.eachDaySchedule || [],
                 packageName: bodyData.packageName,
             }
-            return response.data(res, resultData, 200, message.SUCCESS)
+
+            if (headers.lang == 'ar') {
+                return response.data(res, resultData, 200, arabicMessage.SUCCESS)
+            } else {
+                return response.data(res, resultData, 200, message.SUCCESS)
+            }
         }
 
         //  if nothing was restricted by parent  //
@@ -676,7 +780,12 @@ const updateUsageTime = async (res, headers, bodyData) => {
                 eachDaySchedule: childAppDetails.eachDaySchedule || [],
                 packageName: bodyData.packageName,
             }
-            return response.data(res, resultData, 200, message.SUCCESS)
+
+            if (headers.lang == 'ar') {
+                return response.data(res, resultData, 200, arabicMessage.SUCCESS)
+            } else {
+                return response.data(res, resultData, 200, message.SUCCESS)
+            }
         }
 
         // return response.success(res, 200, message.SUCCESS)
@@ -688,17 +797,32 @@ const updateUsageTime = async (res, headers, bodyData) => {
 //  child Notification List //
 const childNotificationList = async (res, headers) => {
     try {
+        if (!headers.lang) {
+            return response.failure(res, 400, message.LANGUAGE_REQUIRED);
+        }
+
         if (!headers.authorization) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.TOKEN_REQUIRED);
+            }
             return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let childData = await childService.getChildDataById(decoded.childId);
         if (!childData) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.INVALID_TOKEN);
+            }
             return response.failure(res, 400, message.INVALID_TOKEN);
         };
 
         let notificationList = await childService.notificationList(childData.childId);
-        return response.data(res, notificationList, 200, message.SUCCESS)
+
+        if (headers.lang == 'ar') {
+            return response.data(res, notificationList, 200, arabicMessage.SUCCESS)
+        } else {
+            return response.data(res, notificationList, 200, message.SUCCESS)
+        }
     } catch (error) {
         return response.failure(res, 400, error);
     }
@@ -707,22 +831,39 @@ const childNotificationList = async (res, headers) => {
 //  notification Delete By Id  //
 const notificationDeleteById = async (res, headers, paramData) => {
     try {
+        if (!headers.lang) {
+            return response.failure(res, 400, message.LANGUAGE_REQUIRED);
+        }
+
         if (!headers.authorization) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.TOKEN_REQUIRED);
+            }
             return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let childData = await childService.getChildDataById(decoded.childId);
         if (!childData) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.INVALID_TOKEN);
+            }
             return response.failure(res, 400, message.INVALID_TOKEN);
         };
         if (!paramData.id) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.NOTIFICATION_ID_REQUIRED);
+            }
             return response.failure(res, 400, message.NOTIFICATION_ID_REQUIRED);
         }
 
         let notificationDeleteById = await childService.notificationDeleteById(paramData.id);
         let notificationList = await childService.notificationList(childData.childId);
 
-        return response.data(res, notificationList, 200, message.SUCCESS);
+        if (headers.lang == 'ar') {
+            return response.data(res, notificationList, 200, arabicMessage.SUCCESS);
+        } else {
+            return response.data(res, notificationList, 200, message.SUCCESS);
+        }
     } catch (error) {
         return response.failure(res, 400, error);
     }
@@ -731,20 +872,34 @@ const notificationDeleteById = async (res, headers, paramData) => {
 //  all Child Notification Delete  //
 const allChildNotificationDelete = async (res, headers) => {
     try {
+        if (!headers.lang) {
+            return response.failure(res, 400, message.LANGUAGE_REQUIRED);
+        }
+
         if (!headers.authorization) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.TOKEN_REQUIRED);
+            }
             return response.failure(res, 400, message.TOKEN_REQUIRED);
         }
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let childData = await childService.getChildDataById(decoded.childId);
         if (!childData) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 400, arabicMessage.INVALID_TOKEN);
+            }
             return response.failure(res, 400, message.INVALID_TOKEN);
         };
 
         //create DB batch to update multiple data
         let deleteAllNotification = await childService.allChildNotificationDelete(childData.childId);
-
         let notificationList = await childService.notificationList(childData.childId);
-        return response.data(res, notificationList, 200, message.SUCCESS);
+
+        if (headers.lang == 'ar') {
+            return response.data(res, notificationList, 200, arabicMessage.SUCCESS);
+        } else {
+            return response.data(res, notificationList, 200, message.SUCCESS);
+        }
     } catch (error) {
         return response.failure(res, 400, error);
     }

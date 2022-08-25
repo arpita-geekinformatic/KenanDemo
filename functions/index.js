@@ -284,7 +284,7 @@ app.post('/allParentNotificationDelete', async (req, res, next) => {
 //  scan QR code  //
 app.post("/scanQrCode", async (req, res, next) => {
   try {
-    let result = await childController.scanQrCode(res, req.body);
+    let result = await childController.scanQrCode(res, req.body, req.headers);
     return result;
   } catch (error) {
     next(error);
@@ -294,7 +294,7 @@ app.post("/scanQrCode", async (req, res, next) => {
 //  add child device apps  //
 app.post("/addDeviceApps", async (req, res, next) => {
   try {
-    let result = await childController.addDeviceApps(res, req.body);
+    let result = await childController.addDeviceApps(res, req.body, req.headers);
     return result;
   } catch (error) {
     next(error);
