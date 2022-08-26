@@ -109,51 +109,49 @@ const sendDeviceUsageNotification = async (bodyData, updateData, topic, childDat
 }
 
 //  gift Request Rejected by parent Notification  //  (Type => type2)
-const giftRequestRejectedNotification = async () => {
+const giftRequestRejectedNotification = async (childData, parentData, giftNotificationDetails, topic, lang) => {
     try {
+        const message = {
+            data: {
+                title: `Your gift request of '${giftNotificationDetails.giftName}' has been rejected by parent.`,
+                body: `Your gift request of '${giftNotificationDetails.giftName}' has been rejected by parent.`,
+                notificationType: `visible`,
+            },
+            topic: topic
+        };
+        await firebaseAdmin.firebaseSendTopicNotification(message);
 
+        var localDate = new Date();
+        const utcDate = moment.utc(localDate).format();
 
-        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-            const message = {
-                data: {
-                    title: `Your device usage has been changed by parent.`,
-                    body: `Your device usage has been changed by parent.`,
-                    notificationType: `visible`,
-                },
-                topic: topic
-            };
-            await firebaseAdmin.firebaseSendTopicNotification(message);
-    
-            var localDate = new Date();
-            const utcDate = moment.utc(localDate).format();
-            let notificationData = {
-                message: message.data,
-                childDeviceId: childData.deviceId,
-                senderId: parentData.firestore_parentId,
-                senderImage: parentData.photo || '',
-                receiverId: childData.childId,
-                receiverImage: childData.photo,
-                notificationType: notificationType.type2,
-                messageTime: utcDate,
-                isMarked: false,
-                isDeleted: false
-            }
-            let saveNotification = await notificationService.addNotification(notificationData);
-    
-            let activityLogData = {
-                senderId: parentData.firestore_parentId,
-                senderName: parentData.name || '',
-                receiverId: childData.childId,
-                receiverName: childData.name || '',
-                actionPerformed_byId: parentData.firestore_parentId,
-                actionPerformed_byName: parentData.name || '',
-                actionDetails: `Device usage of child ${childData.name} has been changed by parent.`,
-                createdAt: utcDate,
-                isDeleted: false
-            }
-            let saveActivity = await notificationService.addActivityLog(activityLogData);
-    
-            return true;
+        let notificationData = {
+            message: message.data,
+            childDeviceId: childData.deviceId,
+            senderId: parentData.parentId,
+            senderImage: parentData.photo || '',
+            receiverId: childData.childId,
+            receiverImage: childData.photo,
+            notificationType: notificationType.type2,
+            messageTime: utcDate,
+            isMarked: false,
+            isDeleted: false
+        }
+        let saveNotification = await notificationService.addNotification(notificationData);
+
+        let activityLogData = {
+            senderId: parentData.parentId,
+            senderName: parentData.name || '',
+            receiverId: childData.childId,
+            receiverName: childData.name || '',
+            actionPerformed_byId: parentData.parentId,
+            actionPerformed_byName: parentData.name || '',
+            actionDetails: `Your gift request of '${giftNotificationDetails.giftName}' has been rejected by parent.`,
+            createdAt: utcDate,
+            isDeleted: false
+        }
+        let saveActivity = await notificationService.addActivityLog(activityLogData);
+
+        return true;
 
     } catch (error) {
         throw error;
@@ -440,7 +438,7 @@ const requestRedeemGiftNotification = async (childData, parentData, lang, giftDe
             messageTime: utcDate,
             isMarked: false,
             isDeleted: false,
-            giftName : giftDetails.giftName,
+            giftName: giftDetails.giftName,
         }
         let saveNotification = await notificationService.addNotification(notificationData);
 
@@ -454,7 +452,7 @@ const requestRedeemGiftNotification = async (childData, parentData, lang, giftDe
             actionDetails: `${childData.name} wants to redeem the gift: ${giftDetails.giftName}.`,
             createdAt: utcDate,
             isDeleted: false,
-            giftName : giftDetails.giftName,
+            giftName: giftDetails.giftName,
         }
         let saveActivity = await notificationService.addActivityLog(activityLogData);
 
@@ -469,6 +467,7 @@ const requestRedeemGiftNotification = async (childData, parentData, lang, giftDe
 module.exports = {
     sendAppUsageNotification,
     sendDeviceUsageNotification,
+    giftRequestRejectedNotification,
     appRemainingTimeReachedNotification,
     deviceRemainingTimeReachedNotification,
     appRemainingTimeCrossedNotification,

@@ -221,7 +221,7 @@ const getChildList = async (parentId) => {
     }
 }
 
-//  getChildDataById  //
+//  get Child Data By Id  //
 const getChildDataById = async (childId) => {
     try {
         let childDetails = await db.collection("childs").doc(childId).get();

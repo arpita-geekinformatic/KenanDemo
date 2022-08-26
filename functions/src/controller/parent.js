@@ -1275,10 +1275,13 @@ const acceptRejectGiftRequest = async (res, headers, paramData, queryData) => {
         }
 
         const giftNotificationDetails = await parentService.giftNotificationDetails(paramData.id);
+        const childData = await parentService.getChildDataById(giftNotificationDetails.senderId);
+        console.log("************** childData : ", childData);
 
         if (queryData.status == 'rejected') {
             //  send gift rejected notification to child  //
-            let giftRequestRejectedNotification = await notificationData.giftRequestRejectedNotification(childData, parentData, headers.lang, giftDetails);
+            let topic = `child_${childData.childId}`;
+            let giftRequestRejectedNotification = await notificationData.giftRequestRejectedNotification(childData, parentData, giftNotificationDetails, topic, headers.lang);
             console.log("441 >>>>>  giftRequestRejectedNotification : ");
         }
 
