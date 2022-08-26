@@ -494,9 +494,21 @@ const giftNotificationDetails = async (notificationId) => {
         notificationData.receiverImage = giftNotificationDetails._fieldsProto.receiverImage ? giftNotificationDetails._fieldsProto.receiverImage.stringValue : '';
         notificationData.message = giftNotificationDetails._fieldsProto.message ? giftNotificationDetails._fieldsProto.message.mapValue.fields : [];
         notificationData.giftName = giftNotificationDetails._fieldsProto.giftName ? giftNotificationDetails._fieldsProto.giftName.stringValue : '';
+        notificationData.notificationStatus = giftNotificationDetails._fieldsProto.notificationStatus ? giftNotificationDetails._fieldsProto.notificationStatus.stringValue : '';
 
         return notificationData;
 
+    } catch (error) {
+        throw error
+    }
+}
+
+//  update Notification By Id  //
+const updateNotificationById = async (notificationId, updatedData) => {
+    try {
+        let updateNotificationById = await db.collection('notifications').doc(notificationId).update(updatedData);
+        return true;
+        
     } catch (error) {
         throw error
     }
@@ -531,4 +543,5 @@ module.exports = {
     allParentNotificationDelete,
     notificationDeleteById,
     giftNotificationDetails,
+    updateNotificationById,
 }

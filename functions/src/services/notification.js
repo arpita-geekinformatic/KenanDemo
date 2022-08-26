@@ -158,6 +158,57 @@ const giftRequestRejectedNotification = async (childData, parentData, giftNotifi
     }
 }
 
+//  gift Request Accepted by parent Notification  //  (Type => type2)
+const giftRequestAcceptedNotification = async (childData, parentData, giftNotificationDetails, topic, lang) => {
+    try {
+        const message = {
+            data: {
+                title: `Your gift request of '${giftNotificationDetails.giftName}' has been accepted by parent.`,
+                body: `Your gift request of '${giftNotificationDetails.giftName}' has been accepted by parent.`,
+                notificationType: `visible`,
+            },
+            topic: topic
+        };
+        await firebaseAdmin.firebaseSendTopicNotification(message);
+
+        var localDate = new Date();
+        const utcDate = moment.utc(localDate).format();
+
+        let notificationData = {
+            message: message.data,
+            childDeviceId: childData.deviceId,
+            senderId: parentData.parentId,
+            senderImage: parentData.photo || '',
+            receiverId: childData.childId,
+            receiverImage: childData.photo,
+            notificationType: notificationType.type2,
+            messageTime: utcDate,
+            isMarked: false,
+            isDeleted: false
+        }
+        let saveNotification = await notificationService.addNotification(notificationData);
+
+        let activityLogData = {
+            senderId: parentData.parentId,
+            senderName: parentData.name || '',
+            receiverId: childData.childId,
+            receiverName: childData.name || '',
+            actionPerformed_byId: parentData.parentId,
+            actionPerformed_byName: parentData.name || '',
+            actionDetails: `Your gift request of '${giftNotificationDetails.giftName}' has been accepted by parent.`,
+            createdAt: utcDate,
+            isDeleted: false
+        }
+        let saveActivity = await notificationService.addActivityLog(activityLogData);
+
+        return true;
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 
 
 //   PARENT NOTIFICATION   //
@@ -469,6 +520,7 @@ module.exports = {
     sendAppUsageNotification,
     sendDeviceUsageNotification,
     giftRequestRejectedNotification,
+    giftRequestAcceptedNotification,
     appRemainingTimeReachedNotification,
     deviceRemainingTimeReachedNotification,
     appRemainingTimeCrossedNotification,

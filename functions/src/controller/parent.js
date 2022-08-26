@@ -1277,15 +1277,41 @@ const acceptRejectGiftRequest = async (res, headers, paramData, queryData) => {
         const giftNotificationDetails = await parentService.giftNotificationDetails(paramData.id);
         const childData = await parentService.getChildDataById(giftNotificationDetails.senderId);
         console.log("************** childData : ", childData);
-        console.log(">>>>>>>>>>>> giftNotificationDetails : ",giftNotificationDetails);
+        console.log(">>>>>>>>>>>> giftNotificationDetails : ", giftNotificationDetails);
+
+        if (giftNotificationDetails.notificationStatus == 'rejected') {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 200, arabicMessage.GIFT_REJECTED);
+            }
+            return response.failure(res, 200, message.GIFT_REJECTED);
+        }
+
+        if (giftNotificationDetails.notificationStatus == 'accepted') {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 200, arabicMessage.GIFT_ACCEPTED);
+            }
+            return response.failure(res, 200, message.GIFT_ACCEPTED);
+        }
 
         if (queryData.status == 'rejected') {
             //  send gift rejected notification to child  //
             let topic = `child_${childData.childId}`;
             let giftRequestRejectedNotification = await notificationData.giftRequestRejectedNotification(childData, parentData, giftNotificationDetails, topic, headers.lang);
-            console.log("441 >>>>>  giftRequestRejectedNotification : ");
+            console.log("1330 >>>>>  giftRequestRejectedNotification : ");
+
+            let updatedData = { notificationStatus: 'rejected' }
+            let updateNotification = await parentService.updateNotificationById(paramData.id, updatedData)
         }
 
+        if (queryData.status == 'accepted') {
+            //  send gift accepted notification to child  //
+            let topic = `child_${childData.childId}`;
+            let giftRequestAcceptedNotification = await notificationData.giftRequestAcceptedNotification(childData, parentData, giftNotificationDetails, topic, headers.lang);
+            console.log("1309 >>>>>  giftRequestAcceptedNotification : ");
+
+            let updatedData = { notificationStatus: 'accepted' }
+            let updateNotification = await parentService.updateNotificationById(paramData.id, updatedData)
+        }
 
 
 

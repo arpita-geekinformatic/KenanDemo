@@ -47,6 +47,8 @@ const SOMETHING_WRONG = 'هناك خطأ ما ، يرجى المحاولة مر�
 const GIFT_ID_INVALID = 'معرف الهدية غير صالح.';
 const NOT_ENOUGH_POINTs = 'ليس لديك نقاط كافية لاسترداد هذه الهدية.';
 const ACCEPT_STATUS_REQUIRED = 'الحالة مقبولة / مرفوضة مطلوبة.';
+const GIFT_REJECTED = 'تم رفض هذا الطلب بالفعل.';
+const GIFT_ACCEPTED = 'تم قبول هذا الطلب بالفعل.';
 
 
 
@@ -105,6 +107,8 @@ module.exports = {
   GIFT_ID_INVALID,
   NOT_ENOUGH_POINTs,
   ACCEPT_STATUS_REQUIRED,
+  GIFT_REJECTED,
+  GIFT_ACCEPTED,
 
 
   TOKEN_EXPIRED,

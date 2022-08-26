@@ -984,6 +984,7 @@ const redeemGift = async (res, headers, paramData) => {
         }
 
         console.log(">>>>> childData.points : ", childData.points, "  >>>>> giftDetails.points : ", giftDetails.points);
+        //  check if child has enough point ti redeem selected gift  //
         if (parseInt(childData.points) < parseInt(giftDetails.points)) {
             if (headers.lang == 'ar') {
                 return response.failure(res, 400, arabicMessage.NOT_ENOUGH_POINTs);
@@ -994,6 +995,10 @@ const redeemGift = async (res, headers, paramData) => {
         //  send notification to parent of redeem gift request  //
         let requestRedeemGiftNotification = await notificationData.requestRedeemGiftNotification(childData, parentData, headers.lang, giftDetails);
         console.log("441 >>>>>  requestRedeemGiftNotification : ");
+
+        let finalPoints = parseInt(childData.points) - parseInt(giftDetails.points);
+        let updatedChildData = { points :  finalPoints };
+        let updateChildDataById = await childService.updateChildDataById(childData.childId ,updatedChildData)
 
         if (headers.lang == 'ar') {
             return response.success(res, 200, arabicMessage.SUCCESS);
