@@ -1276,8 +1276,6 @@ const acceptRejectGiftRequest = async (res, headers, paramData, queryData) => {
 
         const giftNotificationDetails = await parentService.giftNotificationDetails(paramData.id);
         const childData = await parentService.getChildDataById(giftNotificationDetails.senderId);
-        console.log("************** childData : ", childData);
-        console.log(">>>>>>>>>>>> giftNotificationDetails : ", giftNotificationDetails);
 
         if (giftNotificationDetails.notificationStatus == 'rejected') {
             if (headers.lang == 'ar') {
@@ -1300,7 +1298,18 @@ const acceptRejectGiftRequest = async (res, headers, paramData, queryData) => {
             console.log("1330 >>>>>  giftRequestRejectedNotification : ");
 
             let updatedData = { notificationStatus: 'rejected' }
-            let updateNotification = await parentService.updateNotificationById(paramData.id, updatedData)
+            let updateNotification = await parentService.updateNotificationById(paramData.id, updatedData);
+
+            let finalPoint = parseInt(childData.points) + parseInt(giftNotificationDetails.giftPoint)
+            console.log(">>>>>>>>>>> finalPoint : ", finalPoint);
+            let updatedchildData = { points: finalPoint }
+            let updateChildDataById = await parentService.updateChildDataById(childData.childId, updatedchildData)
+
+            if (headers.lang == 'ar') {
+                return response.success(res, 200, arabicMessage.GIFT_REJECTED_SUCCESSFULLY);
+            } else {
+                return response.success(res, 200, message.GIFT_REJECTED_SUCCESSFULLY);
+            }
         }
 
         if (queryData.status == 'accepted') {
@@ -1311,15 +1320,14 @@ const acceptRejectGiftRequest = async (res, headers, paramData, queryData) => {
 
             let updatedData = { notificationStatus: 'accepted' }
             let updateNotification = await parentService.updateNotificationById(paramData.id, updatedData)
+
+            if (headers.lang == 'ar') {
+                return response.success(res, 200, arabicMessage.GIFT_ACCEPTED_SUCCESSFULLY);
+            } else {
+                return response.success(res, 200, message.GIFT_ACCEPTED_SUCCESSFULLY);
+            }
         }
 
-
-
-        if (headers.lang == 'ar') {
-            return response.success(res, 200, arabicMessage.SUCCESS);
-        } else {
-            return response.success(res, 200, message.SUCCESS);
-        }
     } catch (error) {
         return response.failure(res, 400, error);
     }

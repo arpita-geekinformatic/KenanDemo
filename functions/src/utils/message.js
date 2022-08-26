@@ -49,6 +49,8 @@ const NOT_ENOUGH_POINTs = 'You do not have enough points to redeem this gift.';
 const ACCEPT_STATUS_REQUIRED = 'Accepted/Rejected status required.';
 const GIFT_REJECTED = 'This request has already been rejected.';
 const GIFT_ACCEPTED = 'This request has already been accepted.';
+const GIFT_REJECTED_SUCCESSFULLY  = 'The request was successfully rejected.';
+const GIFT_ACCEPTED_SUCCESSFULLY  = 'The request has been successfully accepted.';
 
 
 const TOKEN_EXPIRED = "Token Expired";
@@ -108,7 +110,9 @@ module.exports = {
   ACCEPT_STATUS_REQUIRED,
   GIFT_REJECTED,
   GIFT_ACCEPTED,
-
+  GIFT_REJECTED_SUCCESSFULLY,
+  GIFT_ACCEPTED_SUCCESSFULLY,
+  
   
   TOKEN_EXPIRED,
   UNAUTHORIZED,

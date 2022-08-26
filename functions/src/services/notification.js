@@ -491,6 +491,7 @@ const requestRedeemGiftNotification = async (childData, parentData, lang, giftDe
             isDeleted: false,
             giftName: giftDetails.giftName,
             notificationStatus : "",
+            giftPoint : giftDetails.points,
         }
         let saveNotification = await notificationService.addNotification(notificationData);
 
@@ -505,6 +506,7 @@ const requestRedeemGiftNotification = async (childData, parentData, lang, giftDe
             createdAt: utcDate,
             isDeleted: false,
             giftName: giftDetails.giftName,
+            giftPoint : giftDetails.points,
         }
         let saveActivity = await notificationService.addActivityLog(activityLogData);
 

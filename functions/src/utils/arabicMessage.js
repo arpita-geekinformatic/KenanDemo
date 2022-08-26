@@ -49,6 +49,8 @@ const NOT_ENOUGH_POINTs = 'ليس لديك نقاط كافية لاسترداد 
 const ACCEPT_STATUS_REQUIRED = 'الحالة مقبولة / مرفوضة مطلوبة.';
 const GIFT_REJECTED = 'تم رفض هذا الطلب بالفعل.';
 const GIFT_ACCEPTED = 'تم قبول هذا الطلب بالفعل.';
+const GIFT_REJECTED_SUCCESSFULLY  = 'تم رفض الطلب بنجاح.';
+const GIFT_ACCEPTED_SUCCESSFULLY  = 'تم قبول الطلب بنجاح.';
 
 
 
@@ -109,8 +111,10 @@ module.exports = {
   ACCEPT_STATUS_REQUIRED,
   GIFT_REJECTED,
   GIFT_ACCEPTED,
+  GIFT_REJECTED_SUCCESSFULLY,
+  GIFT_ACCEPTED_SUCCESSFULLY,
 
-
+  
   TOKEN_EXPIRED,
   UNAUTHORIZED,
   APP_UNINSTALLED,

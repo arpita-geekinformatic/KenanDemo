@@ -262,6 +262,17 @@ const deleteChildById = async (childId) => {
     }
 }
 
+//  update Child Data By Id  //
+const updateChildDataById = async (childId, updateData ) => {
+    try {
+        let updatechild = await db.collection('childs').doc(childId).update(updateData);
+        return true;
+
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 
 //  >>>>>>>>>>>>  DEVICE APPS  >>>>>>>>>>>>>>> //
@@ -495,6 +506,7 @@ const giftNotificationDetails = async (notificationId) => {
         notificationData.message = giftNotificationDetails._fieldsProto.message ? giftNotificationDetails._fieldsProto.message.mapValue.fields : [];
         notificationData.giftName = giftNotificationDetails._fieldsProto.giftName ? giftNotificationDetails._fieldsProto.giftName.stringValue : '';
         notificationData.notificationStatus = giftNotificationDetails._fieldsProto.notificationStatus ? giftNotificationDetails._fieldsProto.notificationStatus.stringValue : '';
+        notificationData.giftPoint = giftNotificationDetails._fieldsProto.giftPoint ? giftNotificationDetails._fieldsProto.giftPoint.stringValue : '0';
 
         return notificationData;
 
@@ -508,7 +520,7 @@ const updateNotificationById = async (notificationId, updatedData) => {
     try {
         let updateNotificationById = await db.collection('notifications').doc(notificationId).update(updatedData);
         return true;
-        
+
     } catch (error) {
         throw error
     }
@@ -530,6 +542,7 @@ module.exports = {
     getChildList,
     getChildDataById,
     deleteChildById,
+    updateChildDataById,
     childDeviceAppList,
     getDeviceAppsIdByPackageName,
     getDeviceAppsIdByPackageNameAndId,
