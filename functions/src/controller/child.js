@@ -991,16 +991,15 @@ const redeemGift = async (res, headers, paramData) => {
             return response.failure(res, 400, message.NOT_ENOUGH_POINTs);
         }
 
-        //  send notification to parent of redeem gift  //
+        //  send notification to parent of redeem gift request  //
+        let requestRedeemGiftNotification = await notificationData.requestRedeemGiftNotification(childData, parentData, headers.lang, giftDetails);
+        console.log("441 >>>>>  requestRedeemGiftNotification : ");
 
-
-
-        
 
         if (headers.lang == 'ar') {
-            return response.data(res, giftDetails, 200, arabicMessage.SUCCESS);
+            return response.success(res, 200, arabicMessage.SUCCESS);
         } else {
-            return response.data(res, giftDetails, 200, message.SUCCESS);
+            return response.success(res, 200, message.SUCCESS);
         }
     } catch (error) {
         return response.failure(res, 400, error);
