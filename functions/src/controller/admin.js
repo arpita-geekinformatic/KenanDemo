@@ -253,7 +253,7 @@ const deleteParent = async (res, headers, paramData) => {
 
     //  send mail to parent and all connected child  //
     let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/accountDeleteEmail.ejs", { async: true });
-    let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: allChildEmailArr, subject: "Kenan Account", text: messageHtml});
+    let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: allChildEmailArr, subject: "Kenan Account", text: messageHtml });
 
     return response.success(res, 200, message.SUCCESS);
   } catch (error) {
@@ -283,6 +283,62 @@ const addGiftType = async (res, bodyData) => {
   }
 }
 
+//  gift Type List  //
+const giftTypeList = async (res, headers) => {
+  try {
+    if (!headers.authorization) {
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+
+    const decoded = await KenanUtilities.decryptToken(headers.authorization);
+    const adminData = await adminService.findAdminByToken(headers.authorization);
+    if (!adminData) {
+      return response.failure(res, 400, message.INVALID_TOKEN,);
+    }
+
+    const giftTypeList = await adminService.giftTypeList();
+
+    return response.data(res, giftTypeList, 200, message.SUCCESS);
+
+  } catch (error) {
+    return response.failure(res, 400, error)
+  }
+}
+
+//  update Gift Type By Id  //
+const updateGiftTypeById = async (res, headers, paramData, bodyData) => {
+  try {
+    if (!headers.authorization) {
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+
+    const decoded = await KenanUtilities.decryptToken(headers.authorization);
+    const adminData = await adminService.findAdminByToken(headers.authorization);
+    if (!adminData) {
+      return response.failure(res, 400, message.INVALID_TOKEN,);
+    }
+
+    if (!paramData.id) {
+      return response.failure(res, 400, message.GIFT_TYPE_ID_REQUIRED,);
+    }
+
+    const giftTypeDetails = await adminService.giftTypeDetailsById(paramData.id)
+    if (!giftTypeDetails) {
+      return response.failure(res, 400, message.INVALID_GIFT_TYPE_ID,);
+    }
+
+    let updatedData = {
+      name: bodyData.name || giftTypeDetails.name,
+      icon: bodyData.icon || giftTypeDetails.icon,
+    }
+    const updateGiftTypeById = await adminService.updateGiftTypeById(paramData.id, updatedData)
+
+    return response.success(res, 200, message.SUCCESS)
+
+  } catch (error) {
+    return response.failure(res, 400, error)
+  }
+}
 
 
 
@@ -297,4 +353,6 @@ module.exports = {
   updateParent,
   deleteParent,
   addGiftType,
+  giftTypeList,
+  updateGiftTypeById,
 }

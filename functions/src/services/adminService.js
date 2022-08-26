@@ -4,7 +4,7 @@ const db = getFirestore();
 // db.settings({ ignoreUndefinedProperties: true });
 
 
-
+//  >>>>>>>>>>>>   ADMIN   >>>>>>>>>>  //
 //  find admin data  //
 const findAdmin = async (email) => {
     try {
@@ -65,6 +65,10 @@ const updateAdmin = async (adminId, newData) => {
     }
 }
 
+
+
+
+//  >>>>>>>>>>>>   PARENTS   >>>>>>>>>>  //
 //  user List  //
 const userList = async (limit, offset) => {
     try {
@@ -109,7 +113,6 @@ const totalUserCount = async () => {
 //  parent details By Id  //
 const parentdetailsById = async (parentId) => {
     try {
-
         let parentDetails = await db.collection('parents').doc(parentId).get();
 
         if (!parentDetails._fieldsProto) {
@@ -125,7 +128,6 @@ const parentdetailsById = async (parentId) => {
         parentData.email = parentDetails._fieldsProto.email ? parentDetails._fieldsProto.email.stringValue : "";
         parentData.isActive = parentDetails._fieldsProto.isActive ? parentDetails._fieldsProto.isActive.booleanValue : false;
         parentData.childId = parentDetails._fieldsProto.childId ? parentDetails._fieldsProto.childId.arrayValue : [];
-
 
         return parentData;
     } catch (error) {
@@ -144,6 +146,9 @@ const updateParentById = async (parentId, newData) => {
     }
 }
 
+
+
+//  >>>>>>>>>>>>   CHILDS   >>>>>>>>>>  //
 //  delete all childs by parent Id  //
 const deleteChildsByParentsId = async (parentId) => {
     try {
@@ -172,6 +177,9 @@ const deleteChildsByParentsId = async (parentId) => {
     }
 }
 
+
+
+//  >>>>>>>>>>>>   DEVICES   >>>>>>>>>>  //
 //  delete Connected Chield Device  //
 const deleteConnectedChildDevice = async (allChildDeviceIdArr) => {
     try {
@@ -195,6 +203,9 @@ const deleteConnectedChildDevice = async (allChildDeviceIdArr) => {
     }
 }
 
+
+
+//  >>>>>>>>>>>>   GIFT TYPES   >>>>>>>>>>  //
 //  add Gift Type  //
 const addGiftType = async (newData) => {
     try {
@@ -206,6 +217,62 @@ const addGiftType = async (newData) => {
     }
 }
 
+//  giftT ype List  //
+const giftTypeList = async () => {
+    try {
+        let giftList = await db.collection("giftTypes").where("isDeleted", "==", false).orderBy('name', 'asc').get();
+
+        let giftArr = [];
+        giftList.forEach(doc => {
+            let giftData = doc.data();
+            giftData.giftId = doc.id;
+
+            giftArr.push(giftData);
+        });
+
+        // giftArr.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1);
+
+        return giftArr;
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  gift Type Details By Id  //
+const giftTypeDetailsById = async (giftTypeId) => {
+    try {
+        let giftTypeDetails = await db.collection('giftTypes').doc(giftTypeId).get();
+
+        if (!giftTypeDetails._fieldsProto) {
+            return false;
+        }
+        if (giftTypeDetails._fieldsProto.isDeleted.booleanValue) {
+            return false;
+        }
+
+        let giftTypeData = {};
+        giftTypeData.giftTypeId = giftTypeId;
+        giftTypeData.name = giftTypeDetails._fieldsProto.name ? giftTypeDetails._fieldsProto.name.stringValue : "";
+        giftTypeData.icon = giftTypeDetails._fieldsProto.icon ? giftTypeDetails._fieldsProto.icon.stringValue : "";
+
+        return giftTypeData;
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  update Gift Type By Id  //
+const updateGiftTypeById = async (giftTypeId, updatedData) => {
+    try {
+        let updateGiftTypeById = await db.collection('giftTypes').doc(giftTypeId).update(updatedData);
+        return true
+
+    } catch (error) {
+        throw error;
+    }
+}
 
 
 
@@ -221,4 +288,7 @@ module.exports = {
     deleteChildsByParentsId,
     deleteConnectedChildDevice,
     addGiftType,
+    giftTypeList,
+    giftTypeDetailsById,
+    updateGiftTypeById,
 }

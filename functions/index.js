@@ -511,11 +511,30 @@ app.delete('/parents/:id', async (req, res, next) => {
   }
 })
 
-
 //  add gift type for parent  //
 app.post('/addGiftType', async (req, res, next) => {
   try {
     let result = await adminController.addGiftType(res, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+//  gift type list  //
+app.get('/giftTypeList', async (req, res, next) => {
+  try {
+    let result = await adminController.giftTypeList(res, req.headers);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+//  update gift type  //
+app.post('/updateGiftType/:id', async(req, res, next) => {
+  try{
+    let result = await adminController.updateGiftTypeById(res, req.headers, req.params, req.body);
     return result;
   } catch (error) {
     next(error)
