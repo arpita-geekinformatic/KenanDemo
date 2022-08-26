@@ -439,6 +439,7 @@ const requestRedeemGiftNotification = async (childData, parentData, lang, giftDe
             isMarked: false,
             isDeleted: false,
             giftName: giftDetails.giftName,
+            notificationStatus : "",
         }
         let saveNotification = await notificationService.addNotification(notificationData);
 

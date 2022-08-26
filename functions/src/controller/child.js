@@ -995,7 +995,6 @@ const redeemGift = async (res, headers, paramData) => {
         let requestRedeemGiftNotification = await notificationData.requestRedeemGiftNotification(childData, parentData, headers.lang, giftDetails);
         console.log("441 >>>>>  requestRedeemGiftNotification : ");
 
-
         if (headers.lang == 'ar') {
             return response.success(res, 200, arabicMessage.SUCCESS);
         } else {
