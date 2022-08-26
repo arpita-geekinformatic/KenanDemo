@@ -287,6 +287,16 @@ app.post('/parentNotificationDelete/:id', async (req, res, next) => {
   }
 })
 
+//  accept/reject gift request from child by Id  //
+app.post('/acceptRejectGiftRequest/:id', async (req, res, next) => {
+  try {
+    let result = await parentController.acceptRejectGiftRequest(res, req.headers, req.params, req.query);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 
 

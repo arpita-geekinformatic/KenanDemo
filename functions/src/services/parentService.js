@@ -6,6 +6,7 @@ const db = getFirestore();
 
 
 
+//  >>>>>>>>>>>>  PARENTS  >>>>>>>>>>>>>>> //
 //  is user exists //
 const isParentExists = async (email) => {
     try {
@@ -47,16 +48,16 @@ const getParentDataByEmail = async (email) => {
         })
 
         let parentDetails = {
-            firestore_parentId : parentArr[0].firestore_parentId,
-            name : parentArr[0].name || '',
-            email : parentArr[0].email,
-            isActive : parentArr[0].isActive,
-            childId : parentArr[0].childId,
-            isBlocked : parentArr[0].isBlocked,
-            authToken : parentArr[0].authToken || '',
-            fcmToken : parentArr[0].fcmToken || '',
+            firestore_parentId: parentArr[0].firestore_parentId,
+            name: parentArr[0].name || '',
+            email: parentArr[0].email,
+            isActive: parentArr[0].isActive,
+            childId: parentArr[0].childId,
+            isBlocked: parentArr[0].isBlocked,
+            authToken: parentArr[0].authToken || '',
+            fcmToken: parentArr[0].fcmToken || '',
             photo: parentArr[0].photo || '',
-            password : parentArr[0].password,
+            password: parentArr[0].password,
         }
         return parentDetails;
 
@@ -128,16 +129,16 @@ const findParentByToken = async (authToken) => {
             parentArr.push(doc.data())
             parentArr[0].firestore_parentId = doc.id
         })
-       
+
         let parentDetails = {
-            firestore_parentId : parentArr[0].firestore_parentId,
-            name : parentArr[0].name || '',
-            email : parentArr[0].email,
-            isActive : parentArr[0].isActive,
-            childId : parentArr[0].childId,
-            isBlocked : parentArr[0].isBlocked,
-            authToken : parentArr[0].authToken || '',
-            fcmToken : parentArr[0].fcmToken || '',
+            firestore_parentId: parentArr[0].firestore_parentId,
+            name: parentArr[0].name || '',
+            email: parentArr[0].email,
+            isActive: parentArr[0].isActive,
+            childId: parentArr[0].childId,
+            isBlocked: parentArr[0].isBlocked,
+            authToken: parentArr[0].authToken || '',
+            fcmToken: parentArr[0].fcmToken || '',
             photo: parentArr[0].photo || '',
             password: parentArr[0].password || '',
         }
@@ -168,6 +169,9 @@ const getParentDataByOTP = async (bodyData) => {
     }
 }
 
+
+
+//  >>>>>>>>>>>>  CHILDS  >>>>>>>>>>>>>>> //
 //  get child details by name and Parent ID  // 
 const getChildByParent = async (childName, parentId) => {
     try {
@@ -258,6 +262,9 @@ const deleteChildById = async (childId) => {
     }
 }
 
+
+
+//  >>>>>>>>>>>>  DEVICE APPS  >>>>>>>>>>>>>>> //
 //  get child device apps list (with app image) by device ID  //
 const childDeviceAppList = async (deviceId) => {
     try {
@@ -322,6 +329,8 @@ const updateDeviceAppsById = async (deviceAppId, updatedData) => {
     }
 }
 
+
+//  >>>>>>>>>>>>  DEVICE   >>>>>>>>>>>>>>> //
 //  update Device Data By Id  //
 const updateDeviceDataById = async (deviceId, updatedData) => {
     try {
@@ -340,6 +349,7 @@ const updateDeviceDataById = async (deviceId, updatedData) => {
 }
 
 
+//  >>>>>>>>>>>>  GIFT TYPES   >>>>>>>>>>>>>>> //
 //  gift Type Dropdown  //
 const giftTypeDropdown = async () => {
     try {
@@ -361,6 +371,9 @@ const giftTypeDropdown = async () => {
     }
 }
 
+
+
+//  >>>>>>>>>>>>  CHILD GIFTS   >>>>>>>>>>>>>>> //
 //  add Gift for child  //
 const addGift = async (giftData) => {
     try {
@@ -405,6 +418,9 @@ const deleteChildGiftById = async (giftId) => {
     }
 }
 
+
+
+//  >>>>>>>>>>>>  NOTIFICATIONS   >>>>>>>>>>>>>>> //
 //  notification List  //
 const notificationList = async (receiverId) => {
     try {
@@ -454,6 +470,38 @@ const notificationDeleteById = async (notificationId) => {
     }
 }
 
+//  gift Notification Details by Id  //
+const giftNotificationDetails = async (notificationId) => {
+    try {
+        let giftNotificationDetails = await db.collection('notifications').doc(notificationId).get();
+
+        if (!giftNotificationDetails._fieldsProto) {
+            return false;
+        }
+        if (giftNotificationDetails._fieldsProto.isDeleted.booleanValue) {
+            return false;
+        }
+
+        let notificationData = {};
+        notificationData.notificationId = notificationId;
+        notificationData.childDeviceId = giftNotificationDetails._fieldsProto.childDeviceId ? giftNotificationDetails._fieldsProto.childDeviceId.stringValue : '';
+        notificationData.senderId = giftNotificationDetails._fieldsProto.senderId ? giftNotificationDetails._fieldsProto.senderId.stringValue : '';
+        notificationData.senderImage = giftNotificationDetails._fieldsProto.senderImage ? giftNotificationDetails._fieldsProto.senderImage.stringValue : '';
+        notificationData.receiverId = giftNotificationDetails._fieldsProto.receiverId ? giftNotificationDetails._fieldsProto.receiverId.stringValue : '';
+        notificationData.messageTime = giftNotificationDetails._fieldsProto.messageTime ? giftNotificationDetails._fieldsProto.messageTime.stringValue : '';
+        notificationData.isMarked = giftNotificationDetails._fieldsProto.isMarked ? giftNotificationDetails._fieldsProto.isMarked.booleanValue : false;
+        notificationData.notificationType = giftNotificationDetails._fieldsProto.notificationType ? giftNotificationDetails._fieldsProto.notificationType.integerValue : 1;
+        notificationData.receiverImage = giftNotificationDetails._fieldsProto.receiverImage ? giftNotificationDetails._fieldsProto.receiverImage.stringValue : '';
+        notificationData.message = giftNotificationDetails._fieldsProto.message ? giftNotificationDetails._fieldsProto.message.mapValue.fields : [];
+        notificationData.giftName = giftNotificationDetails._fieldsProto.giftName ? giftNotificationDetails._fieldsProto.giftName.stringValue : '';
+
+        return notificationData;
+
+    } catch (error) {
+        throw error
+    }
+}
+
 
 
 module.exports = {
@@ -482,4 +530,5 @@ module.exports = {
     notificationList,
     allParentNotificationDelete,
     notificationDeleteById,
+    giftNotificationDetails,
 }

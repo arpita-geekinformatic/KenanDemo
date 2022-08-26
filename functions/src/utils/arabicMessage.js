@@ -46,6 +46,8 @@ const LANGUAGE_REQUIRED = 'Language is required.';
 const SOMETHING_WRONG = 'هناك خطأ ما ، يرجى المحاولة مرة أخرى في وقت لاحق';
 const GIFT_ID_INVALID = 'معرف الهدية غير صالح.';
 const NOT_ENOUGH_POINTs = 'ليس لديك نقاط كافية لاسترداد هذه الهدية.';
+const ACCEPT_STATUS_REQUIRED = 'الحالة مقبولة / مرفوضة مطلوبة.';
+
 
 
 const TOKEN_EXPIRED = "Token Expired";
@@ -102,7 +104,8 @@ module.exports = {
   SOMETHING_WRONG,
   GIFT_ID_INVALID,
   NOT_ENOUGH_POINTs,
-  
+  ACCEPT_STATUS_REQUIRED,
+
 
   TOKEN_EXPIRED,
   UNAUTHORIZED,

@@ -12,7 +12,7 @@ const notificationType = {
 
 
 //   CHILD NOTIFICATION   //
-//  send app usage change notification  // (Type => type2)
+//  send app usage changed by parent notification  // (Type => type2)
 const sendAppUsageNotification = async (bodyData, updateData, topic, childData, parentData) => {
     try {
         const message = {
@@ -60,7 +60,7 @@ const sendAppUsageNotification = async (bodyData, updateData, topic, childData, 
     }
 }
 
-//  send device usage change notification  // (Type => type2)
+//  send device usage changed by parent notification  // (Type => type2)
 const sendDeviceUsageNotification = async (bodyData, updateData, topic, childData, parentData) => {
     try {
         const message = {
@@ -103,6 +103,58 @@ const sendDeviceUsageNotification = async (bodyData, updateData, topic, childDat
         let saveActivity = await notificationService.addActivityLog(activityLogData);
 
         return true;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  gift Request Rejected by parent Notification  //  (Type => type2)
+const giftRequestRejectedNotification = async () => {
+    try {
+
+
+        //>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            const message = {
+                data: {
+                    title: `Your device usage has been changed by parent.`,
+                    body: `Your device usage has been changed by parent.`,
+                    notificationType: `visible`,
+                },
+                topic: topic
+            };
+            await firebaseAdmin.firebaseSendTopicNotification(message);
+    
+            var localDate = new Date();
+            const utcDate = moment.utc(localDate).format();
+            let notificationData = {
+                message: message.data,
+                childDeviceId: childData.deviceId,
+                senderId: parentData.firestore_parentId,
+                senderImage: parentData.photo || '',
+                receiverId: childData.childId,
+                receiverImage: childData.photo,
+                notificationType: notificationType.type2,
+                messageTime: utcDate,
+                isMarked: false,
+                isDeleted: false
+            }
+            let saveNotification = await notificationService.addNotification(notificationData);
+    
+            let activityLogData = {
+                senderId: parentData.firestore_parentId,
+                senderName: parentData.name || '',
+                receiverId: childData.childId,
+                receiverName: childData.name || '',
+                actionPerformed_byId: parentData.firestore_parentId,
+                actionPerformed_byName: parentData.name || '',
+                actionDetails: `Device usage of child ${childData.name} has been changed by parent.`,
+                createdAt: utcDate,
+                isDeleted: false
+            }
+            let saveActivity = await notificationService.addActivityLog(activityLogData);
+    
+            return true;
+
     } catch (error) {
         throw error;
     }
@@ -387,7 +439,8 @@ const requestRedeemGiftNotification = async (childData, parentData, lang, giftDe
             notificationType: notificationType.type1,
             messageTime: utcDate,
             isMarked: false,
-            isDeleted: false
+            isDeleted: false,
+            giftName : giftDetails.giftName,
         }
         let saveNotification = await notificationService.addNotification(notificationData);
 
@@ -400,7 +453,8 @@ const requestRedeemGiftNotification = async (childData, parentData, lang, giftDe
             actionPerformed_byName: childData.name,
             actionDetails: `${childData.name} wants to redeem the gift: ${giftDetails.giftName}.`,
             createdAt: utcDate,
-            isDeleted: false
+            isDeleted: false,
+            giftName : giftDetails.giftName,
         }
         let saveActivity = await notificationService.addActivityLog(activityLogData);
 

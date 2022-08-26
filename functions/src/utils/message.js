@@ -46,6 +46,7 @@ const LANGUAGE_REQUIRED = 'Language is required.';
 const SOMETHING_WRONG = 'Something went wrong please try again later.';
 const GIFT_ID_INVALID = 'Invalid gift Id.';
 const NOT_ENOUGH_POINTs = 'You do not have enough points to redeem this gift.';
+const ACCEPT_STATUS_REQUIRED = 'Accepted/Rejected status required.';
 
 
 const TOKEN_EXPIRED = "Token Expired";
@@ -102,7 +103,8 @@ module.exports = {
   SOMETHING_WRONG,
   GIFT_ID_INVALID,
   NOT_ENOUGH_POINTs,
-
+  ACCEPT_STATUS_REQUIRED,
+  
 
   TOKEN_EXPIRED,
   UNAUTHORIZED,

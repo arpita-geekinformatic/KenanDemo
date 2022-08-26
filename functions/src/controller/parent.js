@@ -1118,7 +1118,7 @@ const deleteChildGiftById = async (res, headers, paramData) => {
         }
 
         let deleteChildGiftById = await parentService.deleteChildGiftById(paramData.id);
-        
+
         if (headers.lang == 'ar') {
             return response.success(res, 200, arabicMessage.GIFT_DELETED_SUCCESSFULLY);
         } else {
@@ -1191,7 +1191,7 @@ const allParentNotificationDelete = async (res, headers) => {
 
         if (headers.lang == 'ar') {
             return response.data(res, notificationList, 200, arabicMessage.SUCCESS);
-        }else{
+        } else {
             return response.data(res, notificationList, 200, message.SUCCESS);
         }
     } catch (error) {
@@ -1199,33 +1199,32 @@ const allParentNotificationDelete = async (res, headers) => {
     }
 }
 
-
 //  notification Delete By Id  //
 const notificationDeleteById = async (res, headers, paramData) => {
     try {
         if (!headers.lang) {
-            return response.failure(res, 400, message.LANGUAGE_REQUIRED);
+            return response.failure(res, 200, message.LANGUAGE_REQUIRED);
         }
 
         if (!headers.authorization) {
             if (headers.lang == 'ar') {
-                return response.failure(res, 400, arabicMessage.TOKEN_REQUIRED);
+                return response.failure(res, 200, arabicMessage.TOKEN_REQUIRED);
             }
-            return response.failure(res, 400, message.TOKEN_REQUIRED);
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
         }
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentData = await parentService.getParentDataById(decoded.id);
         if (!parentData) {
             if (headers.lang == 'ar') {
-                return response.failure(res, 400, arabicMessage.INVALID_TOKEN);
+                return response.failure(res, 200, arabicMessage.INVALID_TOKEN);
             }
-            return response.failure(res, 400, message.INVALID_TOKEN);
+            return response.failure(res, 200, message.INVALID_TOKEN);
         };
         if (!paramData.id) {
             if (headers.lang == 'ar') {
-                return response.failure(res, 400, arabicMessage.NOTIFICATION_ID_REQUIRED);
+                return response.failure(res, 200, arabicMessage.NOTIFICATION_ID_REQUIRED);
             }
-            return response.failure(res, 400, message.NOTIFICATION_ID_REQUIRED);
+            return response.failure(res, 200, message.NOTIFICATION_ID_REQUIRED);
         }
 
         let notificationDeleteById = await parentService.notificationDeleteById(paramData.id);
@@ -1240,6 +1239,63 @@ const notificationDeleteById = async (res, headers, paramData) => {
         return response.failure(res, 400, error);
     }
 }
+
+//  accept/Reject Gift Request from child by Id  //
+const acceptRejectGiftRequest = async (res, headers, paramData, queryData) => {
+    try {
+        if (!headers.lang) {
+            return response.failure(res, 200, message.LANGUAGE_REQUIRED);
+        }
+
+        if (!headers.authorization) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 200, arabicMessage.TOKEN_REQUIRED);
+            }
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentData = await parentService.getParentDataById(decoded.id);
+        if (!parentData) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 200, arabicMessage.INVALID_TOKEN);
+            }
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        };
+        if (!paramData.id) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 200, arabicMessage.NOTIFICATION_ID_REQUIRED);
+            }
+            return response.failure(res, 200, message.NOTIFICATION_ID_REQUIRED);
+        }
+        if (!queryData.status) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 200, arabicMessage.ACCEPT_STATUS_REQUIRED);
+            }
+            return response.failure(res, 200, message.ACCEPT_STATUS_REQUIRED);
+        }
+
+        const giftNotificationDetails = await parentService.giftNotificationDetails(paramData.id);
+
+        if (queryData.status == 'rejected') {
+            //  send gift rejected notification to child  //
+            let giftRequestRejectedNotification = await notificationData.giftRequestRejectedNotification(childData, parentData, headers.lang, giftDetails);
+            console.log("441 >>>>>  giftRequestRejectedNotification : ");
+        }
+
+
+
+
+        if (headers.lang == 'ar') {
+            return response.success(res, 200, arabicMessage.SUCCESS);
+        } else {
+            return response.success(res, 200, message.SUCCESS);
+        }
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
+
+
 
 
 
@@ -1268,4 +1324,5 @@ module.exports = {
     parentNotificationList,
     allParentNotificationDelete,
     notificationDeleteById,
+    acceptRejectGiftRequest,
 }
