@@ -470,7 +470,7 @@ app.post('/auth/forgotPassword', async (req, res, next) => {
   }
 })
 
-// user list  //
+// parent list  //
 app.get('/userList', async (req, res, next) => {
   try {
     let result = await adminController.userList(res, req.headers, req.query);
@@ -506,6 +506,16 @@ app.delete('/parents/:id', async (req, res, next) => {
     let result = await adminController.deleteParent(res, req.headers, req.params);
     return result;
 
+  } catch (error) {
+    next(error)
+  }
+})
+
+//  child list by parent ID  //
+app.get('/parentChildList/:id', async(req, res, next) => {
+  try {
+    let result = await adminController.parentChildList(res, req.headers, req.params, req.query);
+    return result;
   } catch (error) {
     next(error)
   }

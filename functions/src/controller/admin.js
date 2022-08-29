@@ -261,6 +261,33 @@ const deleteParent = async (res, headers, paramData) => {
   }
 }
 
+//  parent Child List by ID  //
+const parentChildList = async (res, headers, paramData, queryData) => {
+  try {
+    if (!headers.authorization) {
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+
+    const decoded = await KenanUtilities.decryptToken(headers.authorization);
+    const adminData = await adminService.findAdminByToken(headers.authorization);
+    if (!adminData) {
+      return response.failure(res, 400, message.INVALID_TOKEN,);
+    }
+
+    if (!paramData.id) {
+      return response.failure(res, 400, message.PARENT_ID_REQUIRED,);
+    }
+
+
+
+
+  } catch (error) {
+    return response.failure(res, 400, error)
+  }
+}
+
+
+
 //  add Gift Type for parent  //
 const addGiftType = async (res, bodyData) => {
   try {
@@ -409,6 +436,7 @@ module.exports = {
   parentDetails,
   updateParent,
   deleteParent,
+  parentChildList,
   addGiftType,
   giftTypeList,
   updateGiftTypeById,

@@ -997,13 +997,13 @@ const redeemGift = async (res, headers, paramData) => {
         console.log("441 >>>>>  requestRedeemGiftNotification : ");
 
         let finalPoints = parseInt(childData.points) - parseInt(giftDetails.points);
-        let updatedChildData = { points :  finalPoints };
-        let updateChildDataById = await childService.updateChildDataById(childData.childId ,updatedChildData)
+        let updatedChildData = { points: finalPoints };
+        let updateChildDataById = await childService.updateChildDataById(childData.childId, updatedChildData)
 
         if (headers.lang == 'ar') {
-            return response.success(res, 200, arabicMessage.SUCCESS);
+            return response.data(res, updatedChildData, 200, arabicMessage.SUCCESS);
         } else {
-            return response.success(res, 200, message.SUCCESS);
+            return response.data(res, updatedChildData, 200, message.SUCCESS);
         }
     } catch (error) {
         return response.failure(res, 400, error);
