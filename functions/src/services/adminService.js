@@ -196,6 +196,76 @@ const childListByParentId = async (parentId) => {
     }
 }
 
+//  all Child List  //
+const allChildList = async (limit, offset) => {
+    try {
+        let childData = await db.collection('childs').where("isDeleted", "==", false).select('name', 'parentId', 'email', 'deviceId', 'photo', 'gender').orderBy('name', 'asc').get();
+
+        let childArr = [];
+        childData.forEach(doc => {
+            let childDetails = doc.data();
+            childDetails.childId = doc.id;
+            childArr.push(childDetails);
+        });
+
+        childArr.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1);
+
+        let start = offset;
+        let end = offset + limit
+        let list = childArr.slice(start, end);
+
+        return list;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  total Child Count  //
+const totalChildCount = async() => {
+    try {
+        let totalchilds = 0;
+        await db.collection('childs').where("isDeleted", "==", false).get().then(snap => {
+            totalchilds = snap.size;
+        });
+
+        return totalchilds;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  child Details By Id  //
+const childDetailsById = async (childId) => {
+    try {
+        let childDetails = await db.collection('childs').doc(childId).get();
+
+        if (!childDetails._fieldsProto) {
+            return false;
+        }
+        if (childDetails._fieldsProto.isDeleted.booleanValue) {
+            return false;
+        }
+
+        let childData = {};
+        childData.childId = childId;
+        childData.name = childDetails._fieldsProto.name ? childDetails._fieldsProto.name.stringValue : "";
+        childData.email = childDetails._fieldsProto.email ? childDetails._fieldsProto.email.stringValue : "";
+        childData.gender = childDetails._fieldsProto.gender ? childDetails._fieldsProto.gender.stringValue : "";
+        childData.deviceId = childDetails._fieldsProto.deviceId ? childDetails._fieldsProto.deviceId.stringValue : "";
+        childData.age = childDetails._fieldsProto.age ? childDetails._fieldsProto.age.integerValue : 0;
+        childData.badge = childDetails._fieldsProto.badge ? childDetails._fieldsProto.badge.integerValue : 0;
+        childData.points = childDetails._fieldsProto.points ? childDetails._fieldsProto.points.integerValue : 0;
+        childData.photo = childDetails._fieldsProto.photo ? childDetails._fieldsProto.photo.stringValue : "";
+        childData.parentId = childDetails._fieldsProto.parentId ? childDetails._fieldsProto.parentId.stringValue : "";
+        childData.fcmToken = childDetails._fieldsProto.fcmToken ? childDetails._fieldsProto.fcmToken.stringValue : "";
+
+        return childData;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 
 
 //  >>>>>>>>>>>>   DEVICES   >>>>>>>>>>  //
@@ -306,6 +376,9 @@ module.exports = {
     updateParentById,
     deleteChildsByParentsId,
     childListByParentId,
+    allChildList,
+    totalChildCount,
+    childDetailsById,
     deleteConnectedChildDevice,
     addGiftType,
     giftTypeList,

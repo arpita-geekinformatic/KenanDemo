@@ -286,7 +286,65 @@ const parentChildList = async (res, headers, paramData) => {
 
 
 
-    return response.data(res, childList, 200, message.SUCCESS )
+    return response.data(res, childList, 200, message.SUCCESS)
+  } catch (error) {
+    return response.failure(res, 400, error)
+  }
+}
+
+//  all Child List  //
+const allChildList = async (res, headers, queryData) => {
+  try {
+    if (!headers.authorization) {
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+
+    const decoded = await KenanUtilities.decryptToken(headers.authorization);
+    const adminData = await adminService.findAdminByToken(headers.authorization);
+    if (!adminData) {
+      return response.failure(res, 400, message.INVALID_TOKEN,);
+    }
+
+    let limit = queryData.limit ? parseInt(queryData.limit) : 10;
+    let offset = queryData.skip ? parseInt(queryData.skip) : 0;
+
+    const allChildList = await adminService.allChildList(limit, offset);
+    const totalChildCount = await adminService.totalChildCount()
+
+    let data = {
+      totalItems: totalChildCount,
+      userList: allChildList
+    }
+    return response.data(res, data, 200, message.SUCCESS)
+
+  } catch (error) {
+    return response.failure(res, 400, error)
+  }
+}
+
+//  child Details By Id  //
+const childDetailsById = async (res, headers, paramData) => {
+  try {
+    if (!headers.authorization) {
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+    if (!paramData.id) {
+      return response.failure(res, 400, message.CHILD_ID_REQUIRED);
+    }
+
+    const decoded = await KenanUtilities.decryptToken(headers.authorization);
+    const adminData = await adminService.findAdminByToken(headers.authorization);
+    if (!adminData) {
+      return response.failure(res, 400, message.INVALID_TOKEN,);
+    }
+
+    const childDetails = await adminService.childDetailsById(paramData.id);
+    if (!childDetails) {
+      return response.failure(res, 400, message.INVALID_CHILD_ID,);
+    }
+
+    return response.data(res, childDetails, 200, message.SUCCESS)
+
   } catch (error) {
     return response.failure(res, 400, error)
   }
@@ -330,7 +388,6 @@ const giftTypeList = async (res, headers) => {
     }
 
     const giftTypeList = await adminService.giftTypeList();
-
     return response.data(res, giftTypeList, 200, message.SUCCESS);
 
   } catch (error) {
@@ -443,6 +500,8 @@ module.exports = {
   updateParent,
   deleteParent,
   parentChildList,
+  allChildList,
+  childDetailsById,
   addGiftType,
   giftTypeList,
   updateGiftTypeById,

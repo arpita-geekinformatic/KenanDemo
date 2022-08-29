@@ -512,7 +512,7 @@ app.delete('/parents/:id', async (req, res, next) => {
 })
 
 //  child list by parent ID  //
-app.get('/parentChildList/:id', async(req, res, next) => {
+app.get('/parentChildList/:id', async (req, res, next) => {
   try {
     let result = await adminController.parentChildList(res, req.headers, req.params);
     return result;
@@ -520,6 +520,28 @@ app.get('/parentChildList/:id', async(req, res, next) => {
     next(error)
   }
 })
+
+//  all child list  //
+app.get('/allChildList', async (req, res, next) => {
+  try {
+    let result = await adminController.allChildList(res, req.headers, req.query);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+//  child details by Id  //
+app.get('/child/:id', async (req, res, next) => {
+  try {
+    let result = await adminController.childDetailsById(res, req.headers, req.params);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+
 
 //  add gift type for parent  //
 app.post('/addGiftType', async (req, res, next) => {
@@ -542,8 +564,8 @@ app.get('/giftTypeList', async (req, res, next) => {
 })
 
 //  update gift type by Id  //
-app.post('/updateGiftType/:id', async(req, res, next) => {
-  try{
+app.post('/updateGiftType/:id', async (req, res, next) => {
+  try {
     let result = await adminController.updateGiftTypeById(res, req.headers, req.params, req.body);
     return result;
   } catch (error) {
@@ -552,8 +574,8 @@ app.post('/updateGiftType/:id', async(req, res, next) => {
 })
 
 //  view gift type by Id  //
-app.get('/viewGiftType/:id', async(req, res, next) => {
-  try{
+app.get('/viewGiftType/:id', async (req, res, next) => {
+  try {
     let result = await adminController.viewGiftTypeById(res, req.headers, req.params);
     return result;
   } catch (error) {
@@ -562,8 +584,8 @@ app.get('/viewGiftType/:id', async(req, res, next) => {
 })
 
 //  delete gift type by Id  //
-app.delete('/deleteGiftType/:id', async(req, res, next) => {
-  try{
+app.delete('/deleteGiftType/:id', async (req, res, next) => {
+  try {
     let result = await adminController.deleteGiftTypeById(res, req.headers, req.params);
     return result;
   } catch (error) {
