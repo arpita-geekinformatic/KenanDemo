@@ -340,6 +340,63 @@ const updateGiftTypeById = async (res, headers, paramData, bodyData) => {
   }
 }
 
+//  view Gift Type By Id  //
+const viewGiftTypeById = async (res, headers, paramData) => {
+  try {
+    if (!headers.authorization) {
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+    if (!paramData.id) {
+      return response.failure(res, 400, message.GIFT_TYPE_ID_REQUIRED,);
+    }
+
+    const decoded = await KenanUtilities.decryptToken(headers.authorization);
+    const adminData = await adminService.findAdminByToken(headers.authorization);
+    if (!adminData) {
+      return response.failure(res, 400, message.INVALID_TOKEN,);
+    }
+
+    const giftTypeDetails = await adminService.giftTypeDetailsById(paramData.id)
+    if (!giftTypeDetails) {
+      return response.failure(res, 400, message.INVALID_GIFT_TYPE_ID,);
+    }
+
+    return response.data(res, giftTypeDetails, 200, message.SUCCESS)
+  } catch (error) {
+    return response.failure(res, 400, error)
+  }
+}
+
+//  delete Gift Type By Id  //
+const deleteGiftTypeById = async (res, headers, paramData) => {
+  try {
+    if (!headers.authorization) {
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+    if (!paramData.id) {
+      return response.failure(res, 400, message.GIFT_TYPE_ID_REQUIRED,);
+    }
+
+    const decoded = await KenanUtilities.decryptToken(headers.authorization);
+    const adminData = await adminService.findAdminByToken(headers.authorization);
+    if (!adminData) {
+      return response.failure(res, 400, message.INVALID_TOKEN,);
+    }
+
+    const giftTypeDetails = await adminService.giftTypeDetailsById(paramData.id)
+    if (!giftTypeDetails) {
+      return response.failure(res, 400, message.INVALID_GIFT_TYPE_ID,);
+    }
+
+    let updatedData = { isDeleted: true }
+    let updateGiftTypeById = await adminService.updateGiftTypeById(paramData.id, updatedData)
+
+    return response.success(res, 200, message.SUCCESS)
+  } catch (error) {
+    return response.failure(res, 400, error)
+  }
+}
+
 
 
 
@@ -355,4 +412,6 @@ module.exports = {
   addGiftType,
   giftTypeList,
   updateGiftTypeById,
+  viewGiftTypeById,
+  deleteGiftTypeById,
 }

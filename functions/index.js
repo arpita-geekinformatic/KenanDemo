@@ -531,10 +531,30 @@ app.get('/giftTypeList', async (req, res, next) => {
   }
 })
 
-//  update gift type  //
+//  update gift type by Id  //
 app.post('/updateGiftType/:id', async(req, res, next) => {
   try{
     let result = await adminController.updateGiftTypeById(res, req.headers, req.params, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+//  view gift type by Id  //
+app.get('/viewGiftType/:id', async(req, res, next) => {
+  try{
+    let result = await adminController.viewGiftTypeById(res, req.headers, req.params);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+//  delete gift type by Id  //
+app.delete('/deleteGiftType/:id', async(req, res, next) => {
+  try{
+    let result = await adminController.deleteGiftTypeById(res, req.headers, req.params);
     return result;
   } catch (error) {
     next(error)
