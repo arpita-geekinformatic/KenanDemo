@@ -262,10 +262,13 @@ const deleteParent = async (res, headers, paramData) => {
 }
 
 //  parent Child List by ID  //
-const parentChildList = async (res, headers, paramData, queryData) => {
+const parentChildList = async (res, headers, paramData) => {
   try {
     if (!headers.authorization) {
       return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+    if (!paramData.id) {
+      return response.failure(res, 400, message.PARENT_ID_REQUIRED,);
     }
 
     const decoded = await KenanUtilities.decryptToken(headers.authorization);
@@ -274,13 +277,16 @@ const parentChildList = async (res, headers, paramData, queryData) => {
       return response.failure(res, 400, message.INVALID_TOKEN,);
     }
 
-    if (!paramData.id) {
-      return response.failure(res, 400, message.PARENT_ID_REQUIRED,);
+    const parentData = await adminService.parentdetailsById(paramData.id)
+    if (!parentData) {
+      return response.failure(res, 400, message.INVALID_PARENT_ID,);
     }
 
+    const childList = await adminService.childListByParentId(paramData.id)
 
 
 
+    return response.data(res, childList, 200, message.SUCCESS )
   } catch (error) {
     return response.failure(res, 400, error)
   }

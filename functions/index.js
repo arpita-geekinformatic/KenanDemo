@@ -514,7 +514,7 @@ app.delete('/parents/:id', async (req, res, next) => {
 //  child list by parent ID  //
 app.get('/parentChildList/:id', async(req, res, next) => {
   try {
-    let result = await adminController.parentChildList(res, req.headers, req.params, req.query);
+    let result = await adminController.parentChildList(res, req.headers, req.params);
     return result;
   } catch (error) {
     next(error)

@@ -128,6 +128,7 @@ const parentdetailsById = async (parentId) => {
         parentData.email = parentDetails._fieldsProto.email ? parentDetails._fieldsProto.email.stringValue : "";
         parentData.isActive = parentDetails._fieldsProto.isActive ? parentDetails._fieldsProto.isActive.booleanValue : false;
         parentData.childId = parentDetails._fieldsProto.childId ? parentDetails._fieldsProto.childId.arrayValue : [];
+        parentData.photo = parentDetails._fieldsProto.photo ? parentDetails._fieldsProto.photo.stringValue : "";
 
         return parentData;
     } catch (error) {
@@ -170,6 +171,24 @@ const deleteChildsByParentsId = async (parentId) => {
             });
         });
         await batch.commit();
+
+        return childArr;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  child List By Parent Id  //
+const childListByParentId = async (parentId) => {
+    try {
+        let childData = await db.collection('childs').where("parentId", "==", parentId).where("isDeleted", "==", false).select('name', 'parentId', 'email', 'deviceId', 'photo', 'gender').orderBy('name', 'asc').get();
+
+        let childArr = [];
+        childData.forEach(doc => {
+            let childDetails = doc.data();
+            childDetails.childId = doc.id;
+            childArr.push(childDetails);
+        });
 
         return childArr;
     } catch (error) {
@@ -286,6 +305,7 @@ module.exports = {
     parentdetailsById,
     updateParentById,
     deleteChildsByParentsId,
+    childListByParentId,
     deleteConnectedChildDevice,
     addGiftType,
     giftTypeList,
