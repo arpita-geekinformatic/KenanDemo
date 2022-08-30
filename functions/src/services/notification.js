@@ -19,7 +19,8 @@ const sendAppUsageNotification = async (bodyData, updateData, topic, childData, 
             data: {
                 title: `Your app usage has been changed by parent.`,
                 body: `Your app usage has been changed by parent.`,
-                notificationType: `visible`,
+                // notificationType: `visible`,
+                notificationType:  notificationType.type2,
             },
             topic: topic
         };
@@ -67,7 +68,8 @@ const sendDeviceUsageNotification = async (bodyData, updateData, topic, childDat
             data: {
                 title: `Your device usage has been changed by parent.`,
                 body: `Your device usage has been changed by parent.`,
-                notificationType: `visible`,
+                // notificationType: `visible`,
+                notificationType:  notificationType.type2,
             },
             topic: topic
         };
@@ -115,7 +117,8 @@ const giftRequestRejectedNotification = async (childData, parentData, giftNotifi
             data: {
                 title: `Your gift request of '${giftNotificationDetails.giftName}' has been rejected by parent.`,
                 body: `Your gift request of '${giftNotificationDetails.giftName}' has been rejected by parent.`,
-                notificationType: `visible`,
+                // notificationType: `visible`,
+                notificationType:  notificationType.type2,
             },
             topic: topic
         };
@@ -165,7 +168,8 @@ const giftRequestAcceptedNotification = async (childData, parentData, giftNotifi
             data: {
                 title: `Your gift request of '${giftNotificationDetails.giftName}' has been accepted by parent.`,
                 body: `Your gift request of '${giftNotificationDetails.giftName}' has been accepted by parent.`,
-                notificationType: `visible`,
+                // notificationType: `visible`,
+                notificationType:  notificationType.type2,
             },
             topic: topic
         };

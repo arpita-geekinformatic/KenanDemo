@@ -350,6 +350,39 @@ const childDetailsById = async (res, headers, paramData) => {
   }
 }
 
+//  child Delete By Id  //
+const childDeleteById = async (res, headers, paramData) => {
+  try {
+    if (!headers.authorization) {
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+    if (!paramData.id) {
+      return response.failure(res, 400, message.CHILD_ID_REQUIRED);
+    }
+
+    const decoded = await KenanUtilities.decryptToken(headers.authorization);
+    const adminData = await adminService.findAdminByToken(headers.authorization);
+    if (!adminData) {
+      return response.failure(res, 400, message.INVALID_TOKEN,);
+    }
+
+    const childDetails = await adminService.childDetailsById(paramData.id);
+    if (!childDetails) {
+      return response.failure(res, 400, message.INVALID_CHILD_ID,);
+    }
+
+    let updatedData = {
+      isDeleted : true
+    }
+    console.log(">>>>>>>>>>>>>> childDetails : ",childDetails);
+
+    return response.success(res, 200, message.SUCCESS)
+  } catch (error) {
+    return response.failure(res, 400, error)
+  }
+}
+
+
 
 
 //  add Gift Type for parent  //
@@ -502,6 +535,7 @@ module.exports = {
   parentChildList,
   allChildList,
   childDetailsById,
+  childDeleteById,
   addGiftType,
   giftTypeList,
   updateGiftTypeById,

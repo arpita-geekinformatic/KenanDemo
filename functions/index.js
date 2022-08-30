@@ -541,6 +541,16 @@ app.get('/child/:id', async (req, res, next) => {
   }
 })
 
+//  child delete by ID  //
+app.delete('/childDelete/:id', async (req, res, next) => {
+  try {
+    let result = await adminController.childDeleteById(res, req.headers, req.params);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 
 //  add gift type for parent  //
