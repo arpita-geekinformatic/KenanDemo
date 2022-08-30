@@ -382,7 +382,13 @@ const childDeleteById = async (res, headers, paramData) => {
         remainingTime: '0',
         timeSpent: '0'
       }
-      const updateDeviceData = await adminService.updateDeviceData(childDetails.deviceId, updatedDevieData)
+      const updateDeviceData = await adminService.updateDeviceData(childDetails.deviceId, updatedDevieData);
+
+      if (childDetails.email) {
+        //  send mail to connected child  //
+        let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/accountDeleteEmail.ejs", { async: true });
+        let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [childDetails.email], subject: "Kenan Account", text: messageHtml });
+      }
     }
 
     let updatedData = {
@@ -393,7 +399,7 @@ const childDeleteById = async (res, headers, paramData) => {
     }
     const updateChildDataById = await adminService.updateChildDataById(paramData.id, updatedData)
     const parentData = await adminService.parentdetailsById(childDetails.parentId);
-    
+
     if (parentData.childId.length > 0) {
       let updatedChildArr = await parentData.childId.filter(element => { return (element != paramData.id) });
       const updatedParentData = { childId: updatedChildArr }
