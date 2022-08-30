@@ -382,7 +382,7 @@ const childDeleteById = async (res, headers, paramData) => {
         remainingTime: '0',
         timeSpent: '0'
       }
-      // const updateDeviceData = await adminService.updateDeviceData(childDetails.deviceId, updatedDevieData)
+      const updateDeviceData = await adminService.updateDeviceData(childDetails.deviceId, updatedDevieData)
     }
 
     let updatedData = {
@@ -391,17 +391,16 @@ const childDeleteById = async (res, headers, paramData) => {
       deviceId: '',
       fcmToken: '',
     }
-    console.log(">>>>>>>>>>>>>> childDetails : ", childDetails);
-    // const updateChildDataById = await adminService.updateChildDataById(paramData.id, updatedData)
-
+    const updateChildDataById = await adminService.updateChildDataById(paramData.id, updatedData)
     const parentData = await adminService.parentdetailsById(childDetails.parentId);
-    console.log("******* parentData.childId : ", parentData.childId);
+    
     if (parentData.childId.length > 0) {
       let updatedChildArr = await parentData.childId.filter(element => { return (element != paramData.id) });
-      console.log("<<<<<<<<<<<< updatedChildArr : ",updatedChildArr);
+      const updatedParentData = { childId: updatedChildArr }
+      const updateParentById = await adminService.updateParentById(childDetails.parentId, updatedParentData)
     }
 
-    return response.success(res, 200, message.SUCCESS)
+    return response.success(res, 200, message.CHILD_DELETED)
   } catch (error) {
     return response.failure(res, 400, error)
   }
