@@ -221,7 +221,7 @@ const allChildList = async (limit, offset) => {
 }
 
 //  total Child Count  //
-const totalChildCount = async() => {
+const totalChildCount = async () => {
     try {
         let totalchilds = 0;
         await db.collection('childs').where("isDeleted", "==", false).get().then(snap => {
@@ -265,6 +265,17 @@ const childDetailsById = async (childId) => {
     }
 }
 
+//  update Child Data By Id  //
+const updateChildDataById = async (childId, updatedData) => {
+    try {
+        let childDetails = await db.collection('childs').doc(childId).update(updatedData);
+        return true;
+
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 
 
@@ -287,6 +298,22 @@ const deleteConnectedChildDevice = async (allChildDeviceIdArr) => {
         }
 
         return true;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  update Device Data  //
+const updateDeviceData = async (deviceId, updatedData) => {
+    try {
+        const batch = db.batch();
+        let deviceData = await db.collection('devices').where('deviceId', '==', deviceId).get();
+        await deviceData.forEach((element) => {
+            batch.update(element.ref, updatedData)
+        })
+        await batch.commit();
+
+        return true
     } catch (error) {
         throw error;
     }
@@ -379,7 +406,9 @@ module.exports = {
     allChildList,
     totalChildCount,
     childDetailsById,
+    updateChildDataById,
     deleteConnectedChildDevice,
+    updateDeviceData,
     addGiftType,
     giftTypeList,
     giftTypeDetailsById,

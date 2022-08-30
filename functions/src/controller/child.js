@@ -119,6 +119,7 @@ const scanQrCode = async (res, bodyData, headers) => {
         const authToken = await KenanUtilities.generateChildToken(bodyData.childId, bodyData.deviceId);
 
         let newChildData = {
+            parentId: bodyData.parentId,
             deviceId: bodyData.deviceId,
             fcmToken: bodyData.FcmToken,
             // password: hashedPassword,

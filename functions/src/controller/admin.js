@@ -371,10 +371,35 @@ const childDeleteById = async (res, headers, paramData) => {
       return response.failure(res, 400, message.INVALID_CHILD_ID,);
     }
 
-    let updatedData = {
-      isDeleted : true
+    if (childDetails.deviceId) {
+      console.log(">>>>>>>>>>>>>>>>> ");
+      const updatedDevieData = {
+        childId: '',
+        parentId: '',
+        eachDaySchedule: [],
+        everyDaySchedule: '',
+        scheduledBy: '',
+        remainingTime: '0',
+        timeSpent: '0'
+      }
+      // const updateDeviceData = await adminService.updateDeviceData(childDetails.deviceId, updatedDevieData)
     }
-    console.log(">>>>>>>>>>>>>> childDetails : ",childDetails);
+
+    let updatedData = {
+      isDeleted: true,
+      parentId: '',
+      deviceId: '',
+      fcmToken: '',
+    }
+    console.log(">>>>>>>>>>>>>> childDetails : ", childDetails);
+    // const updateChildDataById = await adminService.updateChildDataById(paramData.id, updatedData)
+
+    const parentData = await adminService.parentdetailsById(childDetails.parentId);
+    if (parentData.childId.length > 0) {
+      console.log("******* parentData.childId : ", parentData.childId);
+      let updatedChildArr = await parentData.childId.filter(element => { return (element != paramData.id) });
+      console.log("<<<<<<<<<<<< updatedChildArr : ",updatedChildArr);
+    }
 
     return response.success(res, 200, message.SUCCESS)
   } catch (error) {
