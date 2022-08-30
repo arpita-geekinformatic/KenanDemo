@@ -598,6 +598,10 @@ const addChild = async (res, bodyData, headers) => {
             let addChildByParent = await parentService.addChildByParent(newData);
             newData.childId = addChildByParent;
 
+            parentRes.childId.push(addChildByParent);
+            let updatedParentData = { childId : parentRes.childId }
+            const updateParentData = await parentService.updateParentDataById(parentRes.firestore_parentId, updatedParentData )
+
             if (bodyData.email && (bodyData.email != '')) {
 
                 // send mail to child with QR code  //

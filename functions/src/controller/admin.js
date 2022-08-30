@@ -395,8 +395,8 @@ const childDeleteById = async (res, headers, paramData) => {
     // const updateChildDataById = await adminService.updateChildDataById(paramData.id, updatedData)
 
     const parentData = await adminService.parentdetailsById(childDetails.parentId);
+    console.log("******* parentData.childId : ", parentData.childId);
     if (parentData.childId.length > 0) {
-      console.log("******* parentData.childId : ", parentData.childId);
       let updatedChildArr = await parentData.childId.filter(element => { return (element != paramData.id) });
       console.log("<<<<<<<<<<<< updatedChildArr : ",updatedChildArr);
     }

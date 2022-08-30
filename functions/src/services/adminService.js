@@ -127,8 +127,19 @@ const parentdetailsById = async (parentId) => {
         parentData.name = parentDetails._fieldsProto.name ? parentDetails._fieldsProto.name.stringValue : "";
         parentData.email = parentDetails._fieldsProto.email ? parentDetails._fieldsProto.email.stringValue : "";
         parentData.isActive = parentDetails._fieldsProto.isActive ? parentDetails._fieldsProto.isActive.booleanValue : false;
-        parentData.childId = parentDetails._fieldsProto.childId ? parentDetails._fieldsProto.childId.arrayValue : [];
         parentData.photo = parentDetails._fieldsProto.photo ? parentDetails._fieldsProto.photo.stringValue : "";
+
+        let allChildArr = parentDetails._fieldsProto.childId ? parentDetails._fieldsProto.childId.arrayValue.values : [];
+        if(allChildArr.length > 0){
+            let allchildId = [];
+            for(let data of allChildArr){
+                allchildId.push(data.stringValue)
+            }
+            parentData.childId = allchildId
+        }
+        else {
+            parentData.childId = allChildArr
+        }
 
         return parentData;
     } catch (error) {

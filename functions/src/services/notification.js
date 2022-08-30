@@ -110,7 +110,7 @@ const sendDeviceUsageNotification = async (bodyData, updateData, topic, childDat
     }
 }
 
-//  gift Request Rejected by parent Notification  //  (Type => type2)
+//  gift Request Rejected by parent Notification  //  (Type => type1)
 const giftRequestRejectedNotification = async (childData, parentData, giftNotificationDetails, topic, lang) => {
     try {
         const message = {
@@ -118,7 +118,7 @@ const giftRequestRejectedNotification = async (childData, parentData, giftNotifi
                 title: `Your gift request of '${giftNotificationDetails.giftName}' has been rejected by parent.`,
                 body: `Your gift request of '${giftNotificationDetails.giftName}' has been rejected by parent.`,
                 // notificationType: `visible`,
-                notificationType:  notificationType.type2,
+                notificationType:  notificationType.type1,
             },
             topic: topic
         };
@@ -134,7 +134,7 @@ const giftRequestRejectedNotification = async (childData, parentData, giftNotifi
             senderImage: parentData.photo || '',
             receiverId: childData.childId,
             receiverImage: childData.photo,
-            notificationType: notificationType.type2,
+            notificationType: notificationType.type1,
             messageTime: utcDate,
             isMarked: false,
             isDeleted: false
@@ -161,7 +161,7 @@ const giftRequestRejectedNotification = async (childData, parentData, giftNotifi
     }
 }
 
-//  gift Request Accepted by parent Notification  //  (Type => type2)
+//  gift Request Accepted by parent Notification  //  (Type => type1)
 const giftRequestAcceptedNotification = async (childData, parentData, giftNotificationDetails, topic, lang) => {
     try {
         const message = {
@@ -169,7 +169,7 @@ const giftRequestAcceptedNotification = async (childData, parentData, giftNotifi
                 title: `Your gift request of '${giftNotificationDetails.giftName}' has been accepted by parent.`,
                 body: `Your gift request of '${giftNotificationDetails.giftName}' has been accepted by parent.`,
                 // notificationType: `visible`,
-                notificationType:  notificationType.type2,
+                notificationType:  notificationType.type1,
             },
             topic: topic
         };
@@ -185,7 +185,7 @@ const giftRequestAcceptedNotification = async (childData, parentData, giftNotifi
             senderImage: parentData.photo || '',
             receiverId: childData.childId,
             receiverImage: childData.photo,
-            notificationType: notificationType.type2,
+            notificationType: notificationType.type1,
             messageTime: utcDate,
             isMarked: false,
             isDeleted: false
