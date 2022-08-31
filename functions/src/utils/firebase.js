@@ -65,11 +65,11 @@ const firebaseUser = async (user) => {
 const firebaseNotification = async (message) => {
   try {
     let messageRes = await admin.messaging().send(message)
-    return ({ "code": 200, "status": true })
+    return ({ "code": 200, "status": true, "messageRes": messageRes })
 
   } catch (error) {
-    console.log(">>>>>>> error : ",error);
-    return ({ "code": 404, "status": false });
+    console.log(">>>>>>> error : ", error);
+    return ({ "code": 404, "status": false, "error": error });
   }
 }
 

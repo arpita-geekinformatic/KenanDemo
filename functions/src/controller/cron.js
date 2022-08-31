@@ -34,6 +34,9 @@ const resetTimeSpent = async (res) => {
 
 
         if(previousDayName != nextDayName){
+
+            // const getAllDeviceData = await 
+
             // const updateAllDeviceTimeSpent = await cronService.updateAllDeviceTimeSpent();
             // const updateAllAppTimeSpent = await cronService.updateAllAppTimeSpent()
         }
