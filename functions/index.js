@@ -11,12 +11,14 @@ var multer = require('multer');
 const adminController = require("./src/controller/admin");
 const parentController = require("./src/controller/parent");
 const childController = require("./src/controller/child");
+const cronController = require("./src/controller/cron");
 const response = require("./src/utils/response");
 const cors = require("cors");
 let os = require('os');
 const fs = require('fs');
 var Buffer = require('buffer/').Buffer;
 const ejs = require("ejs");
+const cron = require('node-cron');
 
 // const upload = multer({ dest: os.tmpdir() + `/`});
 // app.use(upload.any());
@@ -425,6 +427,28 @@ app.post('/upload', async (req, res, next) => {
   }
 })
 
+//  cron to reset time spent of all device at midnight  //
+cron.schedule('0 0 * * *', () => {
+  console.log("431 ==========  Cron job every night at midnight =========");
+  // notifyUserForUpcomingChecklist();
+});
+
+cron.schedule('0 0 0 * * *', () => {
+  console.log("436 ++++++++++  Cron job every night at midnight ++++++++++");
+  // notifyUserForUpcomingChecklist();
+});
+
+cron.schedule('* * * * *', async () => {
+  console.log('>>>>>>>>>>>>>>> running a task every minute');
+
+  try {
+    let result = await cronController.resetTimeSpent(res);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+
+});
 
 
 
@@ -602,7 +626,7 @@ app.delete('/deleteGiftType/:id', async (req, res, next) => {
 })
 
 //  add/update settings  //
-app.post('settings', async(req, res, next) => {
+app.post('settings', async (req, res, next) => {
   try {
     let result = await adminController.settings(res, req.headers, req.body);
     return result;
@@ -617,3 +641,10 @@ app.post('settings', async(req, res, next) => {
 app.use(errorHanlder);
 app.listen(3000, () => console.log(`server is running on ${3000}`));
 exports.app = functions.https.onRequest(app);
+
+
+
+// exports.myPubSubFunction = functions.pubsub.schedule('* * * * *').onRun(() => {
+//   console.log('Hello World');
+//   return 
+// })
