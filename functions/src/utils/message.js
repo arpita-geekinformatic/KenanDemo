@@ -54,6 +54,7 @@ const GIFT_ACCEPTED_SUCCESSFULLY  = 'The request has been successfully accepted.
 const GIFT_TYPE_ID_REQUIRED = 'Gift type Id required.';
 const INVALID_GIFT_TYPE_ID = 'Invalid gift type Id.';
 const CHILD_DELETED = 'Child successfully deleted.';
+const TYPE_REQUIRED = 'User type requires.';
 
 
 const TOKEN_EXPIRED = "Token Expired";
@@ -118,6 +119,7 @@ module.exports = {
   GIFT_TYPE_ID_REQUIRED,
   INVALID_GIFT_TYPE_ID,
   CHILD_DELETED,
+  TYPE_REQUIRED,
   
   
   TOKEN_EXPIRED,

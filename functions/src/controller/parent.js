@@ -164,6 +164,7 @@ const login = async (res, bodyData, headers) => {
         parentData.authToken = authToken;
         let newData = {
             authToken: authToken,
+            fcmToken : bodyData.fcmToken || parentData.fcmToken,
         }
         const updatePatrentData = await parentService.updateParentDataById(parentData.firestore_parentId, newData);
 

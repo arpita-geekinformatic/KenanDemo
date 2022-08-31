@@ -19,8 +19,7 @@ const sendAppUsageNotification = async (bodyData, updateData, topic, childData, 
             data: {
                 title: `Your app usage has been changed by parent.`,
                 body: `Your app usage has been changed by parent.`,
-                // notificationType: `visible`,
-                notificationType: notificationType.type2,
+                notificationType: `${notificationType.type2}`,
             },
             topic: topic
         };
@@ -68,8 +67,7 @@ const sendDeviceUsageNotification = async (bodyData, updateData, topic, childDat
             data: {
                 title: `Your device usage has been changed by parent.`,
                 body: `Your device usage has been changed by parent.`,
-                // notificationType: `visible`,
-                notificationType: notificationType.type2,
+                notificationType: `${notificationType.type2}`,
             },
             topic: topic
         };
@@ -117,8 +115,7 @@ const giftRequestRejectedNotification = async (childData, parentData, giftNotifi
             data: {
                 title: `Your gift request of '${giftNotificationDetails.giftName}' has been rejected by parent.`,
                 body: `Your gift request of '${giftNotificationDetails.giftName}' has been rejected by parent.`,
-                // notificationType: `visible`,
-                notificationType: notificationType.type1,
+                notificationType: `${notificationType.type1}`,
             },
             topic: topic
         };
@@ -168,8 +165,7 @@ const giftRequestAcceptedNotification = async (childData, parentData, giftNotifi
             data: {
                 title: `Your gift request of '${giftNotificationDetails.giftName}' has been accepted by parent.`,
                 body: `Your gift request of '${giftNotificationDetails.giftName}' has been accepted by parent.`,
-                // notificationType: `visible`,
-                notificationType: notificationType.type1,
+                notificationType: `${notificationType.type1}`,
             },
             topic: topic
         };
@@ -219,7 +215,7 @@ const deviceDisconnectNotification = async (childData, parentData, topic) => {
             data: {
                 title: `This device has been disconnected.`,
                 body: `This device has been disconnected.`,
-                notificationType: notificationType.type3,
+                notificationType: `${notificationType.type3}`,
             },
             topic: topic
         };
@@ -274,7 +270,7 @@ const appRemainingTimeReachedNotification = async (childData, childAppDetails, p
             data: {
                 title: `${childData.name} has reached usage time limit of app ${childAppDetails.appName}.`,
                 body: `${childData.name} has reached usage time limit of app ${childAppDetails.appName}.`,
-                notificationType: notificationType.type2,
+                notificationType: `${notificationType.type2}`,
             }
         }
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
@@ -322,7 +318,7 @@ const deviceRemainingTimeReachedNotification = async (childData, childAppDetails
             data: {
                 title: `${childData.name} has reached device usage time limit.`,
                 body: `${childData.name} has reached device usage time limit.`,
-                notificationType: notificationType.type2,
+                notificationType: `${notificationType.type2}`,
             }
         }
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
@@ -370,7 +366,7 @@ const appRemainingTimeCrossedNotification = async (childData, childAppDetails, p
             data: {
                 title: `${childData.name} has crossed usage time limit of app ${childAppDetails.appName}.`,
                 body: `${childData.name} has crossed usage time limit of app ${childAppDetails.appName}.`,
-                notificationType: notificationType.type2,
+                notificationType: `${notificationType.type2}`,
             }
         }
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
@@ -418,7 +414,7 @@ const deviceRemainingTimeCrossedNotification = async (childData, parentData) => 
             data: {
                 title: `${childData.name} has crossed device usage time limit.`,
                 body: `${childData.name} has crossed device usage time limit.`,
-                notificationType: notificationType.type2,
+                notificationType: `${notificationType.type2}`,
             }
         }
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
@@ -466,7 +462,7 @@ const bothRemainingTimeCrossedNotification = async (childData, childAppDetails, 
             data: {
                 title: `${childData.name} has crossed both device and app ${childAppDetails.appName} usage time limit .`,
                 body: `${childData.name} has crossed both device and app ${childAppDetails.appName} usage time limit.`,
-                notificationType: notificationType.type2,
+                notificationType: `${notificationType.type2}`,
             }
         }
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
@@ -509,26 +505,17 @@ const bothRemainingTimeCrossedNotification = async (childData, childAppDetails, 
 //  redeem Gift Notification  // (Type => type1)
 const requestRedeemGiftNotification = async (childData, parentData, lang, giftDetails) => {
     try {
-        // if (lang == 'ar') {
-        //     var message = {
-        //         token: parentData.fcmToken,
-        //         data: {
-        //             title: `${childData.name} يريد استرداد الهدية: ${giftDetails.giftName}.`,
-        //             body: `${childData.name} يريد استرداد الهدية: ${giftDetails.giftName}.`,
-        //             notificationType: notificationType.type1,
-        //         }
-        //     }
-        // } else {
+
         var message = {
             token: parentData.fcmToken,
             data: {
                 title: `${childData.name} wants to redeem the gift: ${giftDetails.giftName}.`,
                 body: `${childData.name} wants to redeem the gift: ${giftDetails.giftName}.`,
-                notificationType: notificationType.type1,
+                notificationType: `${notificationType.type1}`,
             }
         }
-        // }
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
+        console.log("============ notificationResult : ", notificationResult);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
