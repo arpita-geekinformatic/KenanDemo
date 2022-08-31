@@ -5,11 +5,42 @@ const db = getFirestore();
 
 
 //  >>>>>>>>>>>>   ADMIN   >>>>>>>>>>  //
-//  find admin data  //
-const findAdmin = async (email) => {
+//  update All Device Time Spent  //
+const updateAllDeviceTimeSpent = async () => {
     try {
-        
-        return true
+        const batch = db.batch();
+        const snapshot = await db.collection('devices').get()
+
+        snapshot.forEach((element) => {
+            batch.update(element.ref, {
+                timeSpent: '0',
+                remainingTime: '0'
+            });
+        });
+        await batch.commit();
+        return true;
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  update All App Time Spent  //
+const updateAllAppTimeSpent = async () => {
+    try {
+
+        const batch = db.batch();
+        const snapshot = await db.collection('deviceApps').get()
+
+        snapshot.forEach((element) => {
+            batch.update(element.ref, {
+                timeSpent: '0',
+                remainingTime: '0'
+            });
+        });
+        await batch.commit();
+        return true;
+
     } catch (error) {
         throw error;
     }
@@ -18,7 +49,7 @@ const findAdmin = async (email) => {
 
 
 
-
 module.exports = {
-    findAdmin,
+    updateAllDeviceTimeSpent,
+    updateAllAppTimeSpent,
 }

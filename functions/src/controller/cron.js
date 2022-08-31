@@ -18,11 +18,26 @@ const resetTimeSpent = async (res) => {
     try {
 
         var mydate = new Date();
+        console.log("********* mydate : ",mydate);
         var weekDayName = moment(mydate).format('dddd');
-        console.log(">>>>>>>>>>>>>>> weekDayName : ",weekDayName);
+        console.log("********* weekDayName : ",weekDayName);
+
+        let nextDayDate = moment(mydate).add(5, 'm').format()
+        console.log("???????????? nextDayDate : ",nextDayDate);
+        var nextDayName = moment(nextDayDate).format('dddd');
+        console.log("?????????? weekDayName : ",nextDayName);
+
+        let previousDayDate = moment(mydate).subtract(5, 'm').format()
+        console.log(">>>>>>>>>>> previousDayDate : ",previousDayDate);
+        var previousDayName = moment('2022-08-30T08:19:57+00:00').format('dddd');
+        console.log(">>>>>>>>>>>>>>> previousDayName : ",previousDayName);
 
 
-
+        if(previousDayName != nextDayName){
+            // const updateAllDeviceTimeSpent = await cronService.updateAllDeviceTimeSpent();
+            // const updateAllAppTimeSpent = await cronService.updateAllAppTimeSpent()
+        }
+        
 
         return response.success(res, 200, message.SUCCESS);
 
