@@ -599,8 +599,8 @@ const addChild = async (res, bodyData, headers) => {
             newData.childId = addChildByParent;
 
             parentRes.childId.push(addChildByParent);
-            let updatedParentData = { childId : parentRes.childId }
-            const updateParentData = await parentService.updateParentDataById(parentRes.firestore_parentId, updatedParentData )
+            let updatedParentData = { childId: parentRes.childId }
+            const updateParentData = await parentService.updateParentDataById(parentRes.firestore_parentId, updatedParentData)
 
             if (bodyData.email && (bodyData.email != '')) {
 
@@ -766,6 +766,21 @@ const getChildByParent = async (res, headers, paramData) => {
                 return response.failure(res, 200, arabicMessage.INVALID_CHILD_ID);
             }
             return response.failure(res, 200, message.INVALID_CHILD_ID);
+        }
+
+        if (childProfileDetails.deviceId) {
+            const deviceDetails = await parentService.getDeviceDataById(childProfileDetails.deviceId)
+
+            childProfileDetails.scheduledBy = deviceDetails.scheduledBy || '';
+            childProfileDetails.eachDaySchedule = deviceDetails.eachDaySchedule || [];
+            childProfileDetails.everyDaySchedule = deviceDetails.everyDaySchedule || '';
+            childProfileDetails.timeSpent = deviceDetails.timeSpent || '0';
+        }
+        else {
+            childProfileDetails.scheduledBy = '';
+            childProfileDetails.eachDaySchedule = [];
+            childProfileDetails.everyDaySchedule = '';
+            childProfileDetails.timeSpent = '0';
         }
 
         if (headers.lang == 'ar') {

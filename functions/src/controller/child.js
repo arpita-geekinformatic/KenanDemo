@@ -380,6 +380,7 @@ const childDetails = async (res, headers) => {
         childData.scheduledBy = childDeviceData.scheduledBy || '';
         childData.eachDaySchedule = childDeviceData.eachDaySchedule || [];
         childData.everyDaySchedule = childDeviceData.everyDaySchedule || '';
+        childData.timeSpent = childDeviceData.timeSpent || '0';
 
         if (headers.lang == 'ar') {
             return response.data(res, childData, 200, arabicMessage.SUCCESS);

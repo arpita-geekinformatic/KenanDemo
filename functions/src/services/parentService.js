@@ -263,7 +263,7 @@ const deleteChildById = async (childId) => {
 }
 
 //  update Child Data By Id  //
-const updateChildDataById = async (childId, updateData ) => {
+const updateChildDataById = async (childId, updateData) => {
     try {
         let updatechild = await db.collection('childs').doc(childId).update(updateData);
         return true;
@@ -313,7 +313,7 @@ const getDeviceAppsIdByPackageName = async (deviceId, packageName) => {
     }
 }
 
-//  getDeviceAppsIdByPackageNameAndId  //
+//  get Device Apps Id By Package Name And Id  //
 const getDeviceAppsIdByPackageNameAndId = async (deviceId, packageName) => {
     try {
         let deviceAppData = await db.collection("deviceApps").where("deviceId", "==", deviceId).where("packageName", "==", packageName).get();
@@ -358,6 +358,28 @@ const updateDeviceDataById = async (deviceId, updatedData) => {
         throw error
     }
 }
+
+//  get Device Data By Id  //
+const getDeviceDataById = async (deviceId) => {
+    try {
+        let deviceData = await db.collection('devices').where('deviceId', '==', deviceId).get();
+
+        if (deviceData.empty) {
+            return false;
+        }
+
+        let deviceArr = [];
+        deviceData.forEach(doc => {
+            deviceArr.push(doc.data())
+            deviceArr[0].firestoreDeviceId = doc.id
+        })
+
+        return deviceArr[0];
+    } catch (error) {
+        throw error
+    }
+}
+
 
 
 //  >>>>>>>>>>>>  GIFT TYPES   >>>>>>>>>>>>>>> //
@@ -548,6 +570,7 @@ module.exports = {
     getDeviceAppsIdByPackageNameAndId,
     updateDeviceAppsById,
     updateDeviceDataById,
+    getDeviceDataById,
     giftTypeDropdown,
     addGift,
     childGiftListById,

@@ -67,7 +67,6 @@ const updateAdmin = async (adminId, newData) => {
 
 
 
-
 //  >>>>>>>>>>>>   PARENTS   >>>>>>>>>>  //
 //  user List  //
 const userList = async (limit, offset) => {
@@ -130,9 +129,9 @@ const parentdetailsById = async (parentId) => {
         parentData.photo = parentDetails._fieldsProto.photo ? parentDetails._fieldsProto.photo.stringValue : "";
 
         let allChildArr = parentDetails._fieldsProto.childId ? parentDetails._fieldsProto.childId.arrayValue.values : [];
-        if(allChildArr.length > 0){
+        if (allChildArr.length > 0) {
             let allchildId = [];
-            for(let data of allChildArr){
+            for (let data of allChildArr) {
                 allchildId.push(data.stringValue)
             }
             parentData.childId = allchildId
@@ -289,7 +288,6 @@ const updateChildDataById = async (childId, updatedData) => {
 
 
 
-
 //  >>>>>>>>>>>>   DEVICES   >>>>>>>>>>  //
 //  delete Connected Chield Device  //
 const deleteConnectedChildDevice = async (allChildDeviceIdArr) => {
@@ -403,6 +401,22 @@ const updateGiftTypeById = async (giftTypeId, updatedData) => {
 
 
 
+//  >>>>>>>>>>>  settings  >>>>>>>>>>>>> //
+const settings = async () => {
+    // try {
+    //     const snapshot = await firebase.firestore().collection('events').get()
+    //  snapshot.docs.map(doc => doc.data());
+
+
+
+    // } catch (error) {
+    //     throw error;
+    // }
+}
+
+
+
+
 module.exports = {
     findAdmin,
     findAdminByToken,
@@ -424,4 +438,5 @@ module.exports = {
     giftTypeList,
     giftTypeDetailsById,
     updateGiftTypeById,
+    settings,
 }

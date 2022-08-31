@@ -413,8 +413,6 @@ const childDeleteById = async (res, headers, paramData) => {
 }
 
 
-
-
 //  add Gift Type for parent  //
 const addGiftType = async (res, bodyData) => {
   try {
@@ -551,6 +549,32 @@ const deleteGiftTypeById = async (res, headers, paramData) => {
 }
 
 
+//  add/update settings  //
+const settings = async (res, headers, bodyData) => {
+  try {
+    if (!headers.authorization) {
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+
+    const decoded = await KenanUtilities.decryptToken(headers.authorization);
+    const adminData = await adminService.findAdminByToken(headers.authorization);
+    if (!adminData) {
+      return response.failure(res, 400, message.INVALID_TOKEN,);
+    }
+
+    const settingsDetails = await adminService.settings();
+    // const snapshot = await firebase.firestore().collection('events').get()
+    //  snapshot.docs.map(doc => doc.data());
+
+
+
+  } catch (error) {
+    return response.failure(res, 400, error)
+  }
+}
+
+
+
 
 
 module.exports = {
@@ -571,4 +595,5 @@ module.exports = {
   updateGiftTypeById,
   viewGiftTypeById,
   deleteGiftTypeById,
+  settings,
 }

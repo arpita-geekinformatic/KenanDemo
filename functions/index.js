@@ -551,8 +551,6 @@ app.delete('/childDelete/:id', async (req, res, next) => {
   }
 })
 
-
-
 //  add gift type for parent  //
 app.post('/addGiftType', async (req, res, next) => {
   try {
@@ -597,6 +595,16 @@ app.get('/viewGiftType/:id', async (req, res, next) => {
 app.delete('/deleteGiftType/:id', async (req, res, next) => {
   try {
     let result = await adminController.deleteGiftTypeById(res, req.headers, req.params);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+//  add/update settings  //
+app.post('settings', async(req, res, next) => {
+  try {
+    let result = await adminController.settings(res, req.headers, req.body);
     return result;
   } catch (error) {
     next(error)
