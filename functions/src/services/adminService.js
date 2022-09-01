@@ -315,6 +315,34 @@ const updateChildDataById = async (childId, updatedData) => {
     }
 }
 
+//  total Connected Child Count  //
+const totalConnectedChildCount = async () => {
+    try {
+        let totalUsers = 0;
+        await db.collection('childs').where("isDeleted", "==", false).where('deviceId', '!=', '').get().then(snap => {
+            totalUsers = snap.size;
+        });
+
+        return totalUsers;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  total Non Connected Child Count  //
+const totalNonConnectedChildCount = async () => {
+    try {
+        let totalUsers = 0;
+        await db.collection('childs').where("isDeleted", "==", false).where('deviceId', '==', '').get().then(snap => {
+            totalUsers = snap.size;
+        });
+
+        return totalUsers;
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 
 //  >>>>>>>>>>>>   DEVICES   >>>>>>>>>>  //
@@ -480,6 +508,8 @@ module.exports = {
     totalChildCount,
     childDetailsById,
     updateChildDataById,
+    totalConnectedChildCount,
+    totalNonConnectedChildCount,
     deleteConnectedChildDevice,
     updateDeviceData,
     addGiftType,

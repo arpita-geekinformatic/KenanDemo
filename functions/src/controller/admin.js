@@ -575,12 +575,16 @@ const dashboard = async (res, headers) => {
     const totalInactiveParentCount = await adminService.totalInactiveParentCount();
 
     const totalChildCount = await adminService.totalChildCount();
+    const totalConnectedChildCount = await adminService.totalConnectedChildCount();
+    const totalNonConnectedChildCount = await adminService.totalNonConnectedChildCount();
 
     let data = {
       totalParent : totalParentCount,
       totalActiveParent : totalActiveParentCount,
       totalInactiveParent : totalInactiveParentCount,
       totalchild : totalChildCount,
+      totalConnectedChild : totalConnectedChildCount,
+      totalNonConnectedChild : totalNonConnectedChildCount
     }
     return response.data(res, data, 200, message. SUCCESS)
   } catch (error) {
