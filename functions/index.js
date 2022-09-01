@@ -624,7 +624,7 @@ app.post('/addGiftType', async (req, res, next) => {
 //  gift type list  //
 app.get('/giftTypeList', async (req, res, next) => {
   try {
-    let result = await adminController.giftTypeList(res, req.headers);
+    let result = await adminController.giftTypeList(res, req.headers, req.query);
     return result;
   } catch (error) {
     next(error)

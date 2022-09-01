@@ -425,7 +425,8 @@ const addGiftType = async (res, bodyData) => {
 
     let giftData = {
       name: bodyData.name,
-      icon: bodyData.icon || ""
+      icon: bodyData.icon || "",
+      isDeleted: false
     }
 
     let addGiftType = await adminService.addGiftType(giftData);
@@ -436,7 +437,7 @@ const addGiftType = async (res, bodyData) => {
 }
 
 //  gift Type List  //
-const giftTypeList = async (res, headers) => {
+const giftTypeList = async (res, headers, queryData) => {
   try {
     if (!headers.authorization) {
       return response.failure(res, 400, message.TOKEN_REQUIRED);
@@ -448,8 +449,17 @@ const giftTypeList = async (res, headers) => {
       return response.failure(res, 400, message.INVALID_TOKEN,);
     }
 
-    const giftTypeList = await adminService.giftTypeList();
-    return response.data(res, giftTypeList, 200, message.SUCCESS);
+    let limit = queryData.limit ? parseInt(queryData.limit) : 10;
+    let offset = queryData.skip ? parseInt(queryData.skip) : 0;
+
+    const giftTypeList = await adminService.giftTypeList(limit, offset);
+    const totalGiftTypeCount = await adminService.totalGiftTypeCount();
+
+    let data = {
+      totalItems: totalGiftTypeCount,
+      giftTypeList: giftTypeList
+    }
+    return response.data(res, data, 200, message.SUCCESS);
 
   } catch (error) {
     return response.failure(res, 400, error)

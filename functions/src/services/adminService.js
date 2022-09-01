@@ -343,7 +343,7 @@ const addGiftType = async (newData) => {
 }
 
 //  giftT ype List  //
-const giftTypeList = async () => {
+const giftTypeList = async (limit, offset) => {
     try {
         let giftList = await db.collection("giftTypes").where("isDeleted", "==", false).orderBy('name', 'asc').get();
 
@@ -355,10 +355,27 @@ const giftTypeList = async () => {
             giftArr.push(giftData);
         });
 
-        // giftArr.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1);
+        giftArr.sort((a, b) => a.name.toLowerCase() > b.name.toLowerCase() ? 1 : -1);
 
-        return giftArr;
+        let start = offset;
+        let end = offset + limit
+        let list = giftArr.slice(start, end);
 
+        return list;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  total Gift Type Count  //
+const totalGiftTypeCount = async () => {
+    try {
+        let totalGiftTypes = 0;
+        await db.collection('giftTypes').where("isDeleted", "==", false).get().then(snap => {
+            totalGiftTypes = snap.size;
+        });
+
+        return totalGiftTypes;
     } catch (error) {
         throw error;
     }
@@ -436,6 +453,7 @@ module.exports = {
     updateDeviceData,
     addGiftType,
     giftTypeList,
+    totalGiftTypeCount,
     giftTypeDetailsById,
     updateGiftTypeById,
     settings,

@@ -4,7 +4,70 @@ const db = getFirestore();
 // db.settings({ ignoreUndefinedProperties: true });
 
 
-//  >>>>>>>>>>>>   ADMIN   >>>>>>>>>>  //
+
+// >>>>>>>>>>>>>>  CHILDS  >>>>>>>>>>>>//
+//  get Child Data By Id  //
+const getChildDataById = async (childId) => {
+    try {
+        let childDetails = await db.collection("childs").doc(childId).get();
+        if (!childDetails._fieldsProto) {
+            return false;
+        }
+        if (childDetails._fieldsProto.isDeleted.booleanValue) {
+            return false;
+        }
+
+        let childData = {
+            childId: childId,
+            age: childDetails._fieldsProto.age.integerValue,
+            deviceId: childDetails._fieldsProto.deviceId.stringValue,
+            email: childDetails._fieldsProto.email.stringValue,
+            fcmToken: childDetails._fieldsProto.fcmToken.stringValue,
+            gender: childDetails._fieldsProto.gender.stringValue,
+            name: childDetails._fieldsProto.name.stringValue,
+            parentId: childDetails._fieldsProto.parentId.stringValue,
+            photo: childDetails._fieldsProto.photo ? childDetails._fieldsProto.photo.stringValue : '',
+            authToken: childDetails._fieldsProto.authToken ? childDetails._fieldsProto.authToken.stringValue : '',
+            points: childDetails._fieldsProto.points ? childDetails._fieldsProto.points.integerValue : 0,
+            badge: childDetails._fieldsProto.badge ? childDetails._fieldsProto.badge.integerValue : 0,
+        }
+        return childData;
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  update Child Data By Id  //
+const updateChildDataById = async (childId, updatedData) => {
+    try {
+        let updateChild = await db.collection("childs").doc(childId).update(updatedData);
+        return true;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+//  >>>>>>>>>>>>   DEVICES   >>>>>>>>>>  //
+//  get All Connected Device Data  //
+const getAllConnectedDeviceData = async () => {
+    try {
+        const deviceData = await db.collection('devices').where('childId', '!=', '').get();
+
+        let deviceArr = [];
+        deviceData.forEach(doc => {
+            let deviceDetails = doc.data();
+            deviceDetails.firestoreDeviceId = doc.id;
+            deviceArr.push(deviceDetails);
+        });
+
+        return deviceArr;
+    } catch (error) {
+        throw error;
+    }
+}
+
 //  update All Device Time Spent  //
 const updateAllDeviceTimeSpent = async () => {
     try {
@@ -25,10 +88,30 @@ const updateAllDeviceTimeSpent = async () => {
     }
 }
 
+
+
+//  >>>>>>>>>>>>   DEVICE APPS   >>>>>>>>>>  //
+//  get Connected Device App Data  //
+const getConnectedDeviceAppData = async (deviceId) => {
+    try {
+        const deviceAppData = await db.collection('deviceApps').where('deviceId', '==', deviceId).get();
+
+        let deviceAppArr = [];
+        deviceAppData.forEach(doc => {
+            let deviceAppDetails = doc.data();
+            deviceAppDetails.firestoreDeviceAppId = doc.id;
+            deviceAppArr.push(deviceAppDetails);
+        });
+
+        return deviceAppArr;
+    } catch (error) {
+        throw error;
+    }
+}
+
 //  update All App Time Spent  //
 const updateAllAppTimeSpent = async () => {
     try {
-
         const batch = db.batch();
         const snapshot = await db.collection('deviceApps').get()
 
@@ -50,6 +133,10 @@ const updateAllAppTimeSpent = async () => {
 
 
 module.exports = {
+    getChildDataById,
+    updateChildDataById,
+    getAllConnectedDeviceData,
     updateAllDeviceTimeSpent,
+    getConnectedDeviceAppData,
     updateAllAppTimeSpent,
 }
