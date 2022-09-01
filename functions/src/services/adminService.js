@@ -157,6 +157,35 @@ const updateParentById = async (parentId, newData) => {
     }
 }
 
+//  total Active Parent Count  //
+const totalActiveParentCount = async () => {
+    try {
+        let totalUsers = 0;
+        await db.collection('parents').where("isDeleted", "==", false).where('isActive', '==', true).get().then(snap => {
+            totalUsers = snap.size;
+        });
+
+        return totalUsers;
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  total Inactive Parent Count  //
+const totalInactiveParentCount = async () => {
+    try {
+        let totalUsers = 0;
+        await db.collection('parents').where("isDeleted", "==", false).where('isActive', '==', false).get().then(snap => {
+            totalUsers = snap.size;
+        });
+
+        return totalUsers;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 
 
 //  >>>>>>>>>>>>   CHILDS   >>>>>>>>>>  //
@@ -443,6 +472,8 @@ module.exports = {
     totalUserCount,
     parentdetailsById,
     updateParentById,
+    totalActiveParentCount,
+    totalInactiveParentCount,
     deleteChildsByParentsId,
     childListByParentId,
     allChildList,

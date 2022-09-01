@@ -558,6 +558,38 @@ const deleteGiftTypeById = async (res, headers, paramData) => {
   }
 }
 
+//  dashboard data  //
+const dashboard = async (res, headers) => {
+  try {
+    if (!headers.authorization) {
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+    const decoded = await KenanUtilities.decryptToken(headers.authorization);
+    const adminData = await adminService.findAdminByToken(headers.authorization);
+    if (!adminData) {
+      return response.failure(res, 400, message.INVALID_TOKEN,);
+    }
+
+    const totalParentCount = await adminService.totalUserCount();
+    const totalActiveParentCount = await adminService.totalActiveParentCount();
+    const totalInactiveParentCount = await adminService.totalInactiveParentCount();
+
+    const totalChildCount = await adminService.totalChildCount();
+
+    let data = {
+      totalParent : totalParentCount,
+      totalActiveParent : totalActiveParentCount,
+      totalInactiveParent : totalInactiveParentCount,
+      totalchild : totalChildCount,
+    }
+    return response.data(res, data, 200, message. SUCCESS)
+  } catch (error) {
+    return response.failure(res, 400, error)
+  }
+}
+
+
+
 
 //  add/update settings  //
 const settings = async (res, headers, bodyData) => {
@@ -605,5 +637,6 @@ module.exports = {
   updateGiftTypeById,
   viewGiftTypeById,
   deleteGiftTypeById,
+  dashboard,
   settings,
 }

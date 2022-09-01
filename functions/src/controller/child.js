@@ -197,7 +197,7 @@ const addDeviceApps = async (res, reqBodyData, headers) => {
             //  Insert data in Apps  //
             let appArr = reqBodyData.apps;
             appArr.forEach(async (element) => {
-                console.log("160 >>>>>>>>>. element.status : ", element.status);
+                console.log("200 >>>>>>>>> element.status : ", element.status);
                 let getAppByName = await childService.getAppByName(element.appName, element.packageName);
                 let firestoreAppId;
 
@@ -228,13 +228,10 @@ const addDeviceApps = async (res, reqBodyData, headers) => {
                         packageName: element.packageName || '',
                         firestoreAppId: firestoreAppId,
                         deviceId: bodyData.deviceId,
-                        status: element.status || 0,
+                        status: 0,
                         firestoreDeviceId: firestoreDevicePathId,
                         noOfLaunches: element.noOfLaunches || 0,
-                        // phoneTimeLimit: element.phoneTimeLimit || 1800,
-                        // dailyTimeLimit: element.individualAppTimeLimit || 0,
                         timeSpent: element.timeSpent || '00',
-                        // usageTimeOnDays: element.usageTimeOnDays || '',
                         scheduledBy: element.scheduledBy || '',
                         eachDaySchedule: element.eachDaySchedule || [],
                         everyDaySchedule: element.everyDaySchedule || '',
@@ -248,13 +245,10 @@ const addDeviceApps = async (res, reqBodyData, headers) => {
                         packageName: isDeviceAppExists.packageName ? isDeviceAppExists.packageName : element.packageName,
                         firestoreAppId: firestoreAppId,
                         deviceId: isDeviceAppExists.deviceId ? isDeviceAppExists.deviceId : req.body.deviceId,
-                        status: element.status ? element.status : isDeviceAppExists.status ? isDeviceAppExists.status : 0,
+                        status: isDeviceAppExists.status ? isDeviceAppExists.status : 0,
                         firestoreDeviceId: firestoreDevicePathId,
                         noOfLaunches: isDeviceAppExists.noOfLaunches ? isDeviceAppExists.noOfLaunches : element.noOfLaunches,
-                        // phoneTimeLimit: isDeviceAppExists.phoneTimeLimit ? isDeviceAppExists.phoneTimeLimit : element.phoneTimeLimit,
-                        // dailyTimeLimit: isDeviceAppExists.dailyTimeLimit ? isDeviceAppExists.dailyTimeLimit : element.individualAppTimeLimit,
                         timeSpent: isDeviceAppExists.timeSpent ? isDeviceAppExists.timeSpent : element.timeSpent ? element.timeSpent : '00',
-                        // usageTimeOnDays: isDeviceAppExists.usageTimeOnDays ? isDeviceAppExists.usageTimeOnDays : element.usageTimeOnDays,
                         scheduledBy: isDeviceAppExists.scheduledBy ? isDeviceAppExists.scheduledBy : element.scheduledBy,
                         eachDaySchedule: isDeviceAppExists.eachDaySchedule ? isDeviceAppExists.eachDaySchedule : element.eachDaySchedule,
                         everyDaySchedule: isDeviceAppExists.everyDaySchedule ? isDeviceAppExists.everyDaySchedule : element.everyDaySchedule,
@@ -276,7 +270,7 @@ const addDeviceApps = async (res, reqBodyData, headers) => {
             //  Insert new Apps  //
             let appArr = reqBodyData.apps;
             appArr.forEach(async (element) => {
-                console.log("160 >>>>>>>>>. element.status : ", element.status);
+                console.log("273 >>>>>>>>>. element.status : ", element.status);
                 let getAppByName = await childService.getAppByName(element.appName, element.packageName);
                 let firestoreAppId;
 
@@ -307,13 +301,10 @@ const addDeviceApps = async (res, reqBodyData, headers) => {
                         packageName: element.packageName || '',
                         firestoreAppId: firestoreAppId,
                         deviceId: bodyData.deviceId,
-                        status: element.status || 0,
+                        status: 0,
                         firestoreDeviceId: firestoreDevicePathId,
                         noOfLaunches: element.noOfLaunches || 0,
-                        // phoneTimeLimit: element.phoneTimeLimit || 1800,
-                        // dailyTimeLimit: element.individualAppTimeLimit || 0,
                         timeSpent: element.timeSpent || '00',
-                        // usageTimeOnDays: element.usageTimeOnDays || '',
                         scheduledBy: element.scheduledBy || '',
                         eachDaySchedule: element.eachDaySchedule || [],
                         everyDaySchedule: element.everyDaySchedule || '',
@@ -327,13 +318,10 @@ const addDeviceApps = async (res, reqBodyData, headers) => {
                         packageName: isDeviceAppExists.packageName ? isDeviceAppExists.packageName : element.packageName,
                         firestoreAppId: firestoreAppId,
                         deviceId: isDeviceAppExists.deviceId ? isDeviceAppExists.deviceId : req.body.deviceId,
-                        status: element.status ? element.status : isDeviceAppExists.status ? isDeviceAppExists.status : 0,
+                        status: isDeviceAppExists.status ? isDeviceAppExists.status : 0,
                         firestoreDeviceId: firestoreDevicePathId,
                         noOfLaunches: isDeviceAppExists.noOfLaunches ? isDeviceAppExists.noOfLaunches : element.noOfLaunches,
-                        // phoneTimeLimit: isDeviceAppExists.phoneTimeLimit ? isDeviceAppExists.phoneTimeLimit : element.phoneTimeLimit,
-                        // dailyTimeLimit: isDeviceAppExists.dailyTimeLimit ? isDeviceAppExists.dailyTimeLimit : element.individualAppTimeLimit,
                         timeSpent: isDeviceAppExists.timeSpent ? isDeviceAppExists.timeSpent : element.timeSpent ? element.timeSpent : '00',
-                        // usageTimeOnDays: isDeviceAppExists.usageTimeOnDays ? isDeviceAppExists.usageTimeOnDays : element.usageTimeOnDays,
                         scheduledBy: isDeviceAppExists.scheduledBy ? isDeviceAppExists.scheduledBy : element.scheduledBy,
                         eachDaySchedule: isDeviceAppExists.eachDaySchedule ? isDeviceAppExists.eachDaySchedule : element.eachDaySchedule,
                         everyDaySchedule: isDeviceAppExists.everyDaySchedule ? isDeviceAppExists.everyDaySchedule : element.everyDaySchedule,

@@ -661,6 +661,19 @@ app.delete('/deleteGiftType/:id', async (req, res, next) => {
   }
 })
 
+//  dashboard data  //
+app.get('/dashboard', async(req, res, next) => {
+  try {
+    let result = await adminController.dashboard(res, req.headers);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+
+
+
 //  add/update settings  //
 app.post('settings', async (req, res, next) => {
   try {
@@ -670,6 +683,8 @@ app.post('settings', async (req, res, next) => {
     next(error)
   }
 })
+
+
 
 
 
