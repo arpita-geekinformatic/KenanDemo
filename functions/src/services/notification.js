@@ -13,9 +13,10 @@ const notificationType = {
 
 //   CHILD NOTIFICATION   //
 //  send app usage changed by parent notification  // (Type => type2)
-const sendAppUsageNotification = async (bodyData, updateData, topic, childData, parentData) => {
+const sendAppUsageNotification = async (bodyData, updateData, topic, childData, parentData, childFcmToken) => {
     try {
         const message = {
+            token: childFcmToken,
             'notification': {
                 'title': `Your app usage has been changed by parent.`,
                 'body': `Your app usage has been changed by parent.`,
@@ -25,9 +26,12 @@ const sendAppUsageNotification = async (bodyData, updateData, topic, childData, 
                 'body': `Your app usage has been changed by parent.`,
                 'notificationType': `${notificationType.type2}`,
             },
-            topic: topic
+            // topic: topic
         };
-        await firebaseAdmin.firebaseSendTopicNotification(message);
+        const notificationResult = await firebaseAdmin.firebaseNotification(message);
+        console.log("32 ===== add APP goal notificationResult : ", notificationResult);
+        //    let notificationRes =  await firebaseAdmin.firebaseSendTopicNotification(message);
+        //    console.log("========  notificationRes : ",notificationRes);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
@@ -65,9 +69,10 @@ const sendAppUsageNotification = async (bodyData, updateData, topic, childData, 
 }
 
 //  send device usage changed by parent notification  // (Type => type2)
-const sendDeviceUsageNotification = async (bodyData, updateData, topic, childData, parentData) => {
+const sendDeviceUsageNotification = async (bodyData, updateData, topic, childData, parentData, childFcmToken) => {
     try {
         const message = {
+            token: childFcmToken,
             'notification': {
                 'title': `Your device usage has been changed by parent.`,
                 'body': `Your device usage has been changed by parent.`,
@@ -77,9 +82,11 @@ const sendDeviceUsageNotification = async (bodyData, updateData, topic, childDat
                 'body': `Your device usage has been changed by parent.`,
                 'notificationType': `${notificationType.type2}`,
             },
-            topic: topic
+            // topic: topic
         };
-        await firebaseAdmin.firebaseSendTopicNotification(message);
+        const notificationResult = await firebaseAdmin.firebaseNotification(message);
+        console.log("88 ===== add DEVICE goal notificationResult : ", notificationResult);
+        // await firebaseAdmin.firebaseSendTopicNotification(message);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
@@ -225,10 +232,10 @@ const giftRequestAcceptedNotification = async (childData, parentData, giftNotifi
 }
 
 //  device Disconnect Notification  //    (Type => type3)
-const deviceDisconnectNotification = async (childData, parentData, topic) => {
+const deviceDisconnectNotification = async (childData, parentData, fcmToken) => {
     try {
         const message = {
-            token: childData.fcmToken,
+            token: fcmToken,
             'notification': {
                 'title': `This device has been disconnected.`,
                 'body': `This device has been disconnected.`,
@@ -238,11 +245,9 @@ const deviceDisconnectNotification = async (childData, parentData, topic) => {
                 'body': `This device has been disconnected.`,
                 'notificationType': `${notificationType.type3}`,
             },
-            // topic: topic
         };
-        // await firebaseAdmin.firebaseSendTopicNotification(message);
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
-        console.log("245 >>>>>>>>>>> notificationResult : ",notificationResult);
+        console.log("244 ===== disconnect notificationResult : ", notificationResult);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
