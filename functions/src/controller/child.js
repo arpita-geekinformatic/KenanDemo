@@ -67,7 +67,7 @@ const scanQrCode = async (res, bodyData, headers) => {
         if ((isChildExists.deviceId != "") && (isChildExists.deviceId != bodyData.deviceId)) {
 
             //  send device disconnect notification to child  //
-            let topic = `child_${bodyData.childId}`;
+            let topic = `child_${isChildExists.childId}`;
             let deviceDisconnectNotification = await notificationData.deviceDisconnectNotification(isChildExists, isParentExists, topic);
 
             //  update child data  //

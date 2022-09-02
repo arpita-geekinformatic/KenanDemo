@@ -477,15 +477,25 @@ const updateGiftTypeById = async (giftTypeId, updatedData) => {
 
 //  >>>>>>>>>>>  SETTINGS  >>>>>>>>>>>>> //
 const settings = async () => {
-    // try {
-    //     const snapshot = await firebase.firestore().collection('events').get()
-    //  snapshot.docs.map(doc => doc.data());
+    try {
+        const snapshot = await db.collection('settings').get();
 
+        let settings = []
 
+        snapshot.forEach(doc => {
+            let settingsData = {};
+            settingsData = doc.data();
+            settingsData.settingsId = doc.id;
 
-    // } catch (error) {
-    //     throw error;
-    // }
+            settings.push(settingsData)
+        });
+
+        console.log("????????? settings : ",settings);
+        return true
+
+    } catch (error) {
+        throw error;
+    }
 }
 
 

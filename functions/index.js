@@ -672,7 +672,7 @@ app.get('/dashboard', async(req, res, next) => {
 })
 
 //  add/update settings  //
-app.post('settings', async (req, res, next) => {
+app.post('/settings', async (req, res, next) => {
   try {
     let result = await adminController.settings(res, req.headers, req.body);
     return result;

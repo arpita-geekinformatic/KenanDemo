@@ -609,7 +609,7 @@ const settings = async (res, headers, bodyData) => {
     //  snapshot.docs.map(doc => doc.data());
 
 
-
+    return response.success(res, 200, message.SUCCESS)
   } catch (error) {
     return response.failure(res, 400, error)
   }
