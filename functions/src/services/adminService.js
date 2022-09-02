@@ -476,10 +476,10 @@ const updateGiftTypeById = async (giftTypeId, updatedData) => {
 
 
 //  >>>>>>>>>>>  SETTINGS  >>>>>>>>>>>>> //
+//  get settings details  //
 const settings = async () => {
     try {
         const snapshot = await db.collection('settings').get();
-
         let settings = []
 
         snapshot.forEach(doc => {
@@ -490,7 +490,27 @@ const settings = async () => {
             settings.push(settingsData)
         });
 
-        console.log("????????? settings : ",settings);
+        return settings[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  add settings data  //
+const addSettings = async (newSettingsData) => {
+    try {
+        const addSettings = await db.collection('settings').add(newSettingsData);
+        return true
+
+    } catch (error) {
+        throw error;
+    }
+}
+
+//  update Settings  //
+const updateSettings = async (settingsId, updatedSettingsData) => {
+    try {
+        const updateSettings = await db.collection('settings').doc(settingsId).update(updatedSettingsData);
         return true
 
     } catch (error) {
@@ -528,4 +548,6 @@ module.exports = {
     giftTypeDetailsById,
     updateGiftTypeById,
     settings,
+    addSettings,
+    updateSettings,
 }

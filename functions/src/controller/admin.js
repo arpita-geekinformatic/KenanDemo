@@ -579,14 +579,14 @@ const dashboard = async (res, headers) => {
     const totalNonConnectedChildCount = await adminService.totalNonConnectedChildCount();
 
     let data = {
-      totalParent : totalParentCount,
-      totalActiveParent : totalActiveParentCount,
-      totalInactiveParent : totalInactiveParentCount,
-      totalchild : totalChildCount,
-      totalConnectedChild : totalConnectedChildCount,
-      totalNonConnectedChild : totalNonConnectedChildCount
+      totalParent: totalParentCount,
+      totalActiveParent: totalActiveParentCount,
+      totalInactiveParent: totalInactiveParentCount,
+      totalchild: totalChildCount,
+      totalConnectedChild: totalConnectedChildCount,
+      totalNonConnectedChild: totalNonConnectedChildCount
     }
-    return response.data(res, data, 200, message. SUCCESS)
+    return response.data(res, data, 200, message.SUCCESS)
   } catch (error) {
     return response.failure(res, 400, error)
   }
@@ -605,11 +605,61 @@ const settings = async (res, headers, bodyData) => {
     }
 
     const settingsDetails = await adminService.settings();
-    // const snapshot = await firebase.firestore().collection('events').get()
-    //  snapshot.docs.map(doc => doc.data());
+    console.log("????????? settingsDetails : ", settingsDetails);
 
+    if (!settingsDetails) {
+      console.log("==========  no settings available");
+      let newSettingsData = {
+        maxChildAdd: bodyData.maxChildAdd || 0,
+        bronzeBadgePoint: bodyData.bronzeBadgePoint || 100,
+        silverBadgePoint: bodyData.silverBadgePoint || 200,
+        goldBadgePoint: bodyData.goldBadgePoint || 300,
 
-    return response.success(res, 200, message.SUCCESS)
+        favorableAppTime: bodyData.favorableAppTime || 5,
+        favorableAppAddPoint: bodyData.favorableAppAddPoint || 2,
+        favorableAppSubtractPoint: bodyData.favorableAppSubtractPoint || 1,
+
+        unFavorableAppTime: bodyData.unFavorableAppTime || 5,
+        unFavorableAppAddPoint: bodyData.unFavorableAppAddPoint || 2,
+        unFavorableAppSubtractPoint: bodyData.unFavorableAppSubtractPoint || 1,
+
+        deviceTime: bodyData.deviceTime || 5,
+        deviceAddPoint: bodyData.deviceAddPoint || 2,
+        deviceSubtractPoint: bodyData.deviceSubtractPoint || 1,
+      }
+
+      const addSettings = await adminService.addSettings(newSettingsData);
+      const settingsDetails = await adminService.settings();
+
+      return response.data(res, settingsDetails, 200, message.SUCCESS)
+    }
+    else {
+      console.log("********  settings available");
+      let updatedSettingsData = {
+        maxChildAdd: bodyData.maxChildAdd || settingsDetails.maxChildAdd,
+        bronzeBadgePoint: bodyData.bronzeBadgePoint || settingsDetails.bronzeBadgePoint,
+        silverBadgePoint: bodyData.silverBadgePoint || settingsDetails.silverBadgePoint,
+        goldBadgePoint: bodyData.goldBadgePoint || settingsDetails.goldBadgePoint,
+
+        favorableAppTime: bodyData.favorableAppTime || settingsDetails.favorableAppTime,
+        favorableAppAddPoint: bodyData.favorableAppAddPoint || settingsDetails.favorableAppAddPoint,
+        favorableAppSubtractPoint: bodyData.favorableAppSubtractPoint || settingsDetails.favorableAppSubtractPoint,
+
+        unFavorableAppTime: bodyData.unFavorableAppTime || settingsDetails.unFavorableAppTime,
+        unFavorableAppAddPoint: bodyData.unFavorableAppAddPoint || settingsDetails.unFavorableAppAddPoint,
+        unFavorableAppSubtractPoint: bodyData.unFavorableAppSubtractPoint || settingsDetails.unFavorableAppSubtractPoint,
+
+        deviceTime: bodyData.deviceTime || settingsDetails.deviceTime,
+        deviceAddPoint: bodyData.deviceAddPoint || settingsDetails.deviceAddPoint,
+        deviceSubtractPoint: bodyData.deviceSubtractPoint || settingsDetails.deviceSubtractPoint,
+      }
+
+      const updateSettings = await adminService.updateSettings(settingsDetails.settingsId, updatedSettingsData);
+      const settingsDetails = await adminService.settings();
+
+      return response.data(res, settingsDetails, 200, message.SUCCESS)
+    }
+
   } catch (error) {
     return response.failure(res, 400, error)
   }
