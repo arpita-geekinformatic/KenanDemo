@@ -475,7 +475,7 @@ const updateGiftTypeById = async (giftTypeId, updatedData) => {
 
 
 
-//  >>>>>>>>>>>  settings  >>>>>>>>>>>>> //
+//  >>>>>>>>>>>  SETTINGS  >>>>>>>>>>>>> //
 const settings = async () => {
     // try {
     //     const snapshot = await firebase.firestore().collection('events').get()

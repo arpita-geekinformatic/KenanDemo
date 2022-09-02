@@ -592,16 +592,12 @@ const dashboard = async (res, headers) => {
   }
 }
 
-
-
-
 //  add/update settings  //
 const settings = async (res, headers, bodyData) => {
   try {
     if (!headers.authorization) {
       return response.failure(res, 400, message.TOKEN_REQUIRED);
     }
-
     const decoded = await KenanUtilities.decryptToken(headers.authorization);
     const adminData = await adminService.findAdminByToken(headers.authorization);
     if (!adminData) {

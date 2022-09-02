@@ -164,7 +164,7 @@ const login = async (res, bodyData, headers) => {
         parentData.authToken = authToken;
         let newData = {
             authToken: authToken,
-            fcmToken : bodyData.fcmToken || parentData.fcmToken,
+            fcmToken: bodyData.fcmToken || parentData.fcmToken,
         }
         const updatePatrentData = await parentService.updateParentDataById(parentData.firestore_parentId, newData);
 
@@ -653,14 +653,12 @@ const childList = async (res, headers) => {
         if (!headers.lang) {
             return response.failure(res, 200, message.LANGUAGE_REQUIRED);
         }
-
         if (!headers.authorization) {
             if (headers.lang == 'ar') {
                 return response.failure(res, 200, arabicMessage.TOKEN_REQUIRED);
             }
             return response.failure(res, 200, message.TOKEN_REQUIRED);
         }
-
         const decoded = await KenanUtilities.decryptToken(headers.authorization);
         let parentRes = await parentService.findParentByToken(headers.authorization);
         if (!parentRes) {
@@ -671,6 +669,24 @@ const childList = async (res, headers) => {
         }
 
         let childList = await parentService.getChildList(parentRes.firestore_parentId);
+
+        if (childList.length > 0) {
+            for (let childs of childList) {
+                if (childs.deviceId != '') {
+                    let deviceData = await parentService.getDeviceDataById(childs.deviceId);
+                    childs.scheduledBy = deviceData.scheduledBy || '';
+                    childs.eachDaySchedule = deviceData.eachDaySchedule || [];
+                    childs.everyDaySchedule = deviceData.everyDaySchedule || '';
+                    childs.timeSpent = deviceData.timeSpent || '';
+                }
+                else {
+                    childs.scheduledBy = '';
+                    childs.eachDaySchedule = [];
+                    childs.everyDaySchedule = '';
+                    childs.timeSpent = '';
+                }
+            }
+        }
 
         if (headers.lang == 'ar') {
             return response.data(res, childList, 200, arabicMessage.SUCCESS)

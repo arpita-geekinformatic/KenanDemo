@@ -671,9 +671,6 @@ app.get('/dashboard', async(req, res, next) => {
   }
 })
 
-
-
-
 //  add/update settings  //
 app.post('settings', async (req, res, next) => {
   try {
