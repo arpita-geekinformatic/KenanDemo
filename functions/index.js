@@ -681,6 +681,15 @@ app.post('/settings', async (req, res, next) => {
   }
 })
 
+//  get settings  //
+app.get('/settings', async (req, res, next) => {
+  try {
+    let result = await adminController.getSettings(res, req.headers);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
 
 
 

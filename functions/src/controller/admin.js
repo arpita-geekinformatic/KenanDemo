@@ -662,6 +662,25 @@ const settings = async (res, headers, bodyData) => {
   }
 }
 
+//  get Settings  //
+const getSettings = async (res, headers) => {
+  try {
+    if (!headers.authorization) {
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+    const decoded = await KenanUtilities.decryptToken(headers.authorization);
+    const adminData = await adminService.findAdminByToken(headers.authorization);
+    if (!adminData) {
+      return response.failure(res, 400, message.INVALID_TOKEN,);
+    }
+
+    const settingsDetails = await adminService.settings();
+    return response.data(res, settingsDetails, 200, message.SUCCESS)
+
+  } catch (error) {
+    return response.failure(res, 400, error)
+  }
+}
 
 
 
@@ -686,4 +705,5 @@ module.exports = {
   deleteGiftTypeById,
   dashboard,
   settings,
+  getSettings,
 }
