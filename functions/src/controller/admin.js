@@ -605,10 +605,8 @@ const settings = async (res, headers, bodyData) => {
     }
 
     const settingsDetails = await adminService.settings();
-    console.log("????????? settingsDetails : ", settingsDetails);
 
     if (!settingsDetails) {
-      console.log("==========  no settings available");
       let newSettingsData = {
         maxChildAdd: bodyData.maxChildAdd || 0,
         bronzeBadgePoint: bodyData.bronzeBadgePoint || 100,
@@ -634,7 +632,6 @@ const settings = async (res, headers, bodyData) => {
       return response.data(res, settingsDetails, 200, message.SUCCESS)
     }
     else {
-      console.log("********  settings available");
       let updatedSettingsData = {
         maxChildAdd: bodyData.maxChildAdd || settingsDetails.maxChildAdd,
         bronzeBadgePoint: bodyData.bronzeBadgePoint || settingsDetails.bronzeBadgePoint,
@@ -655,9 +652,9 @@ const settings = async (res, headers, bodyData) => {
       }
 
       const updateSettings = await adminService.updateSettings(settingsDetails.settingsId, updatedSettingsData);
-      const settingsDetails = await adminService.settings();
+      const settingsData = await adminService.settings();
 
-      return response.data(res, settingsDetails, 200, message.SUCCESS)
+      return response.data(res, settingsData, 200, message.SUCCESS)
     }
 
   } catch (error) {

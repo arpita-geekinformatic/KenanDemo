@@ -749,7 +749,7 @@ const updateUsageTime = async (res, headers, bodyData) => {
 
         //  if nothing was restricted by parent  //
         if ((childAppDetails.scheduledBy == '') && (deviceDetails.scheduledBy == '')) {
-            console.log("624 ++++  totalAppTimeSpent : ", totalAppTimeSpent, "  ++++ timeSpent : ", timeSpent);
+            console.log("624 ++++  totalAppTimeSpent : ", totalAppTimeSpent, "  ++++ timeSpent : ", timeSpent, '  ++++ totalTimeSpent : ',totalTimeSpent);
 
             totalAppTimeSpent = parseInt(totalAppTimeSpent) + parseInt(timeSpent);
             let newAppData = {
