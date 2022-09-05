@@ -608,22 +608,22 @@ const settings = async (res, headers, bodyData) => {
 
     if (!settingsDetails) {
       let newSettingsData = {
-        maxChildAdd: bodyData.maxChildAdd || 0,
-        bronzeBadgePoint: bodyData.bronzeBadgePoint || 100,
-        silverBadgePoint: bodyData.silverBadgePoint || 200,
-        goldBadgePoint: bodyData.goldBadgePoint || 300,
+        maxChildAdd: bodyData.maxChildAdd || '0',
+        bronzeBadgePoint: bodyData.bronzeBadgePoint || '100',
+        silverBadgePoint: bodyData.silverBadgePoint || '200',
+        goldBadgePoint: bodyData.goldBadgePoint || '300',
 
-        favorableAppTime: bodyData.favorableAppTime || 5,
-        favorableAppAddPoint: bodyData.favorableAppAddPoint || 2,
-        favorableAppSubtractPoint: bodyData.favorableAppSubtractPoint || 1,
+        favorableAppTime: bodyData.favorableAppTime || '5',
+        favorableAppAddPoint: bodyData.favorableAppAddPoint || '2',
+        favorableAppSubtractPoint: bodyData.favorableAppSubtractPoint || '1',
 
-        unFavorableAppTime: bodyData.unFavorableAppTime || 5,
-        unFavorableAppAddPoint: bodyData.unFavorableAppAddPoint || 2,
-        unFavorableAppSubtractPoint: bodyData.unFavorableAppSubtractPoint || 1,
+        unFavorableAppTime: bodyData.unFavorableAppTime || '5',
+        unFavorableAppAddPoint: bodyData.unFavorableAppAddPoint || '2',
+        unFavorableAppSubtractPoint: bodyData.unFavorableAppSubtractPoint || '1',
 
-        deviceTime: bodyData.deviceTime || 5,
-        deviceAddPoint: bodyData.deviceAddPoint || 2,
-        deviceSubtractPoint: bodyData.deviceSubtractPoint || 1,
+        deviceTime: bodyData.deviceTime || '5',
+        deviceAddPoint: bodyData.deviceAddPoint || '2',
+        deviceSubtractPoint: bodyData.deviceSubtractPoint || '1',
       }
 
       const addSettings = await adminService.addSettings(newSettingsData);
