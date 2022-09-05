@@ -223,6 +223,23 @@ const childAppDetailsByPackageName = async (deviceId, packageName) => {
     }
 }
 
+//  update Device Apps Data in batch  //
+const updateDeviceAppsData = async (deviceId, updatedData) => {
+    try {
+        const batch = db.batch();
+        const sfRef = await db.collection('deviceApps').where("deviceId", "==", deviceId).get();
+
+        await sfRef.forEach((element) => {
+            batch.update(element.ref, updatedData);
+        });
+        await batch.commit();
+        return true;
+
+    } catch (error) {
+        throw error
+    }
+}
+
 
 // >>>>>>>>>>>>>>  CHILDS  >>>>>>>>>>>>//
 //  get Child Data By Id  //
@@ -411,6 +428,7 @@ module.exports = {
     updateDeviceAppDataById,
     updateDeviceDataById,
     childAppDetailsByPackageName,
+    updateDeviceAppsData,
     getChildDataById,
     updateChildDataById,
     getParentDataById,

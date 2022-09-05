@@ -37,9 +37,6 @@ const scanQrCode = async (res, bodyData, headers) => {
             }
             return response.failure(res, 400, message.REQUIRE_CHILD_DEVICE_ID);
         }
-        // if (!bodyData.password) {
-        //     return response.failure(res, 400, message.PASSWORD_REQUIRED);
-        // }
         if (!bodyData.FcmToken) {
             if (headers.lang == 'ar') {
                 return response.failure(res, 400, arabicMessage.REQUIRE_FCM);
@@ -63,13 +60,32 @@ const scanQrCode = async (res, bodyData, headers) => {
             return response.failure(res, 400, message.INVALID_CHILD_ID);
         }
 
+        //  check if device is already connected to other child  //
+        let deviceData = await childService.isDeviceExists(bodyData.deviceId)
+        if ((deviceData.childId != '') && (deviceData.childId != bodyData.childId)) {
+            let updatedChildData = {
+                deviceId : '',
+                fcmToken : ''
+            }
+            let updateOldChildData = await childService.updateChildDataById(deviceData.childId, updatedChildData);
+
+            let updatedData = {
+                scheduledBy: '',
+                eachDaySchedule: [],
+                everyDaySchedule: '',
+                timeSpent: '',
+                remainingTime: ''
+            }
+            let updateDeviceDataById = await childService.updateDeviceDataById(deviceData.firestoreDevicePathId, updatedData);
+            let updateDeviceAppsData = await childService.updateDeviceAppsData(bodyData.deviceId, updatedData)
+        }
+
         //  check is child already connected to other device or not  //
         if ((isChildExists.deviceId != "") && (isChildExists.deviceId != bodyData.deviceId)) {
-
             //  send device disconnect notification to child  //
             let connectedDeviceData = await childService.isDeviceExists(isChildExists.deviceId);
             let oldFcmToken = connectedDeviceData.fcmToken
-            console.log('=============== oldFcmToken : ', oldFcmToken);
+            console.log('68  ======= oldFcmToken : ', oldFcmToken);
             let deviceDisconnectNotification = await notificationData.deviceDisconnectNotification(isChildExists, isParentExists, oldFcmToken);
 
             //  update child data  //
@@ -86,7 +102,6 @@ const scanQrCode = async (res, bodyData, headers) => {
             }
             let updateDeviceData = await childService.updateDeviceDataById(connectedDeviceData.firestoreDevicePathId, updatedDeviceData);
         }
-
 
         let isDeviceExists = await childService.isDeviceExists(bodyData.deviceId);
         if (!isDeviceExists) {
@@ -120,10 +135,8 @@ const scanQrCode = async (res, bodyData, headers) => {
             let updateNewDeviceDataById = await childService.updateDeviceDataById(isDeviceExists.firestoreDevicePathId, newdDeviceData);
         }
 
-        // let hashedPassword = await KenanUtilities.cryptPassword(bodyData.password);
         //  generate child auth token  //
         const authToken = await KenanUtilities.generateChildToken(bodyData.childId, bodyData.deviceId);
-
         let newChildData = {
             parentId: bodyData.parentId,
             deviceId: bodyData.deviceId,
@@ -132,11 +145,6 @@ const scanQrCode = async (res, bodyData, headers) => {
             authToken: authToken
         }
         let updateNewChildDataById = await childService.updateChildDataById(bodyData.childId, newChildData);
-
-        // //  subscribe child topic with parent  // 
-        // const registrationTokens = [isParentExists.fcmToken];
-        // let topic = `child_${bodyData.childId}`;
-        // let subscribeTopic = await firebaseAdmin.firebaseSubscribeTopicNotification(registrationTokens, topic);
 
         let finaldata = {
             parentId: bodyData.parentId,
