@@ -581,7 +581,7 @@ const addChild = async (res, bodyData, headers) => {
 
         let settingsData = await parentService.getSettings();
         let maxChildAdd = parseInt(settingsData.maxChildAdd);
-        if(maxChildAdd <= parentRes.childId.length){
+        if (maxChildAdd <= parentRes.childId.length) {
             if (headers.lang == 'ar') {
                 return response.failure(res, 200, arabicMessage.MAX_CHILD_REACHED);
             }
@@ -740,6 +740,10 @@ const deleteChild = async (res, headers, paramData) => {
             }
             return response.failure(res, 200, message.INVALID_CHILD_ID);
         }
+
+        let updatedChildIdArr = await parentRes.childId.filter(element => { return (element != paramData.id) });
+        let updatedParentData = { childId: updatedChildIdArr };
+        let updateParentData = await parentService.updateParentDataById(parentRes.firestore_parentId, updatedParentData)
 
         let deleteChildById = await parentService.deleteChildById(paramData.id);
 
@@ -902,7 +906,7 @@ const addAppUsage = async (res, headers, bodyData) => {
         let childDeviceDetails = await parentService.getDeviceDataById(childRes.deviceId);
         let childFcmToken = childDeviceDetails.fcmToken;
         console.log('898 ======== childFcmToken : ', childFcmToken);
-        console.log('899  =====  childDeviceDetails : ',childDeviceDetails);
+        console.log('899  =====  childDeviceDetails : ', childDeviceDetails);
 
         //  set app usage  //
         if (bodyData.type == 'appUsage') {
