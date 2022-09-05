@@ -461,28 +461,29 @@ app.get('/resetTimeSpent', async (req, res, next) => {
 })
 
 //  refresh fcm token (For both Parent & Children)  //
-// app.post('/refreshFcmToken', async (req, res, next) => {
-//   try { 
-//     if (!req.body.userType) { //  userType : 1 ==> Parent,  userType : 2 ==> Child    
-//       return response.failure(res, 400, message.TYPE_REQUIRED);
-//     }
+app.post('/refreshFcmToken', async (req, res, next) => {
+  try {
+    if (!req.body.userType) { //  userType : 1 ==> Parent,  userType : 2 ==> Child    
+      return response.failure(res, 400, message.TYPE_REQUIRED);
+    }
 
-//     //  for parent  //
-//     if (req.body.userType == 1) {
-//       console.log("*********  refresh parent Fcm Token *********");
-//       const result = await parentController.refreshFcmToken(res, req.body);
-//       return result;
-//     }
-//     if (req.body.userType == 2) {
-//       //  for child  //
-//       console.log("========  refresh child Fcm Token  ========");
-//       const result = await childController.refreshFcmToken(res, req.body);
-//       return result;
-//     }
-//   } catch (error) {
-//     next(error)
-//   }
-// });
+    //  for parent  //
+    if (req.body.userType == 1) {
+      console.log("*********  refresh parent Fcm Token *********");
+      const result = await parentController.refreshFcmToken(res, req.body, req.headers);
+      return result;
+    }
+    
+    //  for child  //
+    if (req.body.userType == 2) {
+      console.log("========  refresh child Fcm Token  ========");
+      const result = await childController.refreshFcmToken(res, req.body, req.headers);
+      return result;
+    }
+  } catch (error) {
+    next(error)
+  }
+});
 
 
 
@@ -662,7 +663,7 @@ app.delete('/deleteGiftType/:id', async (req, res, next) => {
 })
 
 //  dashboard data  //
-app.get('/dashboard', async(req, res, next) => {
+app.get('/dashboard', async (req, res, next) => {
   try {
     let result = await adminController.dashboard(res, req.headers);
     return result;

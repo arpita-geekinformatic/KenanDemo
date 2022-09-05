@@ -69,7 +69,7 @@ const scanQrCode = async (res, bodyData, headers) => {
             //  send device disconnect notification to child  //
             let connectedDeviceData = await childService.isDeviceExists(isChildExists.deviceId);
             let oldFcmToken = connectedDeviceData.fcmToken
-            console.log('=============== oldFcmToken : ',oldFcmToken);
+            console.log('=============== oldFcmToken : ', oldFcmToken);
             let deviceDisconnectNotification = await notificationData.deviceDisconnectNotification(isChildExists, isParentExists, oldFcmToken);
 
             //  update child data  //
@@ -133,11 +133,10 @@ const scanQrCode = async (res, bodyData, headers) => {
         }
         let updateNewChildDataById = await childService.updateChildDataById(bodyData.childId, newChildData);
 
-
-        //  subscribe child topic with parent  // 
-        const registrationTokens = [isParentExists.fcmToken];
-        let topic = `child_${bodyData.childId}`;
-        let subscribeTopic = await firebaseAdmin.firebaseSubscribeTopicNotification(registrationTokens, topic);
+        // //  subscribe child topic with parent  // 
+        // const registrationTokens = [isParentExists.fcmToken];
+        // let topic = `child_${bodyData.childId}`;
+        // let subscribeTopic = await firebaseAdmin.firebaseSubscribeTopicNotification(registrationTokens, topic);
 
         let finaldata = {
             parentId: bodyData.parentId,
@@ -750,7 +749,7 @@ const updateUsageTime = async (res, headers, bodyData) => {
 
         //  if nothing was restricted by parent  //
         if ((childAppDetails.scheduledBy == '') && (deviceDetails.scheduledBy == '')) {
-            console.log("624 ++++  totalAppTimeSpent : ", totalAppTimeSpent, "  ++++ timeSpent : ", timeSpent, '  ++++ totalTimeSpent : ',totalTimeSpent);
+            console.log("624 ++++  totalAppTimeSpent : ", totalAppTimeSpent, "  ++++ timeSpent : ", timeSpent, '  ++++ totalTimeSpent : ', totalTimeSpent);
 
             totalAppTimeSpent = parseInt(totalAppTimeSpent) + parseInt(timeSpent);
             let newAppData = {
@@ -1006,6 +1005,32 @@ const redeemGift = async (res, headers, paramData) => {
     }
 }
 
+//  refresh FcmToken  //
+const refreshFcmToken = async (res, bodyData, headers) => {
+    try {
+        if (!bodyData.fcmToken) {
+            return response.failure(res, 400, message.REQUIRE_FCM);
+        }
+        if (!headers.authorization) {
+            return response.failure(res, 400, message.TOKEN_REQUIRED);
+        }
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let childData = await childService.getChildDataById(decoded.childId);
+        if (!childData) {
+            return response.failure(res, 400, message.INVALID_TOKEN);
+        };
+
+        let updatedData = { fcmToken: bodyData.fcmToken }
+        let updateChildData = await childService.updateChildDataById(childData.childId, updatedData);
+
+        let childDeviceData = await childService.isDeviceExists(childData.deviceId)
+        let updateChildDeviceData = await childService.updateDeviceDataById(childDeviceData.firestoreDevicePathId, updatedData)
+
+        return response.success(res, 200, message.SUCCESS)
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
 
 
 
@@ -1020,4 +1045,5 @@ module.exports = {
     allChildNotificationDelete,
     giftList,
     redeemGift,
+    refreshFcmToken,
 }

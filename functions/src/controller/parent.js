@@ -893,7 +893,6 @@ const addAppUsage = async (res, headers, bodyData) => {
         }
 
         let childRes = await parentService.getChildDataById(bodyData.childId);
-        let topic = `child_${bodyData.childId}`;
         let childDeviceDetails = await parentService.getDeviceDataById(childRes.deviceId);
         let childFcmToken = childDeviceDetails.fcmToken;
         console.log('899 ======== childFcmToken : ', childFcmToken);
@@ -924,7 +923,7 @@ const addAppUsage = async (res, headers, bodyData) => {
                 let updateDeviceAppsById = await parentService.updateDeviceAppsById(getDeviceAppsIdByPackageName, updateData);
 
                 //  send notification to child device  //
-                let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, topic, childRes, parentRes, childFcmToken);
+                let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, childRes, parentRes, childFcmToken);
             }
 
             if (bodyData.scheduledBy == 'eachDay') {
@@ -940,7 +939,7 @@ const addAppUsage = async (res, headers, bodyData) => {
                 let updateDeviceAppsById = await parentService.updateDeviceAppsById(getDeviceAppsIdByPackageName, updateData);
 
                 //  send notification to child device  //
-                let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, topic, childRes, parentRes, childFcmToken);
+                let sendAppUsageNotification = await notificationData.sendAppUsageNotification(bodyData, updateData, childRes, parentRes, childFcmToken);
             }
 
             if (headers.lang == 'ar') {
@@ -961,7 +960,7 @@ const addAppUsage = async (res, headers, bodyData) => {
 
                 let updateDeviceDataById = await parentService.updateDeviceDataById(childRes.deviceId, updateData)
                 //  send notification to child device  //
-                let deviceUsageNotification = await notificationData.sendDeviceUsageNotification(bodyData, updateData, topic, childRes, parentRes, childFcmToken);
+                let deviceUsageNotification = await notificationData.sendDeviceUsageNotification(bodyData, updateData, childRes, parentRes, childFcmToken);
             }
 
             if (bodyData.scheduledBy == 'eachDay') {
@@ -973,7 +972,7 @@ const addAppUsage = async (res, headers, bodyData) => {
 
                 let updateDeviceDataById = await parentService.updateDeviceDataById(childRes.deviceId, updateData)
                 //  send notification to child device  //
-                let deviceUsageNotification = await notificationData.sendDeviceUsageNotification(bodyData, updateData, topic, childRes, parentRes, childFcmToken);
+                let deviceUsageNotification = await notificationData.sendDeviceUsageNotification(bodyData, updateData, childRes, parentRes, childFcmToken);
             }
 
             if (headers.lang == 'ar') {
@@ -1332,9 +1331,7 @@ const acceptRejectGiftRequest = async (res, headers, paramData, queryData) => {
 
         if (queryData.status == 'rejected') {
             //  send gift rejected notification to child  //
-            let topic = `child_${childData.childId}`;
-            let giftRequestRejectedNotification = await notificationData.giftRequestRejectedNotification(childData, parentData, giftNotificationDetails, topic, headers.lang);
-            console.log("1330 >>>>>  giftRequestRejectedNotification : ");
+            let giftRequestRejectedNotification = await notificationData.giftRequestRejectedNotification(childData, parentData, giftNotificationDetails);
 
             let updatedData = { notificationStatus: 'rejected' }
             let updateNotification = await parentService.updateNotificationById(paramData.id, updatedData);
@@ -1353,9 +1350,7 @@ const acceptRejectGiftRequest = async (res, headers, paramData, queryData) => {
 
         if (queryData.status == 'accepted') {
             //  send gift accepted notification to child  //
-            let topic = `child_${childData.childId}`;
-            let giftRequestAcceptedNotification = await notificationData.giftRequestAcceptedNotification(childData, parentData, giftNotificationDetails, topic, headers.lang);
-            console.log("1309 >>>>>  giftRequestAcceptedNotification : ");
+            let giftRequestAcceptedNotification = await notificationData.giftRequestAcceptedNotification(childData, parentData, giftNotificationDetails);
 
             let updatedData = { notificationStatus: 'accepted' }
             let updateNotification = await parentService.updateNotificationById(paramData.id, updatedData)
@@ -1372,6 +1367,30 @@ const acceptRejectGiftRequest = async (res, headers, paramData, queryData) => {
     }
 }
 
+//  refresh FcmToken  //
+const refreshFcmToken = async (res, bodyData, headers) => {
+    try {
+        if (!headers.authorization) {
+            return response.failure(res, 200, message.TOKEN_REQUIRED);
+        }
+        if (!bodyData.fcmToken) {
+            return response.failure(res, 200, message.REQUIRE_FCM);
+        }
+
+        const decoded = await KenanUtilities.decryptToken(headers.authorization);
+        let parentData = await parentService.getParentDataById(decoded.id);
+        if (!parentData) {
+            return response.failure(res, 200, message.INVALID_TOKEN);
+        };
+
+        let updatedData = { fcmToken: bodyData.fcmToken }
+        let updateParentData = await parentService.updateParentDataById(parentData.parentId, updatedData)
+
+        return response.success(res, 200, message.SUCCESS)
+    } catch (error) {
+        return response.failure(res, 400, error);
+    }
+}
 
 
 
@@ -1402,4 +1421,5 @@ module.exports = {
     allParentNotificationDelete,
     notificationDeleteById,
     acceptRejectGiftRequest,
+    refreshFcmToken,
 }

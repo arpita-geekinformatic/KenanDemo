@@ -13,7 +13,7 @@ const notificationType = {
 
 //   CHILD NOTIFICATION   //
 //  send app usage changed by parent notification  // (Type => type2)
-const sendAppUsageNotification = async (bodyData, updateData, topic, childData, parentData, childFcmToken) => {
+const sendAppUsageNotification = async (bodyData, updateData, childData, parentData, childFcmToken) => {
     try {
         const message = {
             token: childFcmToken,
@@ -26,12 +26,9 @@ const sendAppUsageNotification = async (bodyData, updateData, topic, childData, 
                 'body': `Your app usage has been changed by parent.`,
                 'notificationType': `${notificationType.type2}`,
             },
-            // topic: topic
         };
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
         console.log("32 ===== add APP goal notificationResult : ", notificationResult);
-        //    let notificationRes =  await firebaseAdmin.firebaseSendTopicNotification(message);
-        //    console.log("========  notificationRes : ",notificationRes);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
@@ -69,7 +66,7 @@ const sendAppUsageNotification = async (bodyData, updateData, topic, childData, 
 }
 
 //  send device usage changed by parent notification  // (Type => type2)
-const sendDeviceUsageNotification = async (bodyData, updateData, topic, childData, parentData, childFcmToken) => {
+const sendDeviceUsageNotification = async (bodyData, updateData, childData, parentData, childFcmToken) => {
     try {
         const message = {
             token: childFcmToken,
@@ -82,11 +79,9 @@ const sendDeviceUsageNotification = async (bodyData, updateData, topic, childDat
                 'body': `Your device usage has been changed by parent.`,
                 'notificationType': `${notificationType.type2}`,
             },
-            // topic: topic
         };
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
-        console.log("88 ===== add DEVICE goal notificationResult : ", notificationResult);
-        // await firebaseAdmin.firebaseSendTopicNotification(message);
+        console.log("84 ===== add DEVICE goal notificationResult : ", notificationResult);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
@@ -124,9 +119,10 @@ const sendDeviceUsageNotification = async (bodyData, updateData, topic, childDat
 }
 
 //  gift Request Rejected by parent Notification  //  (Type => type1)
-const giftRequestRejectedNotification = async (childData, parentData, giftNotificationDetails, topic, lang) => {
+const giftRequestRejectedNotification = async (childData, parentData, giftNotificationDetails) => {
     try {
         const message = {
+            token: childData.fcmToken,
             'notification': {
                 'title': `Your gift request of '${giftNotificationDetails.giftName}' has been rejected by parent.`,
                 'body': `Your gift request of '${giftNotificationDetails.giftName}' has been rejected by parent.`,
@@ -136,9 +132,9 @@ const giftRequestRejectedNotification = async (childData, parentData, giftNotifi
                 'body': `Your gift request of '${giftNotificationDetails.giftName}' has been rejected by parent.`,
                 'notificationType': `${notificationType.type1}`,
             },
-            topic: topic
         };
-        await firebaseAdmin.firebaseSendTopicNotification(message);
+        const notificationResult = await firebaseAdmin.firebaseNotification(message);
+        console.log("137 ===== gift Request Rejected notificationResult : ", notificationResult);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
@@ -178,9 +174,10 @@ const giftRequestRejectedNotification = async (childData, parentData, giftNotifi
 }
 
 //  gift Request Accepted by parent Notification  //  (Type => type1)
-const giftRequestAcceptedNotification = async (childData, parentData, giftNotificationDetails, topic, lang) => {
+const giftRequestAcceptedNotification = async (childData, parentData, giftNotificationDetails) => {
     try {
         const message = {
+            token: childData.fcmToken,
             'notification': {
                 'title': `Your gift request of '${giftNotificationDetails.giftName}' has been accepted by parent.`,
                 'body': `Your gift request of '${giftNotificationDetails.giftName}' has been accepted by parent.`,
@@ -190,9 +187,9 @@ const giftRequestAcceptedNotification = async (childData, parentData, giftNotifi
                 'body': `Your gift request of '${giftNotificationDetails.giftName}' has been accepted by parent.`,
                 'notificationType': `${notificationType.type1}`,
             },
-            topic: topic
         };
-        await firebaseAdmin.firebaseSendTopicNotification(message);
+        const notificationResult = await firebaseAdmin.firebaseNotification(message);
+        console.log("192 ===== gift Request Accepted notificationResult : ", notificationResult);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
@@ -247,7 +244,7 @@ const deviceDisconnectNotification = async (childData, parentData, fcmToken) => 
             },
         };
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
-        console.log("244 ===== disconnect notificationResult : ", notificationResult);
+        console.log("247 ===== disconnect notificationResult : ", notificationResult);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
@@ -306,6 +303,7 @@ const appRemainingTimeReachedNotification = async (childData, childAppDetails, p
             }
         }
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
+        console.log("306 ==== app Remaining Time Reached Notification : ", notificationResult);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
@@ -358,6 +356,7 @@ const deviceRemainingTimeReachedNotification = async (childData, childAppDetails
             }
         }
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
+        console.log("359 ==== device Remaining Time Reached Notification : ", notificationResult);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
@@ -410,6 +409,7 @@ const appRemainingTimeCrossedNotification = async (childData, childAppDetails, p
             }
         }
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
+        console.log("412 ==== app time limit crossed Notification : ", notificationResult);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
@@ -462,6 +462,7 @@ const deviceRemainingTimeCrossedNotification = async (childData, parentData) => 
             }
         }
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
+        console.log("465 ==== device time limit crossed Notification : ", notificationResult);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
@@ -514,6 +515,7 @@ const bothRemainingTimeCrossedNotification = async (childData, childAppDetails, 
             }
         }
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
+        console.log("518 ==== both time limit crossed Notification : ", notificationResult);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
@@ -566,7 +568,7 @@ const requestRedeemGiftNotification = async (childData, parentData, lang, giftDe
             }
         }
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
-        console.log("============ notificationResult : ", notificationResult);
+        console.log("571 ==== redeem Gift Notification : ", notificationResult);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();
