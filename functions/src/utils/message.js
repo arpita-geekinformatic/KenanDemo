@@ -55,6 +55,7 @@ const GIFT_TYPE_ID_REQUIRED = 'Gift type Id required.';
 const INVALID_GIFT_TYPE_ID = 'Invalid gift type Id.';
 const CHILD_DELETED = 'Child successfully deleted.';
 const TYPE_REQUIRED = 'User type requires.';
+const MAX_CHILD_REACHED = 'You have already added the maximum child profile set by the administrator.'
 
 
 const TOKEN_EXPIRED = "Token Expired";
@@ -120,6 +121,7 @@ module.exports = {
   INVALID_GIFT_TYPE_ID,
   CHILD_DELETED,
   TYPE_REQUIRED,
+  MAX_CHILD_REACHED,
   
   
   TOKEN_EXPIRED,

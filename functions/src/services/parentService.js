@@ -551,6 +551,30 @@ const updateNotificationById = async (notificationId, updatedData) => {
 
 
 
+
+//  >>>>>>>>>>>  SETTINGS  >>>>>>>>>>>>> //
+//  get settings details  //
+const getSettings = async () => {
+    try {
+        const snapshot = await db.collection('settings').get();
+        let settings = []
+
+        snapshot.forEach(doc => {
+            let settingsData = {};
+            settingsData = doc.data();
+            settingsData.settingsId = doc.id;
+
+            settings.push(settingsData)
+        });
+
+        return settings[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+
 module.exports = {
     isParentExists,
     createParentProfile,
@@ -581,4 +605,5 @@ module.exports = {
     notificationDeleteById,
     giftNotificationDetails,
     updateNotificationById,
+    getSettings,
 }

@@ -579,6 +579,15 @@ const addChild = async (res, bodyData, headers) => {
             return response.failure(res, 200, message.INVALID_TOKEN);
         }
 
+        let settingsData = await parentService.getSettings();
+        let maxChildAdd = parseInt(settingsData.maxChildAdd);
+        if(maxChildAdd <= parentRes.childId.length){
+            if (headers.lang == 'ar') {
+                return response.failure(res, 200, arabicMessage.MAX_CHILD_REACHED);
+            }
+            return response.failure(res, 200, message.MAX_CHILD_REACHED);
+        }
+
         let childData = await parentService.getChildByParent(bodyData.name, parentRes.firestore_parentId);
 
         if (!childData) {
@@ -607,10 +616,7 @@ const addChild = async (res, bodyData, headers) => {
 
                 // send mail to child with QR code  //
                 let qrData = parentRes.firestore_parentId + '_' + addChildByParent;
-
                 var qr_svg = qr.image(qrData, { type: 'png' });
-                console.log(">>>>>> qr_svg : ", qr_svg);
-                // qr_svg.pipe(require('fs').createWriteStream(`./src/views/qrCode/${addChildByParent}.png`));
                 qr_svg.pipe(require('fs').createWriteStream(os.tmpdir() + `/${addChildByParent}.png`));
                 var svg_string = qr.imageSync(qrData, { type: 'png' });
 
@@ -895,7 +901,8 @@ const addAppUsage = async (res, headers, bodyData) => {
         let childRes = await parentService.getChildDataById(bodyData.childId);
         let childDeviceDetails = await parentService.getDeviceDataById(childRes.deviceId);
         let childFcmToken = childDeviceDetails.fcmToken;
-        console.log('899 ======== childFcmToken : ', childFcmToken);
+        console.log('898 ======== childFcmToken : ', childFcmToken);
+        console.log('899  =====  childDeviceDetails : ',childDeviceDetails);
 
         //  set app usage  //
         if (bodyData.type == 'appUsage') {
