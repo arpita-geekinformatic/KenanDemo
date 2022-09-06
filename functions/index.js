@@ -428,10 +428,15 @@ app.post('/upload', async (req, res, next) => {
 })
 
 //  cron to reset time spent of all device at midnight  //
-// cron.schedule('0 0 * * *', () => {
-//   console.log("431 ==========  Cron job every night at midnight =========");
-//   // notifyUserForUpcomingChecklist();
-// });
+cron.schedule('0 0 * * *', async() => {
+  console.log("431 ==========  Cron job every night at midnight =========");
+  try {
+    let result = await cronController.resetTimeSpent(res);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+});
 
 // cron.schedule('0 0 0 * * *', () => {
 //   console.log("436 ++++++++++  Cron job every night at midnight ++++++++++");
