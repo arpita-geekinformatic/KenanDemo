@@ -340,12 +340,66 @@ const updateDeviceAppsById = async (deviceAppId, updatedData) => {
     }
 }
 
+//  device Apps Everyday Schedule  //
+const deviceAppsEverydaySchedule = async (deviceId, packageName) => {
+    try {
+        let deviceApps = await db.collection("deviceApps").where("deviceId", "==", deviceId).where("packageName", "!=", packageName).where("scheduledBy", "==", 'everyDay').get();
+        let deviceAppArr = [];
+        deviceApps.forEach(async (doc) => {
+            await deviceAppArr.push(doc.data());
+        });
+
+        let totalEveryDaySchedule = 0;
+        if (deviceAppArr.length > 0) {
+            for (let everyDayData of deviceAppArr) {
+                totalEveryDaySchedule = (everyDayData.everyDaySchedule != '') ? parseInt(totalEveryDaySchedule) + parseInt(everyDayData.everyDaySchedule) : totalEveryDaySchedule
+            }
+        }
+
+        return totalEveryDaySchedule
+    } catch (error) {
+        throw error
+    }
+}
+
+//  device Apps Eachday Schedule  //
+const deviceAppsEachdaySchedule = async (deviceId, packageName, dayName) => {
+    try {
+        let deviceApps = await db.collection("deviceApps").where("deviceId", "==", deviceId).where("packageName", "!=", packageName).where("scheduledBy", "==", 'eachDay').get();
+        let deviceAppArr = [];
+        deviceApps.forEach(async (doc) => {
+            await deviceAppArr.push(doc.data());
+        });
+
+        const finalEachDayAppArr = []
+        let allEachDayScheduleArr = await deviceAppArr.filter(async (element) => {
+            let appsEachDaySchedule = await element.eachDaySchedule.filter(data => {
+                return ((data.day.toLowerCase() == dayName.toLowerCase()) && (data.status == true))
+            })
+            if (appsEachDaySchedule.length > 0) {
+                finalEachDayAppArr.push(appsEachDaySchedule[0])
+            }
+        })
+
+        let totalEachDaySchedule = 0;
+        if (finalEachDayAppArr.length > 0) {
+            for (let eachDayData of finalEachDayAppArr) {
+                totalEachDaySchedule = (eachDayData.time != '') ? parseInt(totalEachDaySchedule) + parseInt(eachDayData.time) : totalEachDaySchedule
+            }
+        }
+
+        return totalEachDaySchedule
+    } catch (error) {
+        throw error
+    }
+
+}
+
 
 //  >>>>>>>>>>>>  DEVICE   >>>>>>>>>>>>>>> //
 //  update Device Data By Id  //
 const updateDeviceDataById = async (deviceId, updatedData) => {
     try {
-
         const batch = db.batch();
         let deviceData = await db.collection('devices').where('deviceId', '==', deviceId).get();
         await deviceData.forEach((element) => {
@@ -594,6 +648,8 @@ module.exports = {
     getDeviceAppsIdByPackageName,
     getDeviceAppsIdByPackageNameAndId,
     updateDeviceAppsById,
+    deviceAppsEverydaySchedule,
+    deviceAppsEachdaySchedule,
     updateDeviceDataById,
     getDeviceDataById,
     giftTypeDropdown,

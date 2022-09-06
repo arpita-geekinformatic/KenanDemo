@@ -52,6 +52,7 @@ const GIFT_ACCEPTED = 'تم قبول هذا الطلب بالفعل.';
 const GIFT_REJECTED_SUCCESSFULLY  = 'تم رفض الطلب بنجاح.';
 const GIFT_ACCEPTED_SUCCESSFULLY  = 'تم قبول الطلب بنجاح.';
 const MAX_CHILD_REACHED = 'لقد قمت بالفعل بإضافة الحد الأقصى لملف تعريف الطفل الذي حدده المسؤول.';
+const APP_TIME_WARNING = 'لا يمكن أن يكون الوقت المجدول لجميع التطبيقات أكثر من الوقت المجدول للجهاز.';
 
 
 const TOKEN_EXPIRED = "Token Expired";
@@ -114,6 +115,7 @@ module.exports = {
   GIFT_REJECTED_SUCCESSFULLY,
   GIFT_ACCEPTED_SUCCESSFULLY,
   MAX_CHILD_REACHED,
+  APP_TIME_WARNING,
   
   
   TOKEN_EXPIRED,

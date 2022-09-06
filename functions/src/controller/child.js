@@ -62,10 +62,10 @@ const scanQrCode = async (res, bodyData, headers) => {
 
         //  check if device is already connected to other child  //
         let deviceData = await childService.isDeviceExists(bodyData.deviceId)
-        if ((deviceData.childId != '') && (deviceData.childId != bodyData.childId)) {
+        if (deviceData && (deviceData.childId != '') && (deviceData.childId != bodyData.childId)) {
             let updatedChildData = {
-                deviceId : '',
-                fcmToken : ''
+                deviceId: '',
+                fcmToken: ''
             }
             let updateOldChildData = await childService.updateChildDataById(deviceData.childId, updatedChildData);
 
@@ -82,6 +82,7 @@ const scanQrCode = async (res, bodyData, headers) => {
 
         //  check is child already connected to other device or not  //
         if ((isChildExists.deviceId != "") && (isChildExists.deviceId != bodyData.deviceId)) {
+            console.log('85 ***************');
             //  send device disconnect notification to child  //
             let connectedDeviceData = await childService.isDeviceExists(isChildExists.deviceId);
             let oldFcmToken = connectedDeviceData.fcmToken

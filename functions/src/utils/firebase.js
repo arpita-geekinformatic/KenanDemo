@@ -68,7 +68,6 @@ const firebaseNotification = async (message) => {
     return ({ "code": 200, "status": true, "messageRes": messageRes })
 
   } catch (error) {
-    console.log(">>>>>>> error : ", error);
     return ({ "code": 404, "status": false, "error": error });
   }
 }

@@ -923,7 +923,53 @@ const addAppUsage = async (res, headers, bodyData) => {
                 return response.failure(res, 200, message.REQUIRE_APP_STATUS);
             }
 
+            const dayName = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][new Date().getDay()];
+            const day = new Date().getDay();
+            console.log('>>>>>>> dayName : ', dayName, '  >>>>> day : ', day);
+
             if (bodyData.scheduledBy == 'everyDay') {
+                //  check if selected time is less then selected device time or not  //
+                if (childDeviceDetails.scheduledBy == 'everyDay') {
+                    let deviceAppsEverydaySchedule = await parentService.deviceAppsEverydaySchedule(childRes.deviceId, bodyData.packageName);
+                    console.log('934 ==== deviceAppsEverydaySchedule : ', deviceAppsEverydaySchedule);
+                    let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, dayName);
+                    console.log('936 ===== deviceAppsEachdaySchedule : ', deviceAppsEachdaySchedule);
+
+                    let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
+                    let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
+                    console.log('940 ==== existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ==== newTotalTimeSchedule : ', newTotalTimeSchedule, '  ==== device everyDaySchedule : ', childDeviceDetails.everyDaySchedule);
+
+                    if (parseInt(childDeviceDetails.everyDaySchedule) < newTotalTimeSchedule) {
+                        if (headers.lang == 'ar') {
+                            return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
+                        }
+                        return response.failure(res, 200, message.APP_TIME_WARNING);
+                    }
+                }
+                //  check if selected time is less then selected device time or not  //
+                if (childDeviceDetails.scheduledBy == 'eachDay') {
+                    let deviceSchedule = await childDeviceDetails.eachDaySchedule.filter(element => {
+                        return ((element.day.toLowerCase() == dayName.toLowerCase()) && (element.status == true))
+                    })
+                    if (deviceSchedule.length > 0) {
+                        let deviceAppsEverydaySchedule = await parentService.deviceAppsEverydaySchedule(childRes.deviceId, bodyData.packageName);
+                        console.log('956 ===== deviceAppsEverydaySchedule : ', deviceAppsEverydaySchedule);
+                        let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, dayName);
+                        console.log('958 ===== deviceAppsEachdaySchedule : ', deviceAppsEachdaySchedule);
+
+                        let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
+                        let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
+                        console.log('962 ==== existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ==== newTotalTimeSchedule : ', newTotalTimeSchedule, '  === device EachDaySchedule : ', deviceSchedule[0].time);
+
+                        if (parseInt(deviceSchedule[0].time) < newTotalTimeSchedule) {
+                            if (headers.lang == 'ar') {
+                                return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
+                            }
+                            return response.failure(res, 200, message.APP_TIME_WARNING);
+                        }
+                    }
+                }
+
                 let updateData = {
                     status: parseInt(bodyData.status),
                     scheduledBy: bodyData.scheduledBy,
@@ -938,6 +984,48 @@ const addAppUsage = async (res, headers, bodyData) => {
             }
 
             if (bodyData.scheduledBy == 'eachDay') {
+                //  check if selected time is less then selected device time or not  //
+                if (childDeviceDetails.scheduledBy == 'everyDay') {
+                    let deviceAppsEverydaySchedule = await parentService.deviceAppsEverydaySchedule(childRes.deviceId, bodyData.packageName);
+                    console.log('990 ++++ deviceAppsEverydaySchedule : ', deviceAppsEverydaySchedule);
+                    let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, dayName);
+                    console.log('992 ++++ deviceAppsEachdaySchedule : ', deviceAppsEachdaySchedule);
+
+                    let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
+                    let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
+                    console.log('996 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device everyDaySchedule : ', childDeviceDetails.everyDaySchedule);
+
+                    if (parseInt(childDeviceDetails.everyDaySchedule) < newTotalTimeSchedule) {
+                        if (headers.lang == 'ar') {
+                            return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
+                        }
+                        return response.failure(res, 200, message.APP_TIME_WARNING);
+                    }
+                }
+                //  check if selected time is less then selected device time or not  //
+                if (childDeviceDetails.scheduledBy == 'eachDay') {
+                    let deviceSchedule = await childDeviceDetails.eachDaySchedule.filter(element => {
+                        return ((element.day.toLowerCase() == dayName.toLowerCase()) && (element.status == true))
+                    })
+                    if (deviceSchedule.length > 0) {
+                        let deviceAppsEverydaySchedule = await parentService.deviceAppsEverydaySchedule(childRes.deviceId, bodyData.packageName);
+                        console.log('1012 ++++ deviceAppsEverydaySchedule : ', deviceAppsEverydaySchedule);
+                        let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, dayName);
+                        console.log('1014 ++++ deviceAppsEachdaySchedule : ', deviceAppsEachdaySchedule);
+
+                        let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
+                        let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
+                        console.log('1018 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device EachDaySchedule : ', deviceSchedule[0].time);
+
+                        if (parseInt(deviceSchedule[0].time) < newTotalTimeSchedule) {
+                            if (headers.lang == 'ar') {
+                                return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
+                            }
+                            return response.failure(res, 200, message.APP_TIME_WARNING);
+                        }
+                    }
+                }
+
                 let updateData = {
                     status: parseInt(bodyData.status),
                     scheduledBy: bodyData.scheduledBy,
@@ -945,7 +1033,6 @@ const addAppUsage = async (res, headers, bodyData) => {
                     everyDaySchedule: ""
                 }
 
-                // let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageName(childRes.deviceId, bodyData.packageName);
                 let getDeviceAppsIdByPackageName = await parentService.getDeviceAppsIdByPackageNameAndId(childRes.deviceId, bodyData.packageName);
                 let updateDeviceAppsById = await parentService.updateDeviceAppsById(getDeviceAppsIdByPackageName, updateData);
 
