@@ -395,6 +395,63 @@ const deviceAppsEachdaySchedule = async (deviceId, packageName, dayName) => {
 
 }
 
+//  all Device Apps Everyday Schedule  //
+const allDeviceAppsEverydaySchedule = async (deviceId) => {
+    try {
+        let deviceApps = await db.collection("deviceApps").where("deviceId", "==", deviceId).where("scheduledBy", "==", 'everyDay').get();
+        let deviceAppArr = [];
+        deviceApps.forEach(async (doc) => {
+            await deviceAppArr.push(doc.data());
+        });
+
+        let totalEveryDaySchedule = 0;
+        if (deviceAppArr.length > 0) {
+            for (let everyDayData of deviceAppArr) {
+                totalEveryDaySchedule = (everyDayData.everyDaySchedule != '') ? parseInt(totalEveryDaySchedule) + parseInt(everyDayData.everyDaySchedule) : totalEveryDaySchedule
+            }
+        }
+
+        return totalEveryDaySchedule
+    } catch (error) {
+        throw error
+    }
+}
+
+//  all Device Apps Eachday Schedule  //
+const allDeviceAppsEachdaySchedule = async (deviceId, dayName) => {
+    try {
+        let deviceApps = await db.collection("deviceApps").where("deviceId", "==", deviceId).where("scheduledBy", "==", 'eachDay').get();
+        let deviceAppArr = [];
+        deviceApps.forEach(async (doc) => {
+            await deviceAppArr.push(doc.data());
+        });
+
+        const finalEachDayAppArr = []
+        let allEachDayScheduleArr = await deviceAppArr.filter(async (element) => {
+            let appsEachDaySchedule = await element.eachDaySchedule.filter(data => {
+                return ((data.day.toLowerCase() == dayName.toLowerCase()) && (data.status == true))
+            })
+            if (appsEachDaySchedule.length > 0) {
+                finalEachDayAppArr.push(appsEachDaySchedule[0])
+            }
+        })
+
+        let totalEachDaySchedule = 0;
+        if (finalEachDayAppArr.length > 0) {
+            for (let eachDayData of finalEachDayAppArr) {
+                totalEachDaySchedule = (eachDayData.time != '') ? parseInt(totalEachDaySchedule) + parseInt(eachDayData.time) : totalEachDaySchedule
+            }
+        }
+
+        return totalEachDaySchedule
+    } catch (error) {
+        throw error
+    }
+
+}
+
+
+
 
 //  >>>>>>>>>>>>  DEVICE   >>>>>>>>>>>>>>> //
 //  update Device Data By Id  //
@@ -650,6 +707,8 @@ module.exports = {
     updateDeviceAppsById,
     deviceAppsEverydaySchedule,
     deviceAppsEachdaySchedule,
+    allDeviceAppsEverydaySchedule,
+    allDeviceAppsEachdaySchedule,
     updateDeviceDataById,
     getDeviceDataById,
     giftTypeDropdown,

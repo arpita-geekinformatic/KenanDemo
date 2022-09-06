@@ -908,6 +908,12 @@ const addAppUsage = async (res, headers, bodyData) => {
         console.log('898 ======== childFcmToken : ', childFcmToken);
         console.log('899  =====  childDeviceDetails : ', childDeviceDetails);
 
+        const dayNameArr = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
+        const dayName = dayNameArr[new Date().getDay()];
+        const day = new Date().getDay();
+        console.log('>>>>>>> dayName : ', dayName, '  >>>>> day : ', day);
+
+
         //  set app usage  //
         if (bodyData.type == 'appUsage') {
             if (!bodyData.packageName) {
@@ -923,50 +929,47 @@ const addAppUsage = async (res, headers, bodyData) => {
                 return response.failure(res, 200, message.REQUIRE_APP_STATUS);
             }
 
-            const dayName = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][new Date().getDay()];
-            const day = new Date().getDay();
-            console.log('>>>>>>> dayName : ', dayName, '  >>>>> day : ', day);
-
             if (bodyData.scheduledBy == 'everyDay') {
                 //  check if selected time is less then selected device time or not  //
                 if (childDeviceDetails.scheduledBy == 'everyDay') {
-                    let deviceAppsEverydaySchedule = await parentService.deviceAppsEverydaySchedule(childRes.deviceId, bodyData.packageName);
-                    console.log('934 ==== deviceAppsEverydaySchedule : ', deviceAppsEverydaySchedule);
-                    let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, dayName);
-                    console.log('936 ===== deviceAppsEachdaySchedule : ', deviceAppsEachdaySchedule);
-
-                    let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
-                    let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
-                    console.log('940 ==== existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ==== newTotalTimeSchedule : ', newTotalTimeSchedule, '  ==== device everyDaySchedule : ', childDeviceDetails.everyDaySchedule);
-
-                    if (parseInt(childDeviceDetails.everyDaySchedule) < newTotalTimeSchedule) {
-                        if (headers.lang == 'ar') {
-                            return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
-                        }
-                        return response.failure(res, 200, message.APP_TIME_WARNING);
-                    }
-                }
-                //  check if selected time is less then selected device time or not  //
-                if (childDeviceDetails.scheduledBy == 'eachDay') {
-                    let deviceSchedule = await childDeviceDetails.eachDaySchedule.filter(element => {
-                        return ((element.day.toLowerCase() == dayName.toLowerCase()) && (element.status == true))
-                    })
-                    if (deviceSchedule.length > 0) {
+                    for (let day of dayNameArr) {
                         let deviceAppsEverydaySchedule = await parentService.deviceAppsEverydaySchedule(childRes.deviceId, bodyData.packageName);
-                        console.log('956 ===== deviceAppsEverydaySchedule : ', deviceAppsEverydaySchedule);
-                        let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, dayName);
-                        console.log('958 ===== deviceAppsEachdaySchedule : ', deviceAppsEachdaySchedule);
+                        let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, day);
 
                         let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
                         let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
-                        console.log('962 ==== existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ==== newTotalTimeSchedule : ', newTotalTimeSchedule, '  === device EachDaySchedule : ', deviceSchedule[0].time);
+                        console.log('941 ==== existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ==== newTotalTimeSchedule : ', newTotalTimeSchedule, '  ==== device everyDaySchedule : ', childDeviceDetails.everyDaySchedule);
 
-                        if (parseInt(deviceSchedule[0].time) < newTotalTimeSchedule) {
+                        if (parseInt(childDeviceDetails.everyDaySchedule) < parseInt(newTotalTimeSchedule)) {
                             if (headers.lang == 'ar') {
                                 return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
                             }
                             return response.failure(res, 200, message.APP_TIME_WARNING);
                         }
+                    }
+                }
+                //  check if selected time is less then selected device time or not  //
+                if (childDeviceDetails.scheduledBy == 'eachDay') {
+                    let eachDayArr = await childDeviceDetails.eachDaySchedule.filter(element => {
+                        return (element.status == true)
+                    })
+
+                    for (let dateData of eachDayArr) {
+                        let deviceAppsEverydaySchedule = await parentService.deviceAppsEverydaySchedule(childRes.deviceId, bodyData.packageName);
+                        let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, dateData.day);
+
+                        let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
+                        let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
+                        console.log('963 ==== existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ==== newTotalTimeSchedule : ', newTotalTimeSchedule, '  === device EachDaySchedule : ', deviceSchedule[0].time);
+
+                        if (parseInt(dateData.time) < parseInt(newTotalTimeSchedule)) {
+                            if (headers.lang == 'ar') {
+                                return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
+                            }
+                            return response.failure(res, 200, message.APP_TIME_WARNING);
+                        }
+
+
                     }
                 }
 
@@ -986,38 +989,37 @@ const addAppUsage = async (res, headers, bodyData) => {
             if (bodyData.scheduledBy == 'eachDay') {
                 //  check if selected time is less then selected device time or not  //
                 if (childDeviceDetails.scheduledBy == 'everyDay') {
-                    let deviceAppsEverydaySchedule = await parentService.deviceAppsEverydaySchedule(childRes.deviceId, bodyData.packageName);
-                    console.log('990 ++++ deviceAppsEverydaySchedule : ', deviceAppsEverydaySchedule);
-                    let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, dayName);
-                    console.log('992 ++++ deviceAppsEachdaySchedule : ', deviceAppsEachdaySchedule);
+                    for (let day of dayNameArr) {
+                        let deviceAppsEverydaySchedule = await parentService.deviceAppsEverydaySchedule(childRes.deviceId, bodyData.packageName);
+                        let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, day);
 
-                    let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
-                    let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
-                    console.log('996 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device everyDaySchedule : ', childDeviceDetails.everyDaySchedule);
+                        let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
+                        let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
+                        console.log('998 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device everyDaySchedule : ', childDeviceDetails.everyDaySchedule);
 
-                    if (parseInt(childDeviceDetails.everyDaySchedule) < newTotalTimeSchedule) {
-                        if (headers.lang == 'ar') {
-                            return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
+                        if (parseInt(childDeviceDetails.everyDaySchedule) < parseInt(newTotalTimeSchedule)) {
+                            if (headers.lang == 'ar') {
+                                return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
+                            }
+                            return response.failure(res, 200, message.APP_TIME_WARNING);
                         }
-                        return response.failure(res, 200, message.APP_TIME_WARNING);
                     }
                 }
                 //  check if selected time is less then selected device time or not  //
                 if (childDeviceDetails.scheduledBy == 'eachDay') {
-                    let deviceSchedule = await childDeviceDetails.eachDaySchedule.filter(element => {
-                        return ((element.day.toLowerCase() == dayName.toLowerCase()) && (element.status == true))
+                    let eachDayArr = await childDeviceDetails.eachDaySchedule.filter(element => {
+                        return (element.status == true)
                     })
-                    if (deviceSchedule.length > 0) {
+
+                    for (let dateData of eachDayArr) {
                         let deviceAppsEverydaySchedule = await parentService.deviceAppsEverydaySchedule(childRes.deviceId, bodyData.packageName);
-                        console.log('1012 ++++ deviceAppsEverydaySchedule : ', deviceAppsEverydaySchedule);
-                        let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, dayName);
-                        console.log('1014 ++++ deviceAppsEachdaySchedule : ', deviceAppsEachdaySchedule);
+                        let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, dateData.day);
 
                         let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
                         let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
-                        console.log('1018 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device EachDaySchedule : ', deviceSchedule[0].time);
+                        console.log('1020 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device EachDaySchedule : ', deviceSchedule[0].time);
 
-                        if (parseInt(deviceSchedule[0].time) < newTotalTimeSchedule) {
+                        if (parseInt(dateData.time) < parseInt(newTotalTimeSchedule)) {
                             if (headers.lang == 'ar') {
                                 return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
                             }
@@ -1050,6 +1052,21 @@ const addAppUsage = async (res, headers, bodyData) => {
         //  set device usage  //
         if (bodyData.type == 'deviceUsage') {
             if (bodyData.scheduledBy == 'everyDay') {
+                //  check if selected time is less then all apps time or not  //
+                for (let day of dayNameArr) {
+                    let allDeviceAppsEverydaySchedule = await parentService.allDeviceAppsEverydaySchedule(childRes.deviceId);
+                    let allDeviceAppsEachdaySchedule = await parentService.allDeviceAppsEachdaySchedule(childRes.deviceId, day);
+                    let existingTotalTimeSchedule = parseInt(allDeviceAppsEverydaySchedule) + parseInt(allDeviceAppsEachdaySchedule)
+                    console.log('1060 >>>> existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  >>>> device everyDaySchedule : ', bodyData.everyDaySchedule);
+
+                    if (parseInt(bodyData.everyDaySchedule) < parseInt(existingTotalTimeSchedule)) {
+                        if (headers.lang == 'ar') {
+                            return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
+                        }
+                        return response.failure(res, 200, message.APP_TIME_WARNING);
+                    }
+                }
+
                 let updateData = {
                     scheduledBy: bodyData.scheduledBy,
                     eachDaySchedule: [],
@@ -1062,6 +1079,26 @@ const addAppUsage = async (res, headers, bodyData) => {
             }
 
             if (bodyData.scheduledBy == 'eachDay') {
+                //  check if selected time is less then all apps time or not  //
+                let eachDayArr = await bodyData.eachDaySchedule.filter(element => {
+                    return (element.status == true)
+                })
+
+                for (let dateData of eachDayArr) {
+                    let allDeviceAppsEverydaySchedule = await parentService.allDeviceAppsEverydaySchedule(childRes.deviceId);
+                    let allDeviceAppsEachdaySchedule = await parentService.allDeviceAppsEachdaySchedule(childRes.deviceId, dateData.day);
+
+                    let existingTotalTimeSchedule = parseInt(allDeviceAppsEverydaySchedule) + parseInt(allDeviceAppsEachdaySchedule)
+                    console.log('1092 >>>>> existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  >>>> device everyDaySchedule : ', bodyData.everyDaySchedule);
+
+                    if (parseInt(bodyData.everyDaySchedule) < parseInt(existingTotalTimeSchedule)) {
+                        if (headers.lang == 'ar') {
+                            return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
+                        }
+                        return response.failure(res, 200, message.APP_TIME_WARNING);
+                    }
+                }
+
                 let updateData = {
                     scheduledBy: bodyData.scheduledBy,
                     eachDaySchedule: bodyData.eachDaySchedule,
