@@ -56,7 +56,7 @@ const INVALID_GIFT_TYPE_ID = 'Invalid gift type Id.';
 const CHILD_DELETED = 'Child successfully deleted.';
 const TYPE_REQUIRED = 'User type requires.';
 const MAX_CHILD_REACHED = 'You have already added the maximum child profile set by the administrator.';
-const APP_TIME_WARNING = 'The scheduled time of all applications cannot be more than the scheduled time of the device.';
+const APP_TIME_WARNING = 'The scheduled time for all applications cannot be more than that of the device.';
 
 
 const TOKEN_EXPIRED = "Token Expired";
