@@ -272,7 +272,7 @@ const addDeviceApps = async (res, reqBodyData, headers) => {
             console.log("**********  ELSE device already exists");
             firestoreDevicePathId = isDeviceExists.firestoreDevicePathId;
             let newData = {
-                fcmToken: bodyData.fcmToken,
+                fcmToken: bodyData.fcmToken || isDeviceExists.fcmToken,
             }
             let updateDeviceDataById = await childService.updateDeviceDataById(firestoreDevicePathId, newData);
 

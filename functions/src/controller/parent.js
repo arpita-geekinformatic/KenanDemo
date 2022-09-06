@@ -960,7 +960,7 @@ const addAppUsage = async (res, headers, bodyData) => {
 
                         let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
                         let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
-                        console.log('963 ==== existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ==== newTotalTimeSchedule : ', newTotalTimeSchedule, '  === device EachDaySchedule : ', deviceSchedule[0].time);
+                        console.log('963 ==== existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ==== newTotalTimeSchedule : ', newTotalTimeSchedule, '  === device EachDaySchedule : ', dateData.time);
 
                         if (parseInt(dateData.time) < parseInt(newTotalTimeSchedule)) {
                             if (headers.lang == 'ar') {
@@ -1016,14 +1016,20 @@ const addAppUsage = async (res, headers, bodyData) => {
                         let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, dateData.day);
 
                         let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
-                        let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
-                        console.log('1020 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device EachDaySchedule : ', deviceSchedule[0].time);
 
-                        if (parseInt(dateData.time) < parseInt(newTotalTimeSchedule)) {
-                            if (headers.lang == 'ar') {
-                                return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
+                        let newEachDayArr = await bodyData.eachDaySchedule.filter(element => {
+                            return ((element.day.toLowerCase() == dateData.day.toLowerCase()) && (element.status == true))
+                        })
+                        if(newEachDayArr.length > 0){
+                            let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(newEachDayArr[0].time.toLowerCase())
+                            console.log('1020 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device EachDaySchedule : ', dateData.time);
+    
+                            if (parseInt(dateData.time) < parseInt(newTotalTimeSchedule)) {
+                                if (headers.lang == 'ar') {
+                                    return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
+                                }
+                                return response.failure(res, 200, message.APP_TIME_WARNING);
                             }
-                            return response.failure(res, 200, message.APP_TIME_WARNING);
                         }
                     }
                 }

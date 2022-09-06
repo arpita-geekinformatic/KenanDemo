@@ -18,21 +18,25 @@ const resetTimeSpent = async (res) => {
     try {
 
         var mydate = new Date();
-        console.log("********* mydate : ", mydate);
         var weekDayName = moment(mydate).format('dddd');
-        console.log("********* weekDayName : ", weekDayName);
+        console.log('22  ==== mydate : ', mydate, '  ==== weekDayName : ', weekDayName);
 
-        let nextDayDate = moment(mydate).add(5, 'm').format()
-        console.log("???????????? nextDayDate : ", nextDayDate);
+        let nextDayDate = moment(mydate).add(5, 'm').format();
         var nextDayName = moment(nextDayDate).format('dddd');
-        console.log("?????????? weekDayName : ", nextDayName);
+        console.log('26  >>>> nextDayDate : ', nextDayDate, '  >>>>  weekDayName : ', nextDayName);
 
-        let previousDayDate = moment(mydate).subtract(5, 'm').format()
-        console.log(">>>>>>>>>>> previousDayDate : ", previousDayDate);
-        var previousDayName = moment('2022-08-31T08:19:57+00:00').format('dddd');
-        console.log(">>>>>>>>>>>>>>> previousDayName : ", previousDayName);
+        let previousDayDate = moment(mydate).subtract(5, 'm').format();
+        var previousDayName = moment('2022-09-05T08:19:57+00:00').format('dddd');
+        console.log('29  <<<< previousDayDate : ', previousDayDate, '  <<<< previousDayName : ', previousDayName);
 
-        const pointAddSettings = 5;
+        let settings = await cronService.getSettings();
+        console.log('33  ****  settings : ', settings);
+        let unFavorableAppAddPointPerMinute = parseInt(settings.unFavorableAppAddPoint) / parseInt(settings.unFavorableAppTime);
+        console.log('35  ++++  unFavorableAppAddPointPerMinute : ', parseFloat(unFavorableAppAddPointPerMinute));
+        let favorableAppAddPointPerMinute = parseInt(settings.favorableAppAddPoint) / parseInt(settings.favorableAppTime);
+        console.log('37  ++++  favorableAppAddPointPerMinute : ', parseFloat(favorableAppAddPointPerMinute));
+        let deviceAddPointPerMinute = parseInt(settings.deviceAddPoint) / parseInt(settings.deviceTime);
+        console.log('39  ++++  deviceAddPointPerMinute : ', parseFloat(deviceAddPointPerMinute));
 
         if (previousDayName != nextDayName) {
             const getAllConnectedDeviceData = await cronService.getAllConnectedDeviceData();
@@ -42,65 +46,93 @@ const resetTimeSpent = async (res) => {
                     const getConnectedDeviceAppData = await cronService.getConnectedDeviceAppData(deviceData.deviceId)
                     const childData = await cronService.getChildDataById(deviceData.childId)
 
-                    //  calculate usage time and add point on less usage ====>>>  APP  //
+                    //  calculate usage time and add point on less usage ====>>>  APP  //  ( 0: UNFAVORABLE , 1: FAVORABLE )
                     for (let appData of getConnectedDeviceAppData) {
                         let timeSpent = 0;
-                        let appRemainingTime = 0;
+                        let scheduledTime = 0;
 
-                        if (appData.scheduledBy == 'eachDay') {
-                            let dateDetails = await appData.eachDaySchedule.filter(element => { return (element.day == previousDayName.toLocaleLowerCase()) });
-                            if (dateDetails.length > 0) {
-                                let scheduledTime = dateDetails[0].time;
+                        if (appData.status == 0) {
+                            if (appData.scheduledBy == 'eachDay') {
+                                let dateDetails = await appData.eachDaySchedule.filter(element => { return (element.day == previousDayName.toLocaleLowerCase()) });
+                                if (dateDetails.length > 0) {
+                                    scheduledTime = dateDetails[0].time;
+                                    timeSpent = parseInt(appData.timeSpent);
+                                }
+                                console.log('58  ==== scheduledTime : ', scheduledTime, '  ==== timeSpent : ', timeSpent);
+                            }
+
+                            if (appData.scheduledBy == 'everyDay') {
+                                scheduledTime = appData.everyDaySchedule;
                                 timeSpent = parseInt(appData.timeSpent);
-                                appRemainingTime = parseInt(scheduledTime) - parseInt(timeSpent);
+                                console.log('65  ==== scheduledTime : ', scheduledTime, '  ==== timeSpent : ', timeSpent);
+                            }
+
+                            if (parseInt(timeSpent) < parseInt(scheduledTime)) {
+                                let extraRemainingTime = parseInt(scheduledTime) - parseInt(timeSpent)
+                                let extraPointAmount = parseInt(extraRemainingTime) * parseFloat(unFavorableAppAddPointPerMinute);
+                                let totalPoint = parseInt(childData.points) + parseInt(extraPointAmount);
+                                let updatedData = { points: totalPoint }
+                                console.log("73  ==== extraRemainingTime : ", extraRemainingTime, '  ==== extraPointAmount : ', extraPointAmount);
+
+                                let updateChildDataById = await cronService.updateChildDataById(deviceData.childId, updatedData)
                             }
                         }
 
-                        if (appData.scheduledBy == 'everyDay') {
-                            let scheduledTime = appData.everyDaySchedule;
-                            timeSpent = parseInt(appData.timeSpent);
-                            appRemainingTime = parseInt(scheduledTime) - parseInt(timeSpent);
-                        }
-                      
-                        if (parseInt(timeSpent) < parseInt(appRemainingTime)) {
-                            let extraRemainingTime = parseInt(appRemainingTime) - parseInt(timeSpent)
-                            let extraPointAmount = parseInt(extraRemainingTime) / pointAddSettings;
-                            console.log("=========== appRemainingTime : ",appRemainingTime);
-                            console.log("========= extraPointAmount : ",extraPointAmount);
-                            let totalPoint = parseInt(childData.points) + parseInt(extraPointAmount);
-                            let updatedData = { points: totalPoint }
-                            
-                            let updateChildDataById = await cronService.updateChildDataById(deviceData.childId, updatedData)
+                        if (appData.status == 1) {
+                            if (appData.scheduledBy == 'eachDay') {
+                                let dateDetails = await appData.eachDaySchedule.filter(element => { return (element.day == previousDayName.toLocaleLowerCase()) });
+                                if (dateDetails.length > 0) {
+                                    scheduledTime = dateDetails[0].time;
+                                    timeSpent = parseInt(appData.timeSpent);
+                                    console.log('89  ==== scheduledTime : ', scheduledTime, '  ==== timeSpent : ', timeSpent);
+                                }
+                            }
+
+                            if (appData.scheduledBy == 'everyDay') {
+                                scheduledTime = appData.everyDaySchedule;
+                                timeSpent = parseInt(appData.timeSpent);
+                                console.log('97  ==== scheduledTime : ', scheduledTime, '  ==== timeSpent : ', timeSpent);
+                            }
+
+                            if (parseInt(timeSpent) < parseInt(scheduledTime)) {
+                                let extraRemainingTime = parseInt(scheduledTime) - parseInt(timeSpent)
+                                let extraPointAmount = parseInt(extraRemainingTime) * parseFloat(favorableAppAddPointPerMinute);
+                                let totalPoint = parseInt(childData.points) + parseInt(extraPointAmount);
+                                let updatedData = { points: totalPoint }
+                                console.log("105  ==== extraRemainingTime : ", extraRemainingTime, '  ==== extraPointAmount : ', extraPointAmount);
+
+                                let updateChildDataById = await cronService.updateChildDataById(deviceData.childId, updatedData)
+                            }
                         }
                     }
 
                     //  calculate usage time and add point on less usage ====>>>  DEVICE  //
                     let deviceTimeSpent = 0;
-                    let deviceRemainingTime = 0;
+                    let scheduledTime = 0;
+                    const childDetails = await cronService.getChildDataById(deviceData.childId)
 
                     if (deviceData.scheduledBy == 'eachDay') {
                         let dateDetails = await deviceData.eachDaySchedule.filter(element => { return (element.day == previousDayName.toLocaleLowerCase()) });
                         if (dateDetails.length > 0) {
-                            let scheduledTime = dateDetails[0].time;
+                            scheduledTime = dateDetails[0].time;
                             deviceTimeSpent = parseInt(deviceData.timeSpent);
-                            deviceRemainingTime = parseInt(scheduledTime) - parseInt(deviceTimeSpent);
+                            console.log('120  ==== scheduledTime : ', scheduledTime, '  ==== deviceTimeSpent : ', deviceTimeSpent);
                         }
                     }
 
                     if (deviceData.scheduledBy == 'everyDay') {
-                        let scheduledTime = deviceData.everyDaySchedule;
+                        scheduledTime = deviceData.everyDaySchedule;
                         deviceTimeSpent = parseInt(deviceData.timeSpent);
-                        deviceRemainingTime = parseInt(scheduledTime) - parseInt(deviceTimeSpent);
-                        console.log('94 ***** scheduledTime : ', scheduledTime, ' deviceTimeSpent : ',deviceTimeSpent,"  deviceRemainingTime : ",deviceRemainingTime);
+                        console.log('128  ==== scheduledTime : ', scheduledTime, '  ==== deviceTimeSpent : ', deviceTimeSpent);
                     }
 
-                    if (parseInt(deviceTimeSpent) < parseInt(deviceRemainingTime)) {
-                        let extraRemainingTime = parseInt(deviceRemainingTime) - parseInt(deviceTimeSpent)
-                        let extraPointAmount = parseInt(extraRemainingTime) / pointAddSettings
-                        console.log('??????????/ extraPointAmount : ',extraPointAmount);
-                        let totalPoint = parseInt(childData.points) + parseInt(extraPointAmount);
+                    if (parseInt(deviceTimeSpent) < parseInt(scheduledTime)) {
+                        let extraRemainingTime = parseInt(scheduledTime) - parseInt(deviceTimeSpent)
+                        let extraPointAmount = parseInt(extraRemainingTime) * parseFloat(deviceAddPointPerMinute)
+                        let totalPoint = parseInt(childDetails.points) + parseInt(extraPointAmount);
                         let updatedData = { points: totalPoint }
-                        console.log("<<<<<< updatedData : ",updatedData);
+                        console.log("136  ==== extraRemainingTime : ", extraRemainingTime, '  ==== extraPointAmount : ', extraPointAmount);
+
                         let updateChildDataById = await cronService.updateChildDataById(deviceData.childId, updatedData)
                     }
                 }
@@ -108,8 +140,8 @@ const resetTimeSpent = async (res) => {
             }
 
 
-            // const updateAllDeviceTimeSpent = await cronService.updateAllDeviceTimeSpent();
-            // const updateAllAppTimeSpent = await cronService.updateAllAppTimeSpent()
+            const updateAllDeviceTimeSpent = await cronService.updateAllDeviceTimeSpent();
+            const updateAllAppTimeSpent = await cronService.updateAllAppTimeSpent()
         }
 
 
