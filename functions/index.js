@@ -443,8 +443,9 @@ cron.schedule('0 0 * * *', async () => {
 //   // notifyUserForUpcomingChecklist();
 // });
 
-cron.schedule('*/15  * * * *', async () => {
+cron.schedule('0 * * * *', async () => {
   console.log('>>>>>>>>>>>>>>> running a task every 15 minute');
+  return true
   // try {
   //   let result = await cronController.resetTimeSpent(res);
   //   return result;

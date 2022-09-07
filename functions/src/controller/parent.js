@@ -864,7 +864,7 @@ const childDeviceAppList = async (res, headers, bodyData) => {
 //  add App Usage  //
 const addAppUsage = async (res, headers, bodyData) => {
     try {
-        console.log('867  =========== bodyData : ',bodyData);
+        console.log('867  =========== bodyData : ', bodyData);
         if (!headers.lang) {
             return response.failure(res, 200, message.LANGUAGE_REQUIRED);
         }
@@ -930,7 +930,7 @@ const addAppUsage = async (res, headers, bodyData) => {
                 return response.failure(res, 200, message.REQUIRE_APP_STATUS);
             }
 
-            if(childDeviceDetails.scheduledBy == '' ){
+            if (childDeviceDetails.scheduledBy == '') {
                 if (headers.lang == 'ar') {
                     return response.failure(res, 200, arabicMessage.SELECT_DEVICE_USAGE);
                 }
@@ -997,23 +997,25 @@ const addAppUsage = async (res, headers, bodyData) => {
             if (bodyData.scheduledBy == 'eachDay') {
                 //  check if selected time is less then selected device time or not  //
                 if (childDeviceDetails.scheduledBy == 'everyDay') {
-                    
+
                     for (let day of dayNameArr) {
-                        let eachDaySchedule = await bodyData.eachDaySchedule.filter(element => {return ((element.status == true) && (element.day == day) &&  (element.time == ''))});
+                        let eachDaySchedule = await bodyData.eachDaySchedule.filter(element => { return ((element.status == true) && (element.day == day) && (element.time != '')) });
 
-                        let deviceAppsEverydaySchedule = await parentService.deviceAppsEverydaySchedule(childRes.deviceId, bodyData.packageName);
-                        let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, day);
-                        let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
+                        if (eachDaySchedule.length > 0) {
+                            let deviceAppsEverydaySchedule = await parentService.deviceAppsEverydaySchedule(childRes.deviceId, bodyData.packageName);
+                            let deviceAppsEachdaySchedule = await parentService.deviceAppsEachdaySchedule(childRes.deviceId, bodyData.packageName, day);
+                            let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
 
-                        let newTotalTimeSchedule = (eachDaySchedule.length > 0) ? (parseInt(existingTotalTimeSchedule) + parseInt(eachDaySchedule[0].time)) : parseInt(existingTotalTimeSchedule) 
+                            let newTotalTimeSchedule = (parseInt(existingTotalTimeSchedule) + parseInt(eachDaySchedule[0].time))
 
-                        console.log('998 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device everyDaySchedule : ', childDeviceDetails.everyDaySchedule);
+                            console.log('998 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device everyDaySchedule : ', childDeviceDetails.everyDaySchedule);
 
-                        if (parseInt(childDeviceDetails.everyDaySchedule) < parseInt(newTotalTimeSchedule)) {
-                            if (headers.lang == 'ar') {
-                                return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
+                            if (parseInt(childDeviceDetails.everyDaySchedule) < parseInt(newTotalTimeSchedule)) {
+                                if (headers.lang == 'ar') {
+                                    return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
+                                }
+                                return response.failure(res, 200, message.APP_TIME_WARNING);
                             }
-                            return response.failure(res, 200, message.APP_TIME_WARNING);
                         }
                     }
                 }
@@ -1032,10 +1034,10 @@ const addAppUsage = async (res, headers, bodyData) => {
                         let newEachDayArr = await bodyData.eachDaySchedule.filter(element => {
                             return ((element.day.toLowerCase() == dateData.day.toLowerCase()) && (element.status == true))
                         })
-                        if(newEachDayArr.length > 0){
+                        if (newEachDayArr.length > 0) {
                             let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(newEachDayArr[0].time.toLowerCase())
                             console.log('1020 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device EachDaySchedule : ', dateData.time);
-    
+
                             if (parseInt(dateData.time) < parseInt(newTotalTimeSchedule)) {
                                 if (headers.lang == 'ar') {
                                     return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);

@@ -26,7 +26,7 @@ const resetTimeSpent = async (res) => {
         console.log('26  >>>> nextDayDate : ', nextDayDate, '  >>>>  weekDayName : ', nextDayName);
 
         let previousDayDate = moment(mydate).subtract(5, 'm').format();
-        var previousDayName = moment(previousDayDate).format('dddd');
+        var previousDayName = moment('2022-09-06T08:19:57+00:00').format('dddd');
         console.log('29  <<<< previousDayDate : ', previousDayDate, '  <<<< previousDayName : ', previousDayName);
 
         let settings = await cronService.getSettings();
@@ -44,10 +44,11 @@ const resetTimeSpent = async (res) => {
 
                 for (let deviceData of getAllConnectedDeviceData) {
                     const getConnectedDeviceAppData = await cronService.getConnectedDeviceAppData(deviceData.deviceId)
-                    const childData = await cronService.getChildDataById(deviceData.childId)
 
                     //  calculate usage time and add point on less usage ====>>>  APP  //  ( 0: UNFAVORABLE , 1: FAVORABLE )
                     for (let appData of getConnectedDeviceAppData) {
+                        const childData = await cronService.getChildDataById(deviceData.childId)
+
                         let timeSpent = 0;
                         let scheduledTime = 0;
 
@@ -105,13 +106,14 @@ const resetTimeSpent = async (res) => {
                             }
                         }
                     }
-
+                    console.log('%%%%%%%%%%%%%%%%%%%%%%%%');
                     //  calculate usage time and add point on less usage ====>>>  DEVICE  //
                     let deviceTimeSpent = 0;
                     let scheduledTime = 0;
                     const childDetails = await cronService.getChildDataById(deviceData.childId)
 
                     if (deviceData.scheduledBy == 'eachDay') {
+                        console.log('??????????????????????????');
                         let dateDetails = await deviceData.eachDaySchedule.filter(element => { return (element.day == previousDayName.toLocaleLowerCase()) });
                         if (dateDetails.length > 0) {
                             scheduledTime = dateDetails[0].time;
@@ -121,6 +123,7 @@ const resetTimeSpent = async (res) => {
                     }
 
                     if (deviceData.scheduledBy == 'everyDay') {
+                        console.log('&&&&&&&&&&&&&&&&&&&&&&&');
                         scheduledTime = deviceData.everyDaySchedule;
                         deviceTimeSpent = parseInt(deviceData.timeSpent);
                         console.log('128  ==== scheduledTime : ', scheduledTime, '  ==== deviceTimeSpent : ', deviceTimeSpent);
@@ -138,7 +141,7 @@ const resetTimeSpent = async (res) => {
                 }
 
             }
-
+            console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@');
             const updateAllDeviceTimeSpent = await cronService.updateAllDeviceTimeSpent();
             const updateAllAppTimeSpent = await cronService.updateAllAppTimeSpent()
         }
