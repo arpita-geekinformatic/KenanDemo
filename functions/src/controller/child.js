@@ -62,7 +62,9 @@ const scanQrCode = async (res, bodyData, headers) => {
 
         //  check if device is already connected to other child  //
         let deviceData = await childService.isDeviceExists(bodyData.deviceId)
+        console.log('@@@@@@@@@@@@@  deviceData.childId : ', deviceData.childId, '  @@@@@@@@@@  bodyData.childId : ', bodyData.childId);
         if (deviceData && (deviceData.childId != '') && (deviceData.childId != bodyData.childId)) {
+            console.log('#################');
             let updatedChildData = {
                 deviceId: '',
                 fcmToken: ''
@@ -483,9 +485,11 @@ const updateUsageTime = async (res, headers, bodyData) => {
         const dayName = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][new Date().getDay()];
         const day = new Date().getDay();
         let totalAppTimeSpent = childAppDetails.timeSpent || '0';
+        console.log('488  === childAppDetails.timeSpent : ',childAppDetails.timeSpent ,' === startTime : ',bodyData.startTime,' === endTime : ',bodyData.endTime);
         let usageStartTime = new Date(parseInt(bodyData.startTime));
         let usageEndTime = new Date(parseInt(bodyData.endTime));
         let timeSpent = usageEndTime.getMinutes() - usageStartTime.getMinutes();
+        console.log('491 ==== usageStartTime : ', usageStartTime, ' ==== usageEndTime : ', usageEndTime, ' ==== timeSpent : ', timeSpent);
         let appRemainingTime = '0';
         let deviceRemainingTime = '0';
         let totalTimeSpent = deviceDetails.timeSpent || '0';

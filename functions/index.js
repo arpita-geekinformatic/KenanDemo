@@ -438,13 +438,14 @@ cron.schedule('0 0 * * *', async () => {
   }
 });
 
-// cron.schedule('0 0 0 * * *', () => {
-//   console.log("436 ++++++++++  Cron job every night at midnight ++++++++++");
-//   // notifyUserForUpcomingChecklist();
-// });
+cron.schedule('0 0 0 * * *', () => {
+  console.log("436 =============  Cron job every night at midnight ============");
+  return true
+  // notifyUserForUpcomingChecklist();
+});
 
 cron.schedule('0 * * * *', async () => {
-  console.log('>>>>>>>>>>>>>>> running a task every 15 minute');
+  console.log('>>>>>>>>>>>>>>> running a task every 1 hour');
   return true
   // try {
   //   let result = await cronController.resetTimeSpent(res);
