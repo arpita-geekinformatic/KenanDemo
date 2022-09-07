@@ -57,6 +57,7 @@ const CHILD_DELETED = 'Child successfully deleted.';
 const TYPE_REQUIRED = 'User type requires.';
 const MAX_CHILD_REACHED = 'You have already added the maximum child profile set by the administrator.';
 const APP_TIME_WARNING = 'The scheduled time for all applications cannot be more than that of the device.';
+const SELECT_DEVICE_USAGE = 'Add device usage before adding application usage.';
 
 
 const TOKEN_EXPIRED = "Token Expired";
@@ -124,7 +125,7 @@ module.exports = {
   TYPE_REQUIRED,
   MAX_CHILD_REACHED,
   APP_TIME_WARNING,
-  
+  SELECT_DEVICE_USAGE,
   
   TOKEN_EXPIRED,
   UNAUTHORIZED,

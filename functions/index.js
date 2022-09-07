@@ -428,7 +428,7 @@ app.post('/upload', async (req, res, next) => {
 })
 
 //  cron to reset time spent of all device at midnight  //
-cron.schedule('0 0 * * *', async() => {
+cron.schedule('0 0 * * *', async () => {
   console.log("431 ==========  Cron job every night at midnight =========");
   try {
     let result = await cronController.resetTimeSpent(res);
@@ -443,17 +443,15 @@ cron.schedule('0 0 * * *', async() => {
 //   // notifyUserForUpcomingChecklist();
 // });
 
-// cron.schedule('* * * * *', async () => {
-//   console.log('>>>>>>>>>>>>>>> running a task every minute');
-
-//   try {
-//     let result = await cronController.resetTimeSpent(res);
-//     return result;
-//   } catch (error) {
-//     next(error)
-//   }
-
-// });
+cron.schedule('*/15  * * * *', async () => {
+  console.log('>>>>>>>>>>>>>>> running a task every 15 minute');
+  // try {
+  //   let result = await cronController.resetTimeSpent(res);
+  //   return result;
+  // } catch (error) {
+  //   next(error)
+  // }
+});
 
 
 app.get('/resetTimeSpent', async (req, res, next) => {
@@ -478,7 +476,7 @@ app.post('/refreshFcmToken', async (req, res, next) => {
       const result = await parentController.refreshFcmToken(res, req.body, req.headers);
       return result;
     }
-    
+
     //  for child  //
     if (req.body.userType == 2) {
       console.log("========  refresh child Fcm Token  ========");
