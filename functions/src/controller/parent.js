@@ -795,6 +795,31 @@ const getChildByParent = async (res, headers, paramData) => {
             return response.failure(res, 200, message.INVALID_CHILD_ID);
         }
 
+        //  check child badge  //
+        let settings = await parentService.getSettings();
+        if (childProfileDetails.points > 0) {
+            if ((parseInt(settings.bronzeBadgePoint) <= parseInt(childProfileDetails.points)) && (parseInt(childProfileDetails.points) < parseInt(settings.silverBadgePoint)) && (childProfileDetails.badge < 1)) {
+                console.log('================ BRONZE =========',);
+                let updatedData = { badge: 1 }
+                let updateChildDataById = await parentService.updateChildDataById(paramData.id, updatedData)
+                childProfileDetails.badge = 1
+            }
+
+            if ((parseInt(settings.silverBadgePoint) <= parseInt(childProfileDetails.points)) && (parseInt(childProfileDetails.points) < parseInt(settings.goldBadgePoint)) && (childProfileDetails.badge < 2)) {
+                console.log('++++++++++++++++ SILVER +++++++++');
+                let updatedData = { badge: 2 }
+                let updateChildDataById = await parentService.updateChildDataById(paramData.id, updatedData)
+                childProfileDetails.badge = 2
+            }
+
+            if ((parseInt(settings.goldBadgePoint) <= parseInt(childProfileDetails.points)) && (childProfileDetails.badge < 3)) {
+                console.log('>>>>>>>>>>>>>>>> GOLD >>>>>>>>>');
+                let updatedData = { badge: 3 }
+                let updateChildDataById = await parentService.updateChildDataById(paramData.id, updatedData)
+                childProfileDetails.badge = 3
+            }
+        }
+
         if (childProfileDetails.deviceId) {
             const deviceDetails = await parentService.getDeviceDataById(childProfileDetails.deviceId)
 
