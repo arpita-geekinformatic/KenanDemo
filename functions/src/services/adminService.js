@@ -185,6 +185,16 @@ const totalInactiveParentCount = async () => {
     }
 }
 
+//  create parent profile  //
+const createParentProfile = async (newData) => {
+    try {
+        let createParent = await db.collection("parents").add(newData);
+        return createParent.id;
+
+    } catch (error) {
+        throw error;
+    }
+}
 
 
 
@@ -532,6 +542,7 @@ module.exports = {
     updateParentById,
     totalActiveParentCount,
     totalInactiveParentCount,
+    createParentProfile,
     deleteChildsByParentsId,
     childListByParentId,
     allChildList,

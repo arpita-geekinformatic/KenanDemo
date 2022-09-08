@@ -546,6 +546,16 @@ app.get('/userList', async (req, res, next) => {
   }
 })
 
+//  add parent  //
+app.post('/parents', async (req, res, next) => {
+  try {
+    let result = await adminController.addParent(res, req.headers, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
 //  get parent details by ID //
 app.get('/parents/:id', async (req, res, next) => {
   try {

@@ -111,8 +111,20 @@ const forgotPassword = async (res, bodyData) => {
       return response.failure(res, 400, message.USER_NOT_FOUND,);
     }
 
+    let randomOTP = KenanUtilities.genNumericCode(4);
+    let expiredDate = moment().add(10, 'm');
+    let newData = {
+      otp: randomOTP,
+      otpVerified: false,
+      otpExipredAt: `${expiredDate}`
+    }
 
-    return response.data(res, adminData, 200, message.SUCCESS)
+    //  Get email template to send email in ENGLISH
+    let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/english/otpEmail.ejs", { otp: randomOTP }, { async: true });
+    let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Forgot Password", text: messageHtml });
+
+    let updateAdminData = await adminService.updateAdmin(adminData.adminId, newData)
+    return response.success(res, 200, message.SUCCESS);
 
   } catch (error) {
     return response.failure(res, 400, error);
@@ -175,6 +187,67 @@ const parentDetails = async (res, headers, paramData) => {
     return response.failure(res, 400, error);
   }
 }
+
+//  add Parent  //
+const addParent = async (res, headers, bodyData) => {
+  try {
+    if (!headers.authorization) {
+      return response.failure(res, 400, message.TOKEN_REQUIRED);
+    }
+    if (!bodyData.email) {
+      return response.failure(res, 200, message.EMAIL_REQUIRED);
+    }
+    if (!bodyData.password) {
+      return response.failure(res, 200, message.PASSWORD_REQUIRED);
+    }
+
+    const decoded = await KenanUtilities.decryptToken(headers.authorization);
+    const adminData = await adminService.findAdminByToken(headers.authorization);
+    if (!adminData) {
+      return response.failure(res, 400, message.INVALID_TOKEN,);
+    }
+
+    let isParentExists = await adminService.parentdetailsById(bodyData.email);
+    if (isParentExists) {
+      return response.failure(res, 200, message.USER_EXISTS);
+    }
+    let hashedPassword = await KenanUtilities.cryptPassword(bodyData.password);
+
+    let newData = {
+      name: bodyData.name || "",
+      email: bodyData.email || "",
+      password: hashedPassword,
+      isActive: false,
+      isDeleted: false,
+      isBlocked: false,
+      authToken: "",
+      fcmToken: bodyData.fcmToken || "",
+      childId: [],
+      photo: bodyData.photo || '',
+    }
+    let createParentProfile = await adminService.createParentProfile(newData);
+
+    //  create activation link
+    let activationLink = process.env.BASE_URL + "acountAcctivation/" + createParentProfile;
+    console.log("********** activationLink : ", activationLink);
+
+    //  Get email template to send email in ENGLISH     { data: rows,pageTitle: "Edit Agents" }
+    let emailObj = {
+      link: activationLink,
+      password: bodyData.password,
+    }
+    let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/accountCreateEmail.ejs", { link: activationLink , password: bodyData.password }, { async: true });
+
+    let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Account Activation", text: messageHtml });
+    console.log("51  >>>>>>  mailResponse : ", mailResponse);
+
+    return response.success(res, 200, message.ACTIVATION_MAIL_SENT);
+  } catch (error) {
+    return response.failure(res, 400, error);
+  }
+}
+
+
 
 //  update Parent Details by ID  //
 const updateParent = async (res, headers, bodyData) => {
@@ -692,6 +765,7 @@ module.exports = {
   forgotPassword,
   userList,
   parentDetails,
+  addParent,
   updateParent,
   deleteParent,
   parentChildList,
