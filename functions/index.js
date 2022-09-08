@@ -444,7 +444,7 @@ cron.schedule('0 0 0 * * *', () => {
   // notifyUserForUpcomingChecklist();
 });
 
-cron.schedule('0 * * * *', async () => {
+cron.schedule('0 16-17 * * *', async () => {
   console.log('>>>>>>>>>>>>>>> running a task every 1 hour');
   return true
   // try {
