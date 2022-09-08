@@ -246,12 +246,12 @@ const addParent = async (res, headers, bodyData) => {
 
 
 //  update Parent Details by ID  //
-const updateParent = async (res, headers, bodyData) => {
+const updateParent = async (res, headers, bodyData, paramData) => {
   try {
     if (!headers.authorization) {
       return response.failure(res, 400, message.TOKEN_REQUIRED);
     }
-    if (!bodyData.id) {
+    if (!paramData.id) {
       return response.failure(res, 400, message.USER_ID_REQUIRED);
     }
 
@@ -261,17 +261,18 @@ const updateParent = async (res, headers, bodyData) => {
       return response.failure(res, 400, message.INVALID_TOKEN,);
     }
 
-    const parentDetails = await adminService.parentdetailsById(bodyData.id);
+    const parentDetails = await adminService.parentdetailsById(paramData.id);
     if (!parentDetails) {
       return response.failure(res, 400, message.USER_NOT_FOUND);
     }
 
     let updatedData = {
       name: bodyData.name || parentDetails.name,
-      isActive: bodyData.status ? ((bodyData.status == 'active') ? true : false) : parentDetails.isActive
+      photo: bodyData.photo || parentDetails.photo,
+      // isActive: bodyData.status ? ((bodyData.status == 'active') ? true : false) : parentDetails.isActive
     }
 
-    let updateParentById = await adminService.updateParentById(bodyData.id, updatedData)
+    let updateParentById = await adminService.updateParentById(paramData.id, updatedData)
     return response.success(res, 200, message.SUCCESS);
 
   } catch (error) {

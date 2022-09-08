@@ -567,9 +567,9 @@ app.get('/parents/:id', async (req, res, next) => {
 })
 
 //  update parent details by ID  //
-app.put('/parents', async (req, res, next) => {
+app.put('/parents/:id', async (req, res, next) => {
   try {
-    let result = await adminController.updateParent(res, req.headers, req.body);
+    let result = await adminController.updateParent(res, req.headers, req.body, req.params);
     return result;
   } catch (error) {
     next(error)
