@@ -196,6 +196,21 @@ const createParentProfile = async (newData) => {
     }
 }
 
+//  is user exists //
+const isParentExists = async (email) => {
+    try {
+        let parentRes = await db.collection("parents").where("email", "==", email).where("isDeleted", "==", false).limit(1).get();
+
+        if (parentRes.empty) {
+            return false;
+        }
+        return true;
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 
 
 //  >>>>>>>>>>>>   CHILDS   >>>>>>>>>>  //
@@ -543,6 +558,7 @@ module.exports = {
     totalActiveParentCount,
     totalInactiveParentCount,
     createParentProfile,
+    isParentExists,
     deleteChildsByParentsId,
     childListByParentId,
     allChildList,

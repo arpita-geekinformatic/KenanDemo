@@ -207,7 +207,7 @@ const addParent = async (res, headers, bodyData) => {
       return response.failure(res, 400, message.INVALID_TOKEN,);
     }
 
-    let isParentExists = await adminService.parentdetailsById(bodyData.email);
+    let isParentExists = await adminService.isParentExists(bodyData.email);
     if (isParentExists) {
       return response.failure(res, 200, message.USER_EXISTS);
     }
@@ -232,11 +232,7 @@ const addParent = async (res, headers, bodyData) => {
     console.log("********** activationLink : ", activationLink);
 
     //  Get email template to send email in ENGLISH     { data: rows,pageTitle: "Edit Agents" }
-    let emailObj = {
-      link: activationLink,
-      password: bodyData.password,
-    }
-    let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/accountCreateEmail.ejs", { link: activationLink , password: bodyData.password }, { async: true });
+    let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/accountCreateEmail.ejs", { link: activationLink, password: bodyData.password }, { async: true });
 
     let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Account Activation", text: messageHtml });
     console.log("51  >>>>>>  mailResponse : ", mailResponse);
