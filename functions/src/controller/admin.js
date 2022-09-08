@@ -22,7 +22,7 @@ const createAdmin = async (res, bodyData) => {
     if (!adminRes) {
       let adminData = {
         fullName: "Admin",
-        email: "admin@gmail.com",
+        email: "admin@yopmail.com",
         password: password,
         isDeleted: false,
         role: 'Admin'
@@ -119,7 +119,7 @@ const forgotPassword = async (res, bodyData) => {
       otpExipredAt: `${expiredDate}`
     }
 
-    //  Get email template to send email in ENGLISH
+    //  Get email template to send email 
     let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/english/otpEmail.ejs", { otp: randomOTP }, { async: true });
     let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Forgot Password", text: messageHtml });
 

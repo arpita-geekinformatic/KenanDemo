@@ -8,7 +8,7 @@ const db = getFirestore();
 //  find admin data  //
 const findAdmin = async (email) => {
     try {
-        let adminRes = await db.collection("admin").where("email", "==", "admin@gmail.com").where("isDeleted", "==", false).limit(1).get();
+        let adminRes = await db.collection("admin").where("email", "==", email).where("isDeleted", "==", false).limit(1).get();
 
         if (adminRes.empty) {
             return false;
