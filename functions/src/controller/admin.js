@@ -137,10 +137,8 @@ const forgotPassword = async (res, bodyData) => {
 const forgotPasswordLink = async (res, adminId) => {
   try {
     let adminData = await adminService.adminDetailsById(adminId);
-
     if (!adminData) {
       return response.failure(res, 400, message.LINK_INVALID);
-
     }
 
     // Check if link is expired or not ( link valid for 5 minutes)
@@ -154,7 +152,36 @@ const forgotPasswordLink = async (res, adminId) => {
 
     let updateAdmin = await adminService.updateAdmin(adminId, { linkVerified: true })
     return response.success(res, 200, message.SUCCESS)
+  } catch (error) {
+    return response.failure(res, 400, error);
+  }
+}
 
+//  change Password  //
+const changePassword = async (res, bodyData) => {
+  try {
+    if (!bodyData.password) {
+      return response.failure(res, 400, message.NEW_PASSWORD_REQUIRED);
+    }
+    if (!bodyData.email) {
+      return response.failure(res, 400, message.EMAIL_REQUIRED);
+    }
+
+    let adminRes = await adminService.findAdmin(bodyData.email);
+    if (!adminRes) {
+      return response.failure(res, 400, message.USER_NOT_FOUND);
+    }
+
+    let hashedPassword = await KenanUtilities.cryptPassword(bodyData.password);
+    let updatedData = {
+      password: hashedPassword,
+      forgotPasswordLink: '',
+      linkExipredAt: '',
+      linkVerified: true,
+    }
+    let updateAdminData = await adminService.updateAdmin(adminRes.adminId, updatedData);
+
+    return response.success(res, 200, message.SUCCESS);
   } catch (error) {
     return response.failure(res, 400, error);
   }
@@ -792,6 +819,7 @@ module.exports = {
   adminLogout,
   forgotPassword,
   forgotPasswordLink,
+  changePassword,
   userList,
   parentDetails,
   addParent,

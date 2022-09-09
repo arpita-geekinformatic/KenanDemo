@@ -534,6 +534,16 @@ app.get("/forgotPasswordLink/:id", async (req, res, next) => {
   }
 })
 
+//  change Password  //
+app.post('/changePassword', async (req, res, next) => {
+  try {
+    let result = await adminController.changePassword(res, req.body);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
 
 
 
