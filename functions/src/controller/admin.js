@@ -110,8 +110,9 @@ const forgotPassword = async (res, bodyData) => {
     if (!adminData) {
       return response.failure(res, 400, message.USER_NOT_FOUND,);
     }
-    //  forgot password link
-    let forgotPasswordLink = process.env.BASE_URL + "forgotPasswordLink/" + adminData.adminId;
+    //  forgot password link   http://localhost:4200/auth/reset-password
+    // let forgotPasswordLink = process.env.BASE_URL + "forgotPasswordLink/" + adminData.adminId;
+    let forgotPasswordLink = "http://localhost:4200/auth/reset-password/" + adminData.adminId;
     console.log("********** forgotPasswordLink : ", forgotPasswordLink);
 
     let expiredDate = moment().add(5, 'm');
