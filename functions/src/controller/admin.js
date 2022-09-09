@@ -135,7 +135,7 @@ const forgotPassword = async (res, bodyData) => {
 }
 
 //  forgot Password Link  //
-const forgotPasswordLink = async (res, adminId) => {
+const forgotPasswordLink = async (res) => {
   try {
     let adminData = await adminService.adminDetails();
     if (!adminData) {
@@ -151,7 +151,7 @@ const forgotPasswordLink = async (res, adminId) => {
       return response.failure(res, 400, message.LINK_EXPIRED);
     }
 
-    let updateAdmin = await adminService.updateAdmin(adminId, { linkVerified: true })
+    let updateAdmin = await adminService.updateAdmin(adminData.adminId, { linkVerified: true })
     return response.success(res, 200, message.SUCCESS)
   } catch (error) {
     return response.failure(res, 400, error);
@@ -159,16 +159,16 @@ const forgotPasswordLink = async (res, adminId) => {
 }
 
 //  change Password  //
-const changePassword = async (res, bodyData) => {
+const changePassword = async (res, bodyData, adminId) => {
   try {
     if (!bodyData.password) {
       return response.failure(res, 400, message.NEW_PASSWORD_REQUIRED);
     }
-    if (!bodyData.email) {
-      return response.failure(res, 400, message.EMAIL_REQUIRED);
+    if (!adminId) {
+      return response.failure(res, 400, message.USER_ID_REQUIRED);
     }
 
-    let adminRes = await adminService.findAdmin(bodyData.email);
+    let adminRes = await adminService.adminDetailsById(adminId);
     if (!adminRes) {
       return response.failure(res, 400, message.USER_NOT_FOUND);
     }
