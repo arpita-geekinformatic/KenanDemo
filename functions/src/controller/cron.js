@@ -134,12 +134,15 @@ const resetTimeSpent = async () => {
 
                         let updateChildDataById = await cronService.updateChildDataById(deviceData.childId, updatedData)
                     }
+
+                    let updateDeviceTimeSpentById = await cronService.updateDeviceTimeSpentById(deviceData.firestoreDeviceId);
+                    let updateDeviceAppsById = await cronService.updateDeviceAppsById(deviceData.deviceId)
                 }
 
             }
             console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@');
-            const updateAllDeviceTimeSpent = await cronService.updateAllDeviceTimeSpent();
-            const updateAllAppTimeSpent = await cronService.updateAllAppTimeSpent()
+            // const updateAllDeviceTimeSpent = await cronService.updateAllDeviceTimeSpent();
+            // const updateAllAppTimeSpent = await cronService.updateAllAppTimeSpent()
         }
 
         return ("148  ========= Cron Success :");

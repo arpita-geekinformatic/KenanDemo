@@ -89,6 +89,23 @@ const updateAllDeviceTimeSpent = async () => {
 }
 
 
+//  update Device Time Spent By Id  //
+const updateDeviceTimeSpentById = async (firestoreDeviceId) => {
+    try {
+        let newData = {
+            timeSpent: '0',
+            remainingTime: '0'
+        }
+        let updateAdmin = await db.collection('devices').doc(firestoreDeviceId).update(newData);
+        return true;
+    } catch (error) {
+        throw error;
+    }
+
+}
+
+
+
 
 //  >>>>>>>>>>>>   DEVICE APPS   >>>>>>>>>>  //
 //  get Connected Device App Data  //
@@ -130,6 +147,28 @@ const updateAllAppTimeSpent = async () => {
 }
 
 
+//  update Device Apps By Id  //
+const updateDeviceAppsById = async (deviceId) => {
+    try {
+        // Get a new write batch >>>>>>  update multiple data using batch
+        const batch = db.batch();
+        const sfRef = await db.collection('deviceApps').where("deviceId", "==", deviceId).get();
+
+        await sfRef.forEach((element) => {
+            batch.update(element.ref, {
+                timeSpent: '0',
+                remainingTime: '0'
+            });
+        });
+        await batch.commit();
+        return true;
+
+    } catch (error) {
+        throw error
+    }
+}
+
+
 
 //  >>>>>>>>>>>  SETTINGS  >>>>>>>>>>>>> //
 //  get settings details  //
@@ -160,6 +199,8 @@ module.exports = {
     updateChildDataById,
     getAllConnectedDeviceData,
     updateAllDeviceTimeSpent,
+    updateDeviceTimeSpentById,
+    updateDeviceAppsById,
     getConnectedDeviceAppData,
     updateAllAppTimeSpent,
     getSettings,
