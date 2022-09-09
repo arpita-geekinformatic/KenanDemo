@@ -14,9 +14,8 @@ const moment = require("moment");
 
 
 //  cron to reset time spent of all device at midnight  //
-const resetTimeSpent = async (res) => {
+const resetTimeSpent = async () => {
     try {
-
         var mydate = new Date();
         var weekDayName = moment(mydate).format('dddd');
         console.log('22  ==== mydate : ', mydate, '  ==== weekDayName : ', weekDayName);
@@ -146,10 +145,10 @@ const resetTimeSpent = async (res) => {
             const updateAllAppTimeSpent = await cronService.updateAllAppTimeSpent()
         }
 
-        return response.success(res, 200, message.SUCCESS);
+        return ("148  ========= Cron Success :");
 
     } catch (error) {
-        return response.failure(res, 400, error);
+        return ("152  ========= Cron Error :", error);
     }
 }
 
