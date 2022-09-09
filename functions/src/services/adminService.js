@@ -76,9 +76,9 @@ const adminDetailsById = async (adminId) => {
         if (adminDetails._fieldsProto.isDeleted.booleanValue) {
             return false;
         }
-        if(adminDetails._fieldsProto.linkVerified.booleanValue){
-            return false;
-        }
+        // if(adminDetails._fieldsProto.linkVerified.booleanValue){
+        //     return false;
+        // }
 
         let adminData = {};
         adminData.adminId = adminId;

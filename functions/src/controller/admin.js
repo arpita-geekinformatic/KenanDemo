@@ -142,6 +142,9 @@ const forgotPasswordLink = async (res) => {
       return response.failure(res, 400, message.LINK_INVALID);
     }
 
+    if (adminData.linkVerified) {
+      return response.failure(res, 400, message.LINK_INVALID);
+    }
     // Check if link is expired or not ( link valid for 5 minutes)
     let currentDateTime = moment();
     let date = new Date(adminData.linkExipredAt);
