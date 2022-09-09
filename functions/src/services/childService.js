@@ -74,8 +74,8 @@ const getDeviceDataByFirestoreId = async (firestoreDeviceId) => {
             scheduledBy: deviceData._fieldsProto.scheduledBy ? deviceData._fieldsProto.scheduledBy.stringValue : '',
             deviceId: deviceData._fieldsProto.deviceId ? deviceData._fieldsProto.deviceId.stringValue : '',
             deviceName: deviceData._fieldsProto.deviceName ? deviceData._fieldsProto.deviceName.stringValue : '',
-            timeSpent: deviceData._fieldsProto.timeSpent ? deviceData._fieldsProto.timeSpent.stringValue : '',
-            remainingTime: deviceData._fieldsProto.remainingTime ? deviceData._fieldsProto.remainingTime.stringValue : '',
+            timeSpent: deviceData._fieldsProto.timeSpent ? deviceData._fieldsProto.timeSpent.stringValue : '0',
+            remainingTime: deviceData._fieldsProto.remainingTime ? deviceData._fieldsProto.remainingTime.stringValue : '0',
 
         }
         return deviceDetails;

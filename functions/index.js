@@ -436,13 +436,12 @@ cron.schedule('0 0 * * *', () => {
   timezone: "America/New_York"
 });
 
-cron.schedule('0 0 0 * * *', () => {
-  return ("437 =============  Cron job every night at midnight ============");
-},{
-  scheduled: true,
-  timezone: "America/New_York"
-});
-
+// cron.schedule('0 0 0 * * *', () => {
+//   return ("437 =============  Cron job every night at midnight ============");
+// },{
+//   scheduled: true,
+//   timezone: "America/New_York"
+// });
 
 
 

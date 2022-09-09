@@ -76,8 +76,8 @@ const scanQrCode = async (res, bodyData, headers) => {
                 scheduledBy: '',
                 eachDaySchedule: [],
                 everyDaySchedule: '',
-                timeSpent: '',
-                remainingTime: ''
+                timeSpent: '0',
+                remainingTime: '0'
             }
             let updateDeviceDataById = await childService.updateDeviceDataById(deviceData.firestoreDevicePathId, updatedData);
             let updateDeviceAppsData = await childService.updateDeviceAppsData(bodyData.deviceId, updatedData)
@@ -244,6 +244,7 @@ const addDeviceApps = async (res, reqBodyData, headers) => {
                         firestoreDeviceId: firestoreDevicePathId,
                         noOfLaunches: element.noOfLaunches || 0,
                         timeSpent: element.timeSpent || '00',
+                        remainingTime: element.remainingTime || '0',
                         scheduledBy: element.scheduledBy || '',
                         eachDaySchedule: element.eachDaySchedule || [],
                         everyDaySchedule: element.everyDaySchedule || '',
@@ -261,6 +262,7 @@ const addDeviceApps = async (res, reqBodyData, headers) => {
                         firestoreDeviceId: firestoreDevicePathId,
                         noOfLaunches: isDeviceAppExists.noOfLaunches ? isDeviceAppExists.noOfLaunches : element.noOfLaunches,
                         timeSpent: isDeviceAppExists.timeSpent ? isDeviceAppExists.timeSpent : element.timeSpent ? element.timeSpent : '00',
+                        remainingTime: isDeviceAppExists.remainingTime ? isDeviceAppExists.remainingTime : element.remainingTime ? element.remainingTime : '00',
                         scheduledBy: isDeviceAppExists.scheduledBy ? isDeviceAppExists.scheduledBy : element.scheduledBy,
                         eachDaySchedule: isDeviceAppExists.eachDaySchedule ? isDeviceAppExists.eachDaySchedule : element.eachDaySchedule,
                         everyDaySchedule: isDeviceAppExists.everyDaySchedule ? isDeviceAppExists.everyDaySchedule : element.everyDaySchedule,
@@ -317,6 +319,7 @@ const addDeviceApps = async (res, reqBodyData, headers) => {
                         firestoreDeviceId: firestoreDevicePathId,
                         noOfLaunches: element.noOfLaunches || 0,
                         timeSpent: element.timeSpent || '00',
+                        remainingTime: element.remainingTime || '00',
                         scheduledBy: element.scheduledBy || '',
                         eachDaySchedule: element.eachDaySchedule || [],
                         everyDaySchedule: element.everyDaySchedule || '',
@@ -334,6 +337,7 @@ const addDeviceApps = async (res, reqBodyData, headers) => {
                         firestoreDeviceId: firestoreDevicePathId,
                         noOfLaunches: isDeviceAppExists.noOfLaunches ? isDeviceAppExists.noOfLaunches : element.noOfLaunches,
                         timeSpent: isDeviceAppExists.timeSpent ? isDeviceAppExists.timeSpent : element.timeSpent ? element.timeSpent : '00',
+                        remainingTime: isDeviceAppExists.remainingTime ? isDeviceAppExists.remainingTime : element.remainingTime ? element.remainingTime : '00',
                         scheduledBy: isDeviceAppExists.scheduledBy ? isDeviceAppExists.scheduledBy : element.scheduledBy,
                         eachDaySchedule: isDeviceAppExists.eachDaySchedule ? isDeviceAppExists.eachDaySchedule : element.eachDaySchedule,
                         everyDaySchedule: isDeviceAppExists.everyDaySchedule ? isDeviceAppExists.everyDaySchedule : element.everyDaySchedule,

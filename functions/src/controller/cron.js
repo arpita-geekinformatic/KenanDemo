@@ -22,20 +22,17 @@ const resetTimeSpent = async () => {
 
         let nextDayDate = moment(mydate).add(5, 'm').format();
         var nextDayName = moment(nextDayDate).format('dddd');
-        console.log('26  >>>> nextDayDate : ', nextDayDate, '  >>>>  weekDayName : ', nextDayName);
+        console.log('26  ==== nextDayDate : ', nextDayDate, '  ====  weekDayName : ', nextDayName);
 
         let previousDayDate = moment(mydate).subtract(5, 'm').format();
         var previousDayName = moment('2022-09-08T08:19:57+00:00').format('dddd');
-        console.log('29  <<<< previousDayDate : ', previousDayDate, '  <<<< previousDayName : ', previousDayName);
+        console.log('29  ==== previousDayDate : ', previousDayDate, '  ==== previousDayName : ', previousDayName);
 
         let settings = await cronService.getSettings();
-        console.log('33  ****  settings : ', settings);
         let unFavorableAppAddPointPerMinute = parseInt(settings.unFavorableAppAddPoint) / parseInt(settings.unFavorableAppTime);
-        console.log('35  ++++  unFavorableAppAddPointPerMinute : ', parseFloat(unFavorableAppAddPointPerMinute));
         let favorableAppAddPointPerMinute = parseInt(settings.favorableAppAddPoint) / parseInt(settings.favorableAppTime);
-        console.log('37  ++++  favorableAppAddPointPerMinute : ', parseFloat(favorableAppAddPointPerMinute));
         let deviceAddPointPerMinute = parseInt(settings.deviceAddPoint) / parseInt(settings.deviceTime);
-        console.log('39  ++++  deviceAddPointPerMinute : ', parseFloat(deviceAddPointPerMinute));
+        console.log('35  ====  unFavorableAppAddPointPerMinute : ', parseFloat(unFavorableAppAddPointPerMinute), ' ==== favorableAppAddPointPerMinute :', parseFloat(favorableAppAddPointPerMinute), ' ==== deviceAddPointPerMinute : ', parseFloat(deviceAddPointPerMinute));
 
         if (previousDayName != nextDayName) {
             const getAllConnectedDeviceData = await cronService.getAllConnectedDeviceData();
@@ -105,7 +102,7 @@ const resetTimeSpent = async () => {
                             }
                         }
                     }
-                    console.log('%%%%%%%%%%%%%%%%%%%%%%%%');
+                    console.log('%%%%%%%%%%%%%%%%%%%%%%%% deviceData : ', deviceData);
                     //  calculate usage time and add point on less usage ====>>>  DEVICE  //
                     let deviceTimeSpent = 0;
                     let scheduledTime = 0;
