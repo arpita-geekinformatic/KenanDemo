@@ -6,6 +6,7 @@ const notificationData = require("../services/notification");
 const differenceBy = require("lodash/differenceBy");
 const KenanUtilities = require("../utils/KenanUtilities");
 const firebaseAdmin = require('../utils/firebase');
+const moment = require("moment");
 
 var deviceKeys = ["deviceId", "deviceName", "parentId", "childId", "versionCode", "listSize", "apps", "model", "fcmToken", "manufacturer", "model"]
 
@@ -485,11 +486,18 @@ const updateUsageTime = async (res, headers, bodyData) => {
         const dayName = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][new Date().getDay()];
         const day = new Date().getDay();
         let totalAppTimeSpent = childAppDetails.timeSpent || '0';
-        console.log('488  === childAppDetails.timeSpent : ',childAppDetails.timeSpent ,' === startTime : ',bodyData.startTime,' === endTime : ',bodyData.endTime);
+        console.log('489  === childAppDetails.timeSpent : ', childAppDetails.timeSpent, ' === startTime : ', bodyData.startTime, ' === endTime : ', bodyData.endTime);
         let usageStartTime = new Date(parseInt(bodyData.startTime));
         let usageEndTime = new Date(parseInt(bodyData.endTime));
-        let timeSpent = usageEndTime.getMinutes() - usageStartTime.getMinutes();
-        console.log('491 ==== usageStartTime : ', usageStartTime, ' ==== usageEndTime : ', usageEndTime, ' ==== timeSpent : ', timeSpent);
+
+        let minuteDiff = usageEndTime.getMinutes() - usageStartTime.getMinutes();
+        let hourDiff = usageEndTime.getHours() - usageStartTime.getHours();
+        let timeSpent = Math.round((hourDiff * 60) + minuteDiff);
+        console.log('496  ==== minuteDiff : ', minuteDiff, ' === hourDiff : ', hourDiff, ' === timeSpent : ', timeSpent);
+
+        // let timeSpent = usageEndTime.getMinutes() - usageStartTime.getMinutes();
+        console.log('499 ==== usageStartTime : ', usageStartTime, ' ==== usageEndTime : ', usageEndTime);
+
         let appRemainingTime = '0';
         let deviceRemainingTime = '0';
         let totalTimeSpent = deviceDetails.timeSpent || '0';
