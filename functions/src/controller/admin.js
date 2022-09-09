@@ -137,7 +137,7 @@ const forgotPassword = async (res, bodyData) => {
 //  forgot Password Link  //
 const forgotPasswordLink = async (res, adminId) => {
   try {
-    let adminData = await adminService.adminDetailsById(adminId);
+    let adminData = await adminService.adminDetails();
     if (!adminData) {
       return response.failure(res, 400, message.LINK_INVALID);
     }

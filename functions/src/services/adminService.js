@@ -93,6 +93,27 @@ const adminDetailsById = async (adminId) => {
     }
 }
 
+//  admin details  //
+const adminDetails = async () => {
+    try {
+        let adminRes = await db.collection("admin").where("isDeleted", "==", false).limit(1).get();
+
+        if (adminRes.empty) {
+            return false;
+        }
+
+        let adminArr = [];
+        adminRes.forEach(doc => {
+            adminArr.push(doc.data())
+            adminArr[0].adminId = doc.id
+        })
+        return adminArr[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
+
 
 
 //  >>>>>>>>>>>>   PARENTS   >>>>>>>>>>  //
@@ -580,6 +601,7 @@ module.exports = {
     createAdminProfile,
     updateAdmin,
     adminDetailsById,
+    adminDetails,
     userList,
     totalUserCount,
     parentdetailsById,

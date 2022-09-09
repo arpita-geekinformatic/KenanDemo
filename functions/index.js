@@ -525,9 +525,9 @@ app.post('/auth/forgotPassword', async (req, res, next) => {
 })
 
 //  open forgot password link  //
-app.get("/forgotPasswordLink/:id", async (req, res, next) => {
+app.get("/forgotPasswordLink", async (req, res, next) => {
   try {
-    let result = await adminController.forgotPasswordLink(res, req.params.id);
+    let result = await adminController.forgotPasswordLink(res);
     return result;
   } catch (error) {
     next(error)
