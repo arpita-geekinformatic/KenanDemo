@@ -65,6 +65,34 @@ const updateAdmin = async (adminId, newData) => {
     }
 }
 
+//  admin details By Id  //
+const adminDetailsById = async (adminId) => {
+    try {
+        let adminDetails = await db.collection('admin').doc(adminId).get();
+
+        if (!adminDetails._fieldsProto) {
+            return false;
+        }
+        if (adminDetails._fieldsProto.isDeleted.booleanValue) {
+            return false;
+        }
+        if(adminDetails._fieldsProto.linkVerified.booleanValue){
+            return false;
+        }
+
+        let adminData = {};
+        adminData.adminId = adminId;
+        adminData.name = adminDetails._fieldsProto.fullName ? adminDetails._fieldsProto.fullName.stringValue : "";
+        adminData.email = adminDetails._fieldsProto.email ? adminDetails._fieldsProto.email.stringValue : "";
+        adminData.linkExipredAt = adminDetails._fieldsProto.linkExipredAt ? adminDetails._fieldsProto.linkExipredAt.stringValue : "";
+        adminData.forgotPasswordLink = adminDetails._fieldsProto.forgotPasswordLink ? adminDetails._fieldsProto.forgotPasswordLink.stringValue : '';
+      
+        return adminData;
+    } catch (error) {
+        throw error;
+    }
+}
+
 
 
 //  >>>>>>>>>>>>   PARENTS   >>>>>>>>>>  //
@@ -551,6 +579,7 @@ module.exports = {
     findAdminByToken,
     createAdminProfile,
     updateAdmin,
+    adminDetailsById,
     userList,
     totalUserCount,
     parentdetailsById,

@@ -441,18 +441,6 @@ cron.schedule('0 0 * * *', async () => {
 cron.schedule('0 0 0 * * *', () => {
   console.log("436 =============  Cron job every night at midnight ============");
   return true
-  // notifyUserForUpcomingChecklist();
-});
-
-cron.schedule('0 16-17 * * *', async () => {
-  console.log('>>>>>>>>>>>>>>> running a task every 1 hour');
-  return true
-  // try {
-  //   let result = await cronController.resetTimeSpent(res);
-  //   return result;
-  // } catch (error) {
-  //   next(error)
-  // }
 });
 
 
@@ -535,6 +523,19 @@ app.post('/auth/forgotPassword', async (req, res, next) => {
     next(error)
   }
 })
+
+//  open forgot password link  //
+app.get("/forgotPasswordLink/:id", async (req, res, next) => {
+  try {
+    let result = await adminController.forgotPasswordLink(res, req.params.id);
+    return result;
+  } catch (error) {
+    next(error)
+  }
+})
+
+
+
 
 // parent list  //
 app.get('/userList', async (req, res, next) => {

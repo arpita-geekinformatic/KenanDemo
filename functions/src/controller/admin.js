@@ -110,17 +110,19 @@ const forgotPassword = async (res, bodyData) => {
     if (!adminData) {
       return response.failure(res, 400, message.USER_NOT_FOUND,);
     }
+    //  forgot password link
+    let forgotPasswordLink = process.env.BASE_URL + "forgotPasswordLink/" + adminData.adminId;
+    console.log("********** forgotPasswordLink : ", forgotPasswordLink);
 
-    let randomOTP = KenanUtilities.genNumericCode(4);
-    let expiredDate = moment().add(10, 'm');
+    let expiredDate = moment().add(5, 'm');
     let newData = {
-      otp: randomOTP,
-      otpVerified: false,
-      otpExipredAt: `${expiredDate}`
+      forgotPasswordLink: forgotPasswordLink,
+      linkVerified: false,
+      linkExipredAt: `${expiredDate}`
     }
 
     //  Get email template to send email 
-    let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/english/otpEmail.ejs", { otp: randomOTP }, { async: true });
+    let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/forgotPasswordEmail.ejs", { link: forgotPasswordLink }, { async: true });
     let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Forgot Password", text: messageHtml });
 
     let updateAdminData = await adminService.updateAdmin(adminData.adminId, newData)
@@ -130,6 +132,35 @@ const forgotPassword = async (res, bodyData) => {
     return response.failure(res, 400, error);
   }
 }
+
+//  forgot Password Link  //
+const forgotPasswordLink = async (res, adminId) => {
+  try {
+    let adminData = await adminService.adminDetailsById(adminId);
+
+    if (!adminData) {
+      return response.failure(res, 400, message.LINK_INVALID);
+
+    }
+
+    // Check if link is expired or not ( link valid for 5 minutes)
+    let currentDateTime = moment();
+    let date = new Date(adminData.linkExipredAt);
+    let linkExpireTime = moment(date);
+
+    if (currentDateTime.diff(linkExpireTime, 'm') > 5) {
+      return response.failure(res, 400, message.LINK_EXPIRED);
+    }
+
+    let updateAdmin = await adminService.updateAdmin(adminId, { linkVerified: true })
+    return response.success(res, 200, message.SUCCESS)
+
+  } catch (error) {
+    return response.failure(res, 400, error);
+  }
+}
+
+
 
 //  user List  //
 const userList = async (res, headers, queryData) => {
@@ -760,6 +791,7 @@ module.exports = {
   adminLogin,
   adminLogout,
   forgotPassword,
+  forgotPasswordLink,
   userList,
   parentDetails,
   addParent,
