@@ -297,7 +297,6 @@ const addParent = async (res, headers, bodyData) => {
     let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/accountCreateEmail.ejs", { link: activationLink, password: bodyData.password }, { async: true });
 
     let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Account Activation", text: messageHtml });
-    console.log("51  >>>>>>  mailResponse : ", mailResponse);
 
     return response.success(res, 200, message.ACTIVATION_MAIL_SENT);
   } catch (error) {
@@ -504,7 +503,6 @@ const childDeleteById = async (res, headers, paramData) => {
     }
 
     if (childDetails.deviceId) {
-      console.log(">>>>>>>>>>>>>>>>> ");
       const updatedDevieData = {
         childId: '',
         parentId: '',

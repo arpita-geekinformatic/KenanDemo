@@ -18,14 +18,14 @@ const resetTimeSpent = async () => {
     try {
         var mydate = new Date();
         var weekDayName = moment(mydate).format('dddd');
-        console.log('22  ==== mydate : ', mydate, '  ==== weekDayName : ', weekDayName);
+        console.log('21  ==== mydate : ', mydate, '  ==== weekDayName : ', weekDayName);
 
-        let nextDayDate = moment(mydate).add(5, 'm').format();
+        let nextDayDate = moment(mydate).add(10, 'm').format();
         var nextDayName = moment(nextDayDate).format('dddd');
-        console.log('26  ==== nextDayDate : ', nextDayDate, '  ====  weekDayName : ', nextDayName);
+        console.log('25  ==== nextDayDate : ', nextDayDate, '  ====  weekDayName : ', nextDayName);
 
-        let previousDayDate = moment(mydate).subtract(5, 'm').format();
-        var previousDayName = moment('2022-09-08T08:19:57+00:00').format('dddd');
+        let previousDayDate = moment(mydate).subtract(10, 'm').format();
+        var previousDayName = moment(previousDayDate).format('dddd');
         console.log('29  ==== previousDayDate : ', previousDayDate, '  ==== previousDayName : ', previousDayName);
 
         let settings = await cronService.getSettings();
@@ -81,14 +81,14 @@ const resetTimeSpent = async () => {
                                 if (dateDetails.length > 0) {
                                     scheduledTime = dateDetails[0].time;
                                     timeSpent = parseInt(appData.timeSpent);
-                                    console.log('89  ==== scheduledTime : ', scheduledTime, '  ==== timeSpent : ', timeSpent);
+                                    console.log('84  ==== scheduledTime : ', scheduledTime, '  ==== timeSpent : ', timeSpent);
                                 }
                             }
 
                             if (appData.scheduledBy == 'everyDay') {
                                 scheduledTime = appData.everyDaySchedule;
                                 timeSpent = parseInt(appData.timeSpent);
-                                console.log('97  ==== scheduledTime : ', scheduledTime, '  ==== timeSpent : ', timeSpent);
+                                console.log('91  ==== scheduledTime : ', scheduledTime, '  ==== timeSpent : ', timeSpent);
                             }
 
                             if (parseInt(timeSpent) < parseInt(scheduledTime)) {
@@ -96,33 +96,31 @@ const resetTimeSpent = async () => {
                                 let extraPointAmount = parseInt(extraRemainingTime) * parseFloat(favorableAppAddPointPerMinute);
                                 let totalPoint = parseInt(childData.points) + parseInt(extraPointAmount);
                                 let updatedData = { points: totalPoint }
-                                console.log("105  ==== extraRemainingTime : ", extraRemainingTime, '  ==== extraPointAmount : ', extraPointAmount);
+                                console.log("99  ==== extraRemainingTime : ", extraRemainingTime, '  ==== extraPointAmount : ', extraPointAmount);
 
                                 let updateChildDataById = await cronService.updateChildDataById(deviceData.childId, updatedData)
                             }
                         }
                     }
-                    console.log('%%%%%%%%%%%%%%%%%%%%%%%% deviceData : ', deviceData);
+
                     //  calculate usage time and add point on less usage ====>>>  DEVICE  //
                     let deviceTimeSpent = 0;
                     let scheduledTime = 0;
                     const childDetails = await cronService.getChildDataById(deviceData.childId)
 
                     if (deviceData.scheduledBy == 'eachDay') {
-                        console.log('??????????????????????????');
                         let dateDetails = await deviceData.eachDaySchedule.filter(element => { return (element.day == previousDayName.toLocaleLowerCase()) });
                         if (dateDetails.length > 0) {
                             scheduledTime = dateDetails[0].time;
                             deviceTimeSpent = parseInt(deviceData.timeSpent);
-                            console.log('120  ==== scheduledTime : ', scheduledTime, '  ==== deviceTimeSpent : ', deviceTimeSpent);
+                            console.log('116  ==== scheduledTime : ', scheduledTime, '  ==== deviceTimeSpent : ', deviceTimeSpent);
                         }
                     }
 
                     if (deviceData.scheduledBy == 'everyDay') {
-                        console.log('&&&&&&&&&&&&&&&&&&&&&&&');
                         scheduledTime = deviceData.everyDaySchedule;
                         deviceTimeSpent = parseInt(deviceData.timeSpent);
-                        console.log('128  ==== scheduledTime : ', scheduledTime, '  ==== deviceTimeSpent : ', deviceTimeSpent);
+                        console.log('123  ==== scheduledTime : ', scheduledTime, '  ==== deviceTimeSpent : ', deviceTimeSpent);
                     }
 
                     if (parseInt(deviceTimeSpent) < parseInt(scheduledTime)) {
@@ -130,7 +128,7 @@ const resetTimeSpent = async () => {
                         let extraPointAmount = parseInt(extraRemainingTime) * parseFloat(deviceAddPointPerMinute)
                         let totalPoint = parseInt(childDetails.points) + parseInt(extraPointAmount);
                         let updatedData = { points: totalPoint }
-                        console.log("136  ==== extraRemainingTime : ", extraRemainingTime, '  ==== extraPointAmount : ', extraPointAmount);
+                        console.log("131  ==== extraRemainingTime : ", extraRemainingTime, '  ==== extraPointAmount : ', extraPointAmount);
 
                         let updateChildDataById = await cronService.updateChildDataById(deviceData.childId, updatedData)
                     }

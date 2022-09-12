@@ -226,7 +226,6 @@ const childAppDetailsByPackageName = async (deviceId, packageName) => {
 //  update Device Apps Data in batch  //
 const updateDeviceAppsData = async (deviceId, updatedData) => {
     try {
-        console.log('%%%%%%%%%%%%%%%%%%%% deviceId : ',deviceId);
         const batch = db.batch();
         const sfRef = await db.collection('deviceApps').where("deviceId", "==", deviceId).get();
 

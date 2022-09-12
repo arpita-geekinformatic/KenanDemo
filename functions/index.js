@@ -463,14 +463,12 @@ app.post('/refreshFcmToken', async (req, res, next) => {
 
     //  for parent  //
     if (req.body.userType == 1) {
-      console.log("*********  refresh parent Fcm Token *********");
       const result = await parentController.refreshFcmToken(res, req.body, req.headers);
       return result;
     }
 
     //  for child  //
     if (req.body.userType == 2) {
-      console.log("========  refresh child Fcm Token  ========");
       const result = await childController.refreshFcmToken(res, req.body, req.headers);
       return result;
     }

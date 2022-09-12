@@ -16,7 +16,7 @@ const sendSendgridMail = async (data) => {
 
     var message = {
         to: [...data.recipient_email],
-        cc: ['aditya@geekinformatic.com'],
+        cc: ['kenanco.2022@gmail.com'],
         from: process.env.SENDGRID_SENDER_EMAIL,
         subject: data.subject,
         text: data.text,

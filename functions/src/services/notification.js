@@ -28,7 +28,7 @@ const sendAppUsageNotification = async (bodyData, updateData, childData, parentD
             },
         };
         const notificationResult = await firebaseAdmin.firebaseNotification(message);
-        console.log("32 ===== add APP goal notificationResult : ", notificationResult);
+        console.log("31 ===== add APP goal notificationResult : ", notificationResult);
 
         var localDate = new Date();
         const utcDate = moment.utc(localDate).format();

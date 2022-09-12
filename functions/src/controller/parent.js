@@ -69,18 +69,14 @@ const signUp = async (res, bodyData, headers) => {
         //  Get email template to send email in ARABIC 
         if (headers.lang == 'ar') {
             let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/arabic/activationEmail.ejs", { link: activationLink }, { async: true });
-
             let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "رابط تفعيل الحساب.", text: messageHtml });
-            console.log("51  >>>>>>  mailResponse : ", mailResponse);
 
             return response.success(res, 200, arabicMessage.ACTIVATION_MAIL_SENT);
         }
         //  Get email template to send email in ENGLISH 
         else {
             let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/english/activationEmail.ejs", { link: activationLink }, { async: true });
-
             let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Account Activation", text: messageHtml });
-            console.log("51  >>>>>>  mailResponse : ", mailResponse);
 
             return response.success(res, 200, message.ACTIVATION_MAIL_SENT);
         }
@@ -889,11 +885,9 @@ const childDeviceAppList = async (res, headers, bodyData) => {
 //  add App Usage  //
 const addAppUsage = async (res, headers, bodyData) => {
     try {
-        console.log('867  =========== bodyData : ', bodyData);
         if (!headers.lang) {
             return response.failure(res, 200, message.LANGUAGE_REQUIRED);
         }
-
         if (!headers.authorization) {
             if (headers.lang == 'ar') {
                 return response.failure(res, 200, arabicMessage.TOKEN_REQUIRED);
@@ -931,8 +925,6 @@ const addAppUsage = async (res, headers, bodyData) => {
         let childRes = await parentService.getChildDataById(bodyData.childId);
         let childDeviceDetails = await parentService.getDeviceDataById(childRes.deviceId);
         let childFcmToken = childDeviceDetails.fcmToken;
-        console.log('898 ======== childFcmToken : ', childFcmToken);
-        console.log('899  =====  childDeviceDetails : ', childDeviceDetails);
 
         const dayNameArr = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
         const dayName = dayNameArr[new Date().getDay()];
@@ -971,7 +963,7 @@ const addAppUsage = async (res, headers, bodyData) => {
 
                         let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
                         let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
-                        console.log('941 ==== existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ==== newTotalTimeSchedule : ', newTotalTimeSchedule, '  ==== device everyDaySchedule : ', childDeviceDetails.everyDaySchedule);
+                        console.log('966 ==== existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ==== newTotalTimeSchedule : ', newTotalTimeSchedule, '  ==== device everyDaySchedule : ', childDeviceDetails.everyDaySchedule);
 
                         if (parseInt(childDeviceDetails.everyDaySchedule) < parseInt(newTotalTimeSchedule)) {
                             if (headers.lang == 'ar') {
@@ -993,7 +985,7 @@ const addAppUsage = async (res, headers, bodyData) => {
 
                         let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
                         let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
-                        console.log('963 ==== existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ==== newTotalTimeSchedule : ', newTotalTimeSchedule, '  === device EachDaySchedule : ', dateData.time);
+                        console.log('988 ==== existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ==== newTotalTimeSchedule : ', newTotalTimeSchedule, '  === device EachDaySchedule : ', dateData.time);
 
                         if (parseInt(dateData.time) < parseInt(newTotalTimeSchedule)) {
                             if (headers.lang == 'ar') {
@@ -1033,7 +1025,7 @@ const addAppUsage = async (res, headers, bodyData) => {
 
                             let newTotalTimeSchedule = (parseInt(existingTotalTimeSchedule) + parseInt(eachDaySchedule[0].time))
 
-                            console.log('998 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device everyDaySchedule : ', childDeviceDetails.everyDaySchedule);
+                            console.log('1028 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device everyDaySchedule : ', childDeviceDetails.everyDaySchedule);
 
                             if (parseInt(childDeviceDetails.everyDaySchedule) < parseInt(newTotalTimeSchedule)) {
                                 if (headers.lang == 'ar') {
@@ -1061,7 +1053,7 @@ const addAppUsage = async (res, headers, bodyData) => {
                         })
                         if (newEachDayArr.length > 0) {
                             let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(newEachDayArr[0].time.toLowerCase())
-                            console.log('1020 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device EachDaySchedule : ', dateData.time);
+                            console.log('1056 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device EachDaySchedule : ', dateData.time);
 
                             if (parseInt(dateData.time) < parseInt(newTotalTimeSchedule)) {
                                 if (headers.lang == 'ar') {
@@ -1102,7 +1094,7 @@ const addAppUsage = async (res, headers, bodyData) => {
                     let allDeviceAppsEverydaySchedule = await parentService.allDeviceAppsEverydaySchedule(childRes.deviceId);
                     let allDeviceAppsEachdaySchedule = await parentService.allDeviceAppsEachdaySchedule(childRes.deviceId, day);
                     let existingTotalTimeSchedule = parseInt(allDeviceAppsEverydaySchedule) + parseInt(allDeviceAppsEachdaySchedule)
-                    console.log('1060 >>>> existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  >>>> device everyDaySchedule : ', bodyData.everyDaySchedule);
+                    console.log('1097 >>>> existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  >>>> device everyDaySchedule : ', bodyData.everyDaySchedule);
 
                     if (parseInt(bodyData.everyDaySchedule) < parseInt(existingTotalTimeSchedule)) {
                         if (headers.lang == 'ar') {
@@ -1134,7 +1126,7 @@ const addAppUsage = async (res, headers, bodyData) => {
                     let allDeviceAppsEachdaySchedule = await parentService.allDeviceAppsEachdaySchedule(childRes.deviceId, dateData.day);
 
                     let existingTotalTimeSchedule = parseInt(allDeviceAppsEverydaySchedule) + parseInt(allDeviceAppsEachdaySchedule)
-                    console.log('1092 >>>>> existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  >>>> device everyDaySchedule : ', bodyData.everyDaySchedule);
+                    console.log('1129 >>>>> existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  >>>> device everyDaySchedule : ', bodyData.everyDaySchedule);
 
                     if (parseInt(bodyData.everyDaySchedule) < parseInt(existingTotalTimeSchedule)) {
                         if (headers.lang == 'ar') {
@@ -1517,7 +1509,6 @@ const acceptRejectGiftRequest = async (res, headers, paramData, queryData) => {
             let updateNotification = await parentService.updateNotificationById(paramData.id, updatedData);
 
             let finalPoint = parseInt(childData.points) + parseInt(giftNotificationDetails.giftPoint)
-            console.log(">>>>>>>>>>> finalPoint : ", finalPoint);
             let updatedchildData = { points: finalPoint }
             let updateChildDataById = await parentService.updateChildDataById(childData.childId, updatedchildData)
 

@@ -306,7 +306,6 @@ const getDeviceAppsIdByPackageName = async (deviceId, packageName) => {
         deviceAppData.forEach(doc => {
             firestoreDeviceAppId = doc.id;
         });
-        console.log(">>>>>>>... firestoreDeviceAppId : ", firestoreDeviceAppId);
         return firestoreDeviceAppId
     } catch (error) {
         throw error
@@ -322,7 +321,6 @@ const getDeviceAppsIdByPackageNameAndId = async (deviceId, packageName) => {
         deviceAppData.forEach(doc => {
             firestoreDeviceAppId = doc.id;
         });
-        console.log(">>>>>>>... firestoreDeviceAppId : ", firestoreDeviceAppId);
         return firestoreDeviceAppId
     } catch (error) {
         throw error
