@@ -428,12 +428,12 @@ app.post('/upload', async (req, res, next) => {
 })
 
 //  cron to reset time spent of all device at midnight  //
-cron.schedule('0 0 * * *', () => {
+cron.schedule('0 0 0 * * *', () => {
   console.log("432 ==========  Cron job every night at midnight =========");
   cronController.resetTimeSpent()
 },{
   scheduled: true,
-  timezone: "America/New_York"
+  timezone: "Asia/Aden"
 });
 
 // cron.schedule('0 0 0 * * *', () => {

@@ -26,6 +26,7 @@ const resetTimeSpent = async () => {
 
         let previousDayDate = moment(mydate).subtract(10, 'm').format();
         var previousDayName = moment(previousDayDate).format('dddd');
+        // var previousDayName = moment('2022-09-011T08:19:57+00:00').format('dddd');
         console.log('29  ==== previousDayDate : ', previousDayDate, '  ==== previousDayName : ', previousDayName);
 
         let settings = await cronService.getSettings();
