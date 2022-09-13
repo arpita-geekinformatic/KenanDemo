@@ -60,6 +60,7 @@ const APP_TIME_WARNING = 'The scheduled time for all applications cannot be more
 const SELECT_DEVICE_USAGE = 'Add device usage before adding application usage.';
 const LINK_EXPIRED = "Link Expired.";
 const LINK_INVALID = "This link is invalid.";
+const MAX_GIFT_EXCEED = 'You cannot add more than 6 gifts until the child redeems any gift.';
 
 
 const TOKEN_EXPIRED = "Token Expired";
@@ -130,7 +131,8 @@ module.exports = {
   SELECT_DEVICE_USAGE,
   LINK_EXPIRED,
   LINK_INVALID,
-  
+  MAX_GIFT_EXCEED,
+
 
   TOKEN_EXPIRED,
   UNAUTHORIZED,

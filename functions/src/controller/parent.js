@@ -552,7 +552,6 @@ const addChild = async (res, bodyData, headers) => {
         if (!headers.lang) {
             return response.failure(res, 200, message.LANGUAGE_REQUIRED);
         }
-
         if (!headers.authorization) {
             if (headers.lang == 'ar') {
                 return response.failure(res, 200, arabicMessage.TOKEN_REQUIRED);
@@ -640,9 +639,9 @@ const addChild = async (res, bodyData, headers) => {
         }
 
         if (headers.lang == 'ar') {
-            return response.data(res, {}, 200, arabicMessage.KID_EXISTS);
+            return response.failure(res, 200, arabicMessage.KID_EXISTS);
         } else {
-            return response.data(res, {}, 200, message.KID_EXISTS);
+            return response.failure(res, 200, message.KID_EXISTS);
         }
     } catch (error) {
         return response.failure(res, 400, error);
@@ -1199,7 +1198,6 @@ const addGift = async (res, headers, bodyData) => {
         if (!headers.lang) {
             return response.failure(res, 200, message.LANGUAGE_REQUIRED);
         }
-
         if (!headers.authorization) {
             if (headers.lang == 'ar') {
                 return response.failure(res, 200, arabicMessage.TOKEN_REQUIRED);
@@ -1237,13 +1235,27 @@ const addGift = async (res, headers, bodyData) => {
             return response.failure(res, 200, message.INVALID_TOKEN);
         }
 
+        const childGiftDetails = await parentService.childGiftListById(bodyData.childId, parentRes.firestore_parentId);
+        if (childGiftDetails.length > 0) {
+            const notRedeemGiftArr = await childGiftDetails.filter(element => { return (!element.redeemGift) })
+            console.log('>>>>>>>>>  notRedeemGiftArr : ', notRedeemGiftArr.length);
+            if (notRedeemGiftArr.length == 6) {
+                if (headers.lang == 'ar') {
+                    return response.success(res, 200, arabicMessage.MAX_GIFT_EXCEED);
+                } else {
+                    return response.success(res, 200, message.MAX_GIFT_EXCEED);
+                }
+            }
+        }
+
         let giftData = {
             childId: bodyData.childId,
             parentId: parentRes.firestore_parentId,
             giftName: bodyData.giftName,
             giftIcon: bodyData.giftIcon || '',
             points: parseInt(bodyData.points),
-            isDeleted: false
+            isDeleted: false,
+            redeemGift: false
         }
         let addGift = await parentService.addGift(giftData);
 

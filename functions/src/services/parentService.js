@@ -540,6 +540,7 @@ const childGiftListById = async (childId, parentId) => {
             giftData.giftIcon = doc.data().giftIcon;
             giftData.giftName = doc.data().giftName;
             giftData.points = doc.data().points;
+            giftData.redeemGift = doc.data().redeemGift;
 
             childGiftListArr.push(giftData);
         })
