@@ -416,6 +416,31 @@ const giftDetailsById = async (giftId) => {
 
 
 
+//  >>>>>>>>>>>  SETTINGS  >>>>>>>>>>>>> //
+//  get settings details  //
+const getSettings = async () => {
+    try {
+        const snapshot = await db.collection('settings').get();
+        let settings = []
+
+        snapshot.forEach(doc => {
+            let settingsData = {};
+            settingsData = doc.data();
+            settingsData.settingsId = doc.id;
+
+            settings.push(settingsData)
+        });
+
+        return settings[0];
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+
+
+
 module.exports = {
     isDeviceExists,
     addDeviceData,
@@ -438,4 +463,5 @@ module.exports = {
     allChildNotificationDelete,
     giftList,
     giftDetailsById,
+    getSettings,
 }
