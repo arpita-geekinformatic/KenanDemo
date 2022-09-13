@@ -413,6 +413,15 @@ const giftDetailsById = async (giftId) => {
     }
 }
 
+//  update Child Gift  //
+const updateChildGift = async (giftId, updatedData) => {
+    try {
+        let updateChildGift = await db.collection("childGifts").doc(giftId).update(updatedData);
+        return true;
+    } catch (error) {
+        throw error;
+    }
+}
 
 
 
@@ -463,5 +472,6 @@ module.exports = {
     allChildNotificationDelete,
     giftList,
     giftDetailsById,
+    updateChildGift,
     getSettings,
 }

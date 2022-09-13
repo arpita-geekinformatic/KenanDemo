@@ -1238,7 +1238,6 @@ const addGift = async (res, headers, bodyData) => {
         const childGiftDetails = await parentService.childGiftListById(bodyData.childId, parentRes.firestore_parentId);
         if (childGiftDetails.length > 0) {
             const notRedeemGiftArr = await childGiftDetails.filter(element => { return (!element.redeemGift) })
-            console.log('>>>>>>>>>  notRedeemGiftArr : ', notRedeemGiftArr.length);
             if (notRedeemGiftArr.length == 6) {
                 if (headers.lang == 'ar') {
                     return response.success(res, 200, arabicMessage.MAX_GIFT_EXCEED);
@@ -1275,7 +1274,6 @@ const childGiftList = async (res, headers, bodyData) => {
         if (!headers.lang) {
             return response.failure(res, 200, message.LANGUAGE_REQUIRED);
         }
-
         if (!headers.authorization) {
             if (headers.lang == 'ar') {
                 return response.failure(res, 200, arabicMessage.TOKEN_REQUIRED);
@@ -1299,11 +1297,17 @@ const childGiftList = async (res, headers, bodyData) => {
         }
 
         let childGiftListById = await parentService.childGiftListById(bodyData.childId, parentRes.firestore_parentId);
+        let giftListArr = [];
+        if (childGiftListById.length > 6) {
+            giftListArr = await childGiftListById.filter(element => { return (!element.redeemGift) })
+        } else {
+            giftListArr = childGiftListById
+        }
 
         if (headers.lang == 'ar') {
-            return response.data(res, childGiftListById, 200, arabicMessage.SUCCESS);
+            return response.data(res, giftListArr, 200, arabicMessage.SUCCESS);
         } else {
-            return response.data(res, childGiftListById, 200, message.SUCCESS);
+            return response.data(res, giftListArr, 200, message.SUCCESS);
         }
     } catch (error) {
         return response.failure(res, 400, error);

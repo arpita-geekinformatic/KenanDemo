@@ -882,7 +882,6 @@ const giftList = async (res, headers) => {
         if (!headers.lang) {
             return response.failure(res, 400, message.LANGUAGE_REQUIRED);
         }
-
         if (!headers.authorization) {
             if (headers.lang == 'ar') {
                 return response.failure(res, 400, arabicMessage.TOKEN_REQUIRED);
@@ -899,11 +898,17 @@ const giftList = async (res, headers) => {
         };
 
         const giftList = await childService.giftList(decoded.childId);
+        let giftListArr = [];
+        if (giftList.length > 6) {
+            giftListArr = await giftList.filter(element => { return (!element.redeemGift) })
+        } else {
+            giftListArr = giftList
+        }
 
         if (headers.lang == 'ar') {
-            return response.data(res, giftList, 200, arabicMessage.SUCCESS);
+            return response.data(res, giftListArr, 200, arabicMessage.SUCCESS);
         } else {
-            return response.data(res, giftList, 200, message.SUCCESS);
+            return response.data(res, giftListArr, 200, message.SUCCESS);
         }
     } catch (error) {
         return response.failure(res, 400, error);
@@ -916,7 +921,6 @@ const redeemGift = async (res, headers, paramData) => {
         if (!headers.lang) {
             return response.failure(res, 400, message.LANGUAGE_REQUIRED);
         }
-
         if (!paramData.id) {
             if (headers.lang == 'ar') {
                 return response.failure(res, 400, arabicMessage.GIFT_ID_REQUIRED);
@@ -966,6 +970,7 @@ const redeemGift = async (res, headers, paramData) => {
         let requestRedeemGiftNotification = await notificationData.requestRedeemGiftNotification(childData, parentData, headers.lang, giftDetails);
         console.log("1003 >>>>>  requestRedeemGiftNotification : ");
 
+        const updateChildGift = await childService.updateChildGift(paramData.id, { redeemGift: true })
         let finalPoints = parseInt(childData.points) - parseInt(giftDetails.points);
         let updatedChildData = { points: finalPoints };
         let updateChildDataById = await childService.updateChildDataById(childData.childId, updatedChildData)
