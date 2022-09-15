@@ -69,7 +69,7 @@ const signUp = async (res, bodyData, headers) => {
         //  Get email template to send email in ARABIC 
         if (headers.lang == 'ar') {
             let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/arabic/activationEmail.ejs", { link: activationLink }, { async: true });
-            let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "رابط تفعيل الحساب.", text: messageHtml });
+            let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: 'تفعيل الحساب', text: messageHtml });
 
             return response.success(res, 200, arabicMessage.ACTIVATION_MAIL_SENT);
         }
@@ -251,7 +251,7 @@ const forgotPassword = async (res, bodyData, headers) => {
         //  Get email template to send email in ARABIC 
         if (headers.lang == 'ar') {
             let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/arabic/otpEmail.ejs", { otp: randomOTP }, { async: true });
-            let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: 'قم بتغيير كلمة المرور.', text: messageHtml });
+            let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: 'لا أتذكر كلمة المرور', text: messageHtml });
 
             let updateParentData = await parentService.updateSpecificParentData(parentData.firestore_parentId, newData)
             return response.success(res, 200, arabicMessage.SUCCESS);
@@ -354,7 +354,7 @@ const resendOTP = async (res, bodyData, headers) => {
         //  Get email template to send email in ARABIC //
         if (headers.lang == 'ar') {
             let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/arabic/otpEmail.ejs", { otp: randomOTP }, { async: true });
-            let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "التحقق من OTP", text: messageHtml });
+            let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: 'التحقق برمز (OTP)', text: messageHtml });
 
             let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId, newData);
             return response.success(res, 200, arabicMessage.SUCCESS);
@@ -622,7 +622,7 @@ const addChild = async (res, bodyData, headers) => {
                 //  send QR code mail in ARABIC  //
                 if (headers.lang == 'ar') {
                     let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/arabic/qrCodeEmail.ejs", { data: "url" }, { async: true });
-                    let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "رمز الاستجابة السريعة.", text: messageHtml, attachments: attachments });
+                    let mailResponse = MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: 'رمز (QR)', text: messageHtml, attachments: attachments });
                 }
                 //  send QR code mail in ENGLISH  //
                 else {

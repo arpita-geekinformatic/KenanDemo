@@ -503,6 +503,24 @@ const updateUsageTime = async (res, headers, bodyData) => {
         let timeSpent = Math.round((totalHourDiff * 60) + totalMinuteDiff);
         console.log('498  ==== totalMinuteDiff : ', totalMinuteDiff, ' === totalHourDiff : ', totalHourDiff, ' === timeSpent : ', timeSpent);
 
+
+        var date1 = new Date(parseInt(bodyData.startTime)).getTime();
+        var date2 = new Date(parseInt(bodyData.endTime)).getTime();
+        var diff = date2 - date1;
+
+        var minutes = (diff / 1000) / 60;
+        var hours = minutes / 60;
+        console.log('minutes : ', minutes)
+        console.log('hours : ', hours)
+        if(parseInt(hours) > 0){
+            timeSpent = (parseInt(hours) * 60) + parseInt(minutes)
+        }else{
+            timeSpent = parseInt(minutes)
+        }
+
+        console.log('timeSpent : ', timeSpent)
+
+
         let appRemainingTime = '0';
         let deviceRemainingTime = '0';
         let totalTimeSpent = deviceDetails.timeSpent || '0';

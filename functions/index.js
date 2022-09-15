@@ -431,7 +431,7 @@ app.post('/upload', async (req, res, next) => {
 cron.schedule('0 0 0 * * *', () => {
   console.log("432 ==========  Cron job every night at midnight =========");
   cronController.resetTimeSpent()
-},{
+}, {
   scheduled: true,
   timezone: "Asia/Aden"
 });
