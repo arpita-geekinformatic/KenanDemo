@@ -492,7 +492,6 @@ const updateUsageTime = async (res, headers, bodyData) => {
         const dayName = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"][new Date().getDay()];
         const day = new Date().getDay();
         let totalAppTimeSpent = childAppDetails.timeSpent || '0';
-        console.log('487  === childAppDetails.timeSpent : ', childAppDetails.timeSpent, ' === startTime : ', bodyData.startTime, ' === endTime : ', bodyData.endTime);
         let usageStartTime = new Date(parseInt(bodyData.startTime));
         let usageEndTime = new Date(parseInt(bodyData.endTime));
 
@@ -501,8 +500,6 @@ const updateUsageTime = async (res, headers, bodyData) => {
         let totalMinuteDiff = (minuteDiff < 0) ? (minuteDiff * (-1)) : minuteDiff;
         let totalHourDiff = (hourDiff < 0) ? (hourDiff * (-1)) : hourDiff;
         let timeSpent = Math.round((totalHourDiff * 60) + totalMinuteDiff);
-        console.log('498  ==== totalMinuteDiff : ', totalMinuteDiff, ' === totalHourDiff : ', totalHourDiff, ' === timeSpent : ', timeSpent);
-
 
         var date1 = new Date(parseInt(bodyData.startTime)).getTime();
         var date2 = new Date(parseInt(bodyData.endTime)).getTime();
@@ -740,44 +737,7 @@ const updateUsageTime = async (res, headers, bodyData) => {
                 return response.data(res, resultData, 200, message.SUCCESS)
             }
         }
-
-        // //  if nothing was restricted by parent  //
-        // if ((childAppDetails.scheduledBy == '') && (deviceDetails.scheduledBy == '')) {
-        //     console.log("764 ++++  totalAppTimeSpent : ", totalAppTimeSpent, "  ++++ timeSpent : ", timeSpent, '  ++++ totalTimeSpent : ', totalTimeSpent);
-
-        //     totalAppTimeSpent = parseInt(totalAppTimeSpent) + parseInt(timeSpent);
-        //     let newAppData = {
-        //         timeSpent: `${totalAppTimeSpent}`,
-        //         remainingTime: `${appRemainingTime}`
-        //     }
-        //     console.log("771 ++++  newAppData :", newAppData);
-        //     let updateChildAppDetails = await childService.updateDeviceAppDataById(childAppDetails.firestoreDeviceAppId, newAppData);
-
-        //     totalTimeSpent = parseInt(totalTimeSpent) + parseInt(timeSpent);
-        //     let newDeviceData = {
-        //         timeSpent: `${totalTimeSpent}`,
-        //         remainingTime: `${deviceRemainingTime}`
-        //     }
-        //     console.log("779 ++++  newDeviceData :", newDeviceData);
-        //     let updateChildDeviceDetails = await childService.updateDeviceDataById(deviceDetails.firestoreDevicePathId, newDeviceData);
-
-        //     let resultData = {
-        //         status: childAppDetails.status,
-        //         timeSpent: `${totalAppTimeSpent}`,
-        //         scheduledBy: childAppDetails.scheduledBy || '',
-        //         everyDaySchedule: childAppDetails.everyDaySchedule || '',
-        //         eachDaySchedule: childAppDetails.eachDaySchedule || [],
-        //         packageName: bodyData.packageName,
-        //     }
-
-        //     if (headers.lang == 'ar') {
-        //         return response.data(res, resultData, 200, arabicMessage.SUCCESS)
-        //     } else {
-        //         return response.data(res, resultData, 200, message.SUCCESS)
-        //     }
-        // }
-
-        // return response.success(res, 200, message.SUCCESS)
+      
     } catch (error) {
         return response.failure(res, 400, error);
     }

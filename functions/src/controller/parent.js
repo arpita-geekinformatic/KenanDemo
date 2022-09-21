@@ -26,59 +26,116 @@ const signUp = async (res, bodyData, headers) => {
             return response.failure(res, 200, message.LANGUAGE_REQUIRED);
         }
 
-        if (!bodyData.email) {
-            if (headers.lang == 'ar') {
-                return response.failure(res, 200, arabicMessage.EMAIL_REQUIRED);
+        //  for google signup  //
+        if (bodyData.id && (bodyData.id != '')) {
+            if (!bodyData.email) {
+                if (headers.lang == 'ar') {
+                    return response.failure(res, 200, arabicMessage.EMAIL_REQUIRED);
+                }
+                return response.failure(res, 200, message.EMAIL_REQUIRED);
             }
-            return response.failure(res, 200, message.EMAIL_REQUIRED);
-        }
-        if (!bodyData.password) {
-            if (headers.lang == 'ar') {
-                return response.failure(res, 200, arabicMessage.PASSWORD_REQUIRED);
+
+            let isParentExists = await parentService.isParentExists(bodyData.email);
+            console.log('>>>>>>>> isParentExists : ', isParentExists);
+            if (isParentExists) {
+                if (headers.lang == 'ar') {
+                    return response.failure(res, 200, arabicMessage.USER_EXISTS);
+                }
+                return response.failure(res, 200, message.USER_EXISTS);
             }
-            return response.failure(res, 200, message.PASSWORD_REQUIRED);
-        }
 
-        let isParentExists = await parentService.isParentExists(bodyData.email);
-        if (isParentExists) {
-            if (headers.lang == 'ar') {
-                return response.failure(res, 200, arabicMessage.USER_EXISTS);
+            let newData = {
+                name: bodyData.displayName || "",
+                email: bodyData.email || "",
+                password: '',
+                isActive: false,
+                isDeleted: false,
+                isBlocked: false,
+                authToken: "",
+                fcmToken: bodyData.fcmToken || "",
+                childId: [],
+                photo: bodyData.photoUrl || '',
+                socialId: bodyData.id
             }
-            return response.failure(res, 200, message.USER_EXISTS);
+            let createParentProfile = await parentService.createParentProfile(newData);
+
+            //  create activation link
+            let activationLink = process.env.BASE_URL + "acountAcctivation/" + createParentProfile;
+            console.log("********** activationLink : ", activationLink);
+
+            //  Get email template to send email in ARABIC 
+            if (headers.lang == 'ar') {
+                let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/arabic/activationEmail.ejs", { link: activationLink }, { async: true });
+                let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: 'تفعيل الحساب', text: messageHtml });
+
+                return response.success(res, 200, arabicMessage.ACTIVATION_MAIL_SENT);
+            }
+            //  Get email template to send email in ENGLISH 
+            else {
+                let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/english/activationEmail.ejs", { link: activationLink }, { async: true });
+                let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Account Activation", text: messageHtml });
+
+                return response.success(res, 200, message.ACTIVATION_MAIL_SENT);
+            }
         }
-        let hashedPassword = await KenanUtilities.cryptPassword(bodyData.password);
 
-        let newData = {
-            name: bodyData.name || "",
-            email: bodyData.email || "",
-            password: hashedPassword,
-            isActive: false,
-            isDeleted: false,
-            isBlocked: false,
-            authToken: "",
-            fcmToken: bodyData.fcmToken || "",
-            childId: [],
-            photo: '',
-        }
-        let createParentProfile = await parentService.createParentProfile(newData);
-
-        //  create activation link
-        let activationLink = process.env.BASE_URL + "acountAcctivation/" + createParentProfile;
-        console.log("********** activationLink : ", activationLink);
-
-        //  Get email template to send email in ARABIC 
-        if (headers.lang == 'ar') {
-            let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/arabic/activationEmail.ejs", { link: activationLink }, { async: true });
-            let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: 'تفعيل الحساب', text: messageHtml });
-
-            return response.success(res, 200, arabicMessage.ACTIVATION_MAIL_SENT);
-        }
-        //  Get email template to send email in ENGLISH 
+        //  for normal signup  //
         else {
-            let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/english/activationEmail.ejs", { link: activationLink }, { async: true });
-            let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Account Activation", text: messageHtml });
+            if (!bodyData.email) {
+                if (headers.lang == 'ar') {
+                    return response.failure(res, 200, arabicMessage.EMAIL_REQUIRED);
+                }
+                return response.failure(res, 200, message.EMAIL_REQUIRED);
+            }
+            if (!bodyData.password) {
+                if (headers.lang == 'ar') {
+                    return response.failure(res, 200, arabicMessage.PASSWORD_REQUIRED);
+                }
+                return response.failure(res, 200, message.PASSWORD_REQUIRED);
+            }
 
-            return response.success(res, 200, message.ACTIVATION_MAIL_SENT);
+            let isParentExists = await parentService.isParentExists(bodyData.email);
+            if (isParentExists) {
+                if (headers.lang == 'ar') {
+                    return response.failure(res, 200, arabicMessage.USER_EXISTS);
+                }
+                return response.failure(res, 200, message.USER_EXISTS);
+            }
+            let hashedPassword = await KenanUtilities.cryptPassword(bodyData.password);
+
+            let newData = {
+                name: bodyData.name || "",
+                email: bodyData.email || "",
+                password: hashedPassword,
+                isActive: false,
+                isDeleted: false,
+                isBlocked: false,
+                authToken: "",
+                fcmToken: bodyData.fcmToken || "",
+                childId: [],
+                photo: '',
+                socialId: ''
+            }
+            let createParentProfile = await parentService.createParentProfile(newData);
+
+            //  create activation link
+            let activationLink = process.env.BASE_URL + "acountAcctivation/" + createParentProfile;
+            console.log("********** activationLink : ", activationLink);
+
+            //  Get email template to send email in ARABIC 
+            if (headers.lang == 'ar') {
+                let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/arabic/activationEmail.ejs", { link: activationLink }, { async: true });
+                let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: 'تفعيل الحساب', text: messageHtml });
+
+                return response.success(res, 200, arabicMessage.ACTIVATION_MAIL_SENT);
+            }
+            //  Get email template to send email in ENGLISH 
+            else {
+                let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/english/activationEmail.ejs", { link: activationLink }, { async: true });
+                let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Account Activation", text: messageHtml });
+
+                return response.success(res, 200, message.ACTIVATION_MAIL_SENT);
+            }
         }
     } catch (error) {
         return response.failure(res, 400, error);
@@ -121,55 +178,94 @@ const login = async (res, bodyData, headers) => {
             return response.failure(res, 200, message.LANGUAGE_REQUIRED);
         }
 
-        if (!bodyData.email) {
-            if (headers.lang == 'ar') {
-                return response.failure(res, 200, arabicMessage.EMAIL_REQUIRED);
+        if (bodyData.id && (bodyData.id != '')) {
+            if (!bodyData.email) {
+                if (headers.lang == 'ar') {
+                    return response.failure(res, 200, arabicMessage.EMAIL_REQUIRED);
+                }
+                return response.failure(res, 200, message.EMAIL_REQUIRED);
             }
-            return response.failure(res, 200, message.EMAIL_REQUIRED);
-        }
-        if (!bodyData.password) {
-            if (headers.lang == 'ar') {
-                return response.failure(res, 200, arabicMessage.PASSWORD_REQUIRED);
+
+            let parentData = await parentService.getParentDataByEmail(bodyData.email);
+            if (!parentData) {
+                if (headers.lang == 'ar') {
+                    return response.failure(res, 200, arabicMessage.USER_NOT_FOUND);
+                }
+                return response.failure(res, 200, message.USER_NOT_FOUND,);
             }
-            return response.failure(res, 200, message.PASSWORD_REQUIRED);
+            if (!parentData.isActive) {
+                if (headers.lang == 'ar') {
+                    return response.failure(res, 200, arabicMessage.INACTIVE_ACCOUNT);
+                }
+                return response.failure(res, 200, message.INACTIVE_ACCOUNT,);
+            }
+
+            const authToken = await KenanUtilities.generateToken(parentData.email, parentData.firestore_parentId);
+            parentData.authToken = authToken;
+            let newData = {
+                authToken: authToken,
+                fcmToken: bodyData.fcmToken || parentData.fcmToken,
+            }
+            const updatePatrentData = await parentService.updateParentDataById(parentData.firestore_parentId, newData);
+            delete parentData.password
+
+            if (headers.lang == 'ar') {
+                return response.data(res, parentData, 200, arabicMessage.SUCCESS);
+            } else {
+                return response.data(res, parentData, 200, message.SUCCESS)
+            }
         }
 
-        let parentData = await parentService.getParentDataByEmail(bodyData.email);
-        if (!parentData) {
-            if (headers.lang == 'ar') {
-                return response.failure(res, 200, arabicMessage.USER_NOT_FOUND);
+        else {
+            if (!bodyData.email) {
+                if (headers.lang == 'ar') {
+                    return response.failure(res, 200, arabicMessage.EMAIL_REQUIRED);
+                }
+                return response.failure(res, 200, message.EMAIL_REQUIRED);
             }
-            return response.failure(res, 200, message.USER_NOT_FOUND,);
-        }
-        if (!parentData.isActive) {
-            if (headers.lang == 'ar') {
-                return response.failure(res, 200, arabicMessage.INACTIVE_ACCOUNT);
+            if (!bodyData.password) {
+                if (headers.lang == 'ar') {
+                    return response.failure(res, 200, arabicMessage.PASSWORD_REQUIRED);
+                }
+                return response.failure(res, 200, message.PASSWORD_REQUIRED);
             }
-            return response.failure(res, 200, message.INACTIVE_ACCOUNT,);
-        }
 
-        const match = await KenanUtilities.VerifyPassword(bodyData.password, parentData.password);
-        if (!match) {
-            if (headers.lang == 'ar') {
-                return response.failure(res, 200, arabicMessage.INVALID_PASSWORD);
+            let parentData = await parentService.getParentDataByEmail(bodyData.email);
+            if (!parentData) {
+                if (headers.lang == 'ar') {
+                    return response.failure(res, 200, arabicMessage.USER_NOT_FOUND);
+                }
+                return response.failure(res, 200, message.USER_NOT_FOUND,);
             }
-            return response.failure(res, 200, message.INVALID_PASSWORD);
-        }
+            if (!parentData.isActive) {
+                if (headers.lang == 'ar') {
+                    return response.failure(res, 200, arabicMessage.INACTIVE_ACCOUNT);
+                }
+                return response.failure(res, 200, message.INACTIVE_ACCOUNT,);
+            }
 
-        const authToken = await KenanUtilities.generateToken(parentData.email, parentData.firestore_parentId);
-        parentData.authToken = authToken;
-        let newData = {
-            authToken: authToken,
-            fcmToken: bodyData.fcmToken || parentData.fcmToken,
-        }
-        const updatePatrentData = await parentService.updateParentDataById(parentData.firestore_parentId, newData);
+            const match = await KenanUtilities.VerifyPassword(bodyData.password, parentData.password);
+            if (!match) {
+                if (headers.lang == 'ar') {
+                    return response.failure(res, 200, arabicMessage.INVALID_PASSWORD);
+                }
+                return response.failure(res, 200, message.INVALID_PASSWORD);
+            }
 
-        delete parentData.password
+            const authToken = await KenanUtilities.generateToken(parentData.email, parentData.firestore_parentId);
+            parentData.authToken = authToken;
+            let newData = {
+                authToken: authToken,
+                fcmToken: bodyData.fcmToken || parentData.fcmToken,
+            }
+            const updatePatrentData = await parentService.updateParentDataById(parentData.firestore_parentId, newData);
+            delete parentData.password
 
-        if (headers.lang == 'ar') {
-            return response.data(res, parentData, 200, arabicMessage.SUCCESS);
-        } else {
-            return response.data(res, parentData, 200, message.SUCCESS)
+            if (headers.lang == 'ar') {
+                return response.data(res, parentData, 200, arabicMessage.SUCCESS);
+            } else {
+                return response.data(res, parentData, 200, message.SUCCESS)
+            }
         }
     } catch (error) {
         return response.failure(res, 400, error);
