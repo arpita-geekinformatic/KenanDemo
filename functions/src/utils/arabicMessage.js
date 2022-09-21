@@ -55,6 +55,7 @@ const MAX_CHILD_REACHED = 'لقد قمت بالفعل بإضافة الحد ال
 const APP_TIME_WARNING = 'لا يمكن أن يكون الوقت المجدول لجميع التطبيقات أكثر من وقت الجهاز.';
 const SELECT_DEVICE_USAGE = 'أضف استخدام الجهاز قبل إضافة استخدام التطبيق.';
 const MAX_GIFT_EXCEED = 'لا يمكنك إضافة أكثر من 6 هدايا حتى يقوم الطفل باسترداد أي هدية.';
+const RESET_PASSWORD_INVALID = 'أعد تعيين كلمة المرور من حساب Google الخاص بك.';
 
 
 const TOKEN_EXPIRED = 'انتهت صلاحية الرمز (Token)';
@@ -120,7 +121,8 @@ module.exports = {
   APP_TIME_WARNING,
   SELECT_DEVICE_USAGE,
   MAX_GIFT_EXCEED,
-
+  RESET_PASSWORD_INVALID,
+  
   
   TOKEN_EXPIRED,
   UNAUTHORIZED,

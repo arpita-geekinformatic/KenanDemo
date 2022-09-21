@@ -34,9 +34,15 @@ const signUp = async (res, bodyData, headers) => {
                 }
                 return response.failure(res, 200, message.EMAIL_REQUIRED);
             }
+            if (!bodyData.fcmToken) {
+                if (headers.lang == 'ar') {
+                    return response.failure(res, 200, arabicMessage.REQUIRE_FCM);
+                }
+                return response.failure(res, 200, message.REQUIRE_FCM);
+            }
+
 
             let isParentExists = await parentService.isParentExists(bodyData.email);
-            console.log('>>>>>>>> isParentExists : ', isParentExists);
             if (isParentExists) {
                 if (headers.lang == 'ar') {
                     return response.failure(res, 200, arabicMessage.USER_EXISTS);
@@ -45,37 +51,31 @@ const signUp = async (res, bodyData, headers) => {
             }
 
             let newData = {
-                name: bodyData.displayName || "",
-                email: bodyData.email || "",
-                password: '',
-                isActive: false,
+                name: bodyData.name || "",
+                email: bodyData.email,
+                password: bodyData.password || '',
+                isActive: true,
                 isDeleted: false,
                 isBlocked: false,
                 authToken: "",
-                fcmToken: bodyData.fcmToken || "",
+                fcmToken: bodyData.fcmToken,
                 childId: [],
                 photo: bodyData.photoUrl || '',
                 socialId: bodyData.id
             }
             let createParentProfile = await parentService.createParentProfile(newData);
 
-            //  create activation link
-            let activationLink = process.env.BASE_URL + "acountAcctivation/" + createParentProfile;
-            console.log("********** activationLink : ", activationLink);
-
-            //  Get email template to send email in ARABIC 
-            if (headers.lang == 'ar') {
-                let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/arabic/activationEmail.ejs", { link: activationLink }, { async: true });
-                let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: 'تفعيل الحساب', text: messageHtml });
-
-                return response.success(res, 200, arabicMessage.ACTIVATION_MAIL_SENT);
+            const authToken = await KenanUtilities.generateToken(bodyData.email, createParentProfile);
+            let updatedData = {
+                authToken: authToken,
             }
-            //  Get email template to send email in ENGLISH 
-            else {
-                let messageHtml = await ejs.renderFile(process.cwd() + "/src/views/english/activationEmail.ejs", { link: activationLink }, { async: true });
-                let mailResponse = await MailerUtilities.sendSendgridMail({ recipient_email: [bodyData.email], subject: "Account Activation", text: messageHtml });
+            const updatePatrentData = await parentService.updateParentDataById(createParentProfile, updatedData);
+            newData.authToken = authToken
 
-                return response.success(res, 200, message.ACTIVATION_MAIL_SENT);
+            if (headers.lang == 'ar') {
+                return response.data(res, newData, 200, arabicMessage.SUCCESS);
+            } else {
+                return response.data(res, newData, 200, message.SUCCESS)
             }
         }
 
@@ -178,6 +178,7 @@ const login = async (res, bodyData, headers) => {
             return response.failure(res, 200, message.LANGUAGE_REQUIRED);
         }
 
+        //  for google login  //
         if (bodyData.id && (bodyData.id != '')) {
             if (!bodyData.email) {
                 if (headers.lang == 'ar') {
@@ -216,57 +217,64 @@ const login = async (res, bodyData, headers) => {
             }
         }
 
+        //  for normal login  //
         else {
-            if (!bodyData.email) {
-                if (headers.lang == 'ar') {
-                    return response.failure(res, 200, arabicMessage.EMAIL_REQUIRED);
-                }
-                return response.failure(res, 200, message.EMAIL_REQUIRED);
-            }
-            if (!bodyData.password) {
-                if (headers.lang == 'ar') {
-                    return response.failure(res, 200, arabicMessage.PASSWORD_REQUIRED);
-                }
-                return response.failure(res, 200, message.PASSWORD_REQUIRED);
-            }
-
-            let parentData = await parentService.getParentDataByEmail(bodyData.email);
-            if (!parentData) {
-                if (headers.lang == 'ar') {
-                    return response.failure(res, 200, arabicMessage.USER_NOT_FOUND);
-                }
-                return response.failure(res, 200, message.USER_NOT_FOUND,);
-            }
-            if (!parentData.isActive) {
-                if (headers.lang == 'ar') {
-                    return response.failure(res, 200, arabicMessage.INACTIVE_ACCOUNT);
-                }
-                return response.failure(res, 200, message.INACTIVE_ACCOUNT,);
-            }
-
-            const match = await KenanUtilities.VerifyPassword(bodyData.password, parentData.password);
-            if (!match) {
-                if (headers.lang == 'ar') {
-                    return response.failure(res, 200, arabicMessage.INVALID_PASSWORD);
-                }
-                return response.failure(res, 200, message.INVALID_PASSWORD);
-            }
-
-            const authToken = await KenanUtilities.generateToken(parentData.email, parentData.firestore_parentId);
-            parentData.authToken = authToken;
-            let newData = {
-                authToken: authToken,
-                fcmToken: bodyData.fcmToken || parentData.fcmToken,
-            }
-            const updatePatrentData = await parentService.updateParentDataById(parentData.firestore_parentId, newData);
-            delete parentData.password
-
+        if (!bodyData.email) {
             if (headers.lang == 'ar') {
-                return response.data(res, parentData, 200, arabicMessage.SUCCESS);
-            } else {
-                return response.data(res, parentData, 200, message.SUCCESS)
+                return response.failure(res, 200, arabicMessage.EMAIL_REQUIRED);
             }
+            return response.failure(res, 200, message.EMAIL_REQUIRED);
         }
+        if (!bodyData.password) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 200, arabicMessage.PASSWORD_REQUIRED);
+            }
+            return response.failure(res, 200, message.PASSWORD_REQUIRED);
+        }
+
+        let parentData = await parentService.getParentDataByEmail(bodyData.email);
+        if (!parentData) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 200, arabicMessage.USER_NOT_FOUND);
+            }
+            return response.failure(res, 200, message.USER_NOT_FOUND,);
+        }
+        if (!parentData.isActive) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 200, arabicMessage.INACTIVE_ACCOUNT);
+            }
+            return response.failure(res, 200, message.INACTIVE_ACCOUNT,);
+        }
+        if (parentData.socialId) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 200, arabicMessage.USER_NOT_FOUND);
+            }
+            return response.failure(res, 200, message.USER_NOT_FOUND,);
+        }
+
+        const match = await KenanUtilities.VerifyPassword(bodyData.password, parentData.password);
+        if (!match) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 200, arabicMessage.INVALID_PASSWORD);
+            }
+            return response.failure(res, 200, message.INVALID_PASSWORD);
+        }
+
+        const authToken = await KenanUtilities.generateToken(parentData.email, parentData.firestore_parentId);
+        parentData.authToken = authToken;
+        let newData = {
+            authToken: authToken,
+            fcmToken: bodyData.fcmToken || parentData.fcmToken,
+        }
+        const updatePatrentData = await parentService.updateParentDataById(parentData.firestore_parentId, newData);
+        delete parentData.password
+
+        if (headers.lang == 'ar') {
+            return response.data(res, parentData, 200, arabicMessage.SUCCESS);
+        } else {
+            return response.data(res, parentData, 200, message.SUCCESS)
+        }
+    }
     } catch (error) {
         return response.failure(res, 400, error);
     }
@@ -548,6 +556,12 @@ const resetPassword = async (res, bodyData, headers) => {
                 return response.failure(res, 200, arabicMessage.INVALID_TOKEN);
             }
             return response.failure(res, 200, message.INVALID_TOKEN);
+        }
+        if (parentRes.socialId) {
+            if (headers.lang == 'ar') {
+                return response.failure(res, 200, arabicMessage.RESET_PASSWORD_INVALID);
+            }
+            return response.failure(res, 200, message.RESET_PASSWORD_INVALID,);
         }
 
         const match = await KenanUtilities.VerifyPassword(bodyData.password, parentRes.password);
@@ -1026,8 +1040,6 @@ const addAppUsage = async (res, headers, bodyData) => {
         const dayNameArr = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"]
         const dayName = dayNameArr[new Date().getDay()];
         const day = new Date().getDay();
-        console.log('>>>>>>> dayName : ', dayName, '  >>>>> day : ', day);
-
 
         //  set app usage  //
         if (bodyData.type == 'appUsage') {
@@ -1060,7 +1072,6 @@ const addAppUsage = async (res, headers, bodyData) => {
 
                         let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
                         let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
-                        console.log('966 ==== existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ==== newTotalTimeSchedule : ', newTotalTimeSchedule, '  ==== device everyDaySchedule : ', childDeviceDetails.everyDaySchedule);
 
                         if (parseInt(childDeviceDetails.everyDaySchedule) < parseInt(newTotalTimeSchedule)) {
                             if (headers.lang == 'ar') {
@@ -1082,7 +1093,6 @@ const addAppUsage = async (res, headers, bodyData) => {
 
                         let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
                         let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(bodyData.everyDaySchedule)
-                        console.log('988 ==== existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ==== newTotalTimeSchedule : ', newTotalTimeSchedule, '  === device EachDaySchedule : ', dateData.time);
 
                         if (parseInt(dateData.time) < parseInt(newTotalTimeSchedule)) {
                             if (headers.lang == 'ar') {
@@ -1090,8 +1100,6 @@ const addAppUsage = async (res, headers, bodyData) => {
                             }
                             return response.failure(res, 200, message.APP_TIME_WARNING);
                         }
-
-
                     }
                 }
 
@@ -1111,7 +1119,6 @@ const addAppUsage = async (res, headers, bodyData) => {
             if (bodyData.scheduledBy == 'eachDay') {
                 //  check if selected time is less then selected device time or not  //
                 if (childDeviceDetails.scheduledBy == 'everyDay') {
-
                     for (let day of dayNameArr) {
                         let eachDaySchedule = await bodyData.eachDaySchedule.filter(element => { return ((element.status == true) && (element.day == day) && (element.time != '')) });
 
@@ -1121,9 +1128,6 @@ const addAppUsage = async (res, headers, bodyData) => {
                             let existingTotalTimeSchedule = parseInt(deviceAppsEverydaySchedule) + parseInt(deviceAppsEachdaySchedule)
 
                             let newTotalTimeSchedule = (parseInt(existingTotalTimeSchedule) + parseInt(eachDaySchedule[0].time))
-
-                            console.log('1028 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device everyDaySchedule : ', childDeviceDetails.everyDaySchedule);
-
                             if (parseInt(childDeviceDetails.everyDaySchedule) < parseInt(newTotalTimeSchedule)) {
                                 if (headers.lang == 'ar') {
                                     return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
@@ -1150,8 +1154,6 @@ const addAppUsage = async (res, headers, bodyData) => {
                         })
                         if (newEachDayArr.length > 0) {
                             let newTotalTimeSchedule = parseInt(existingTotalTimeSchedule) + parseInt(newEachDayArr[0].time.toLowerCase())
-                            console.log('1056 ++++ existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  ++++ newTotalTimeSchedule : ', newTotalTimeSchedule, '  ++++ device EachDaySchedule : ', dateData.time);
-
                             if (parseInt(dateData.time) < parseInt(newTotalTimeSchedule)) {
                                 if (headers.lang == 'ar') {
                                     return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
@@ -1191,7 +1193,6 @@ const addAppUsage = async (res, headers, bodyData) => {
                     let allDeviceAppsEverydaySchedule = await parentService.allDeviceAppsEverydaySchedule(childRes.deviceId);
                     let allDeviceAppsEachdaySchedule = await parentService.allDeviceAppsEachdaySchedule(childRes.deviceId, day);
                     let existingTotalTimeSchedule = parseInt(allDeviceAppsEverydaySchedule) + parseInt(allDeviceAppsEachdaySchedule)
-                    console.log('1097 >>>> existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  >>>> device everyDaySchedule : ', bodyData.everyDaySchedule);
 
                     if (parseInt(bodyData.everyDaySchedule) < parseInt(existingTotalTimeSchedule)) {
                         if (headers.lang == 'ar') {
@@ -1204,9 +1205,9 @@ const addAppUsage = async (res, headers, bodyData) => {
                 let updateData = {
                     scheduledBy: bodyData.scheduledBy,
                     eachDaySchedule: [],
-                    everyDaySchedule: bodyData.everyDaySchedule
+                    everyDaySchedule: bodyData.everyDaySchedule,
+                    usageNotification: false,
                 }
-
                 let updateDeviceDataById = await parentService.updateDeviceDataById(childRes.deviceId, updateData)
                 //  send notification to child device  //
                 let deviceUsageNotification = await notificationData.sendDeviceUsageNotification(bodyData, updateData, childRes, parentRes, childFcmToken);
@@ -1223,8 +1224,6 @@ const addAppUsage = async (res, headers, bodyData) => {
                     let allDeviceAppsEachdaySchedule = await parentService.allDeviceAppsEachdaySchedule(childRes.deviceId, dateData.day);
 
                     let existingTotalTimeSchedule = parseInt(allDeviceAppsEverydaySchedule) + parseInt(allDeviceAppsEachdaySchedule)
-                    console.log('1129 >>>>> existingTotalTimeSchedule : ', existingTotalTimeSchedule, '  >>>> device everyDaySchedule : ', bodyData.everyDaySchedule);
-
                     if (parseInt(bodyData.everyDaySchedule) < parseInt(existingTotalTimeSchedule)) {
                         if (headers.lang == 'ar') {
                             return response.failure(res, 200, arabicMessage.APP_TIME_WARNING);
@@ -1236,9 +1235,9 @@ const addAppUsage = async (res, headers, bodyData) => {
                 let updateData = {
                     scheduledBy: bodyData.scheduledBy,
                     eachDaySchedule: bodyData.eachDaySchedule,
-                    everyDaySchedule: ""
+                    everyDaySchedule: "",
+                    usageNotification: false,
                 }
-
                 let updateDeviceDataById = await parentService.updateDeviceDataById(childRes.deviceId, updateData)
                 //  send notification to child device  //
                 let deviceUsageNotification = await notificationData.sendDeviceUsageNotification(bodyData, updateData, childRes, parentRes, childFcmToken);

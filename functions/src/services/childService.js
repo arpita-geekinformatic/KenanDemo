@@ -76,6 +76,7 @@ const getDeviceDataByFirestoreId = async (firestoreDeviceId) => {
             deviceName: deviceData._fieldsProto.deviceName ? deviceData._fieldsProto.deviceName.stringValue : '',
             timeSpent: deviceData._fieldsProto.timeSpent ? deviceData._fieldsProto.timeSpent.stringValue : '0',
             remainingTime: deviceData._fieldsProto.remainingTime ? deviceData._fieldsProto.remainingTime.stringValue : '0',
+            usageNotification: deviceData._fieldsProto.usageNotification ? deviceData._fieldsProto.usageNotification.booleanValue : false,
 
         }
         return deviceDetails;

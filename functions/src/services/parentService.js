@@ -57,7 +57,8 @@ const getParentDataByEmail = async (email) => {
             authToken: parentArr[0].authToken || '',
             fcmToken: parentArr[0].fcmToken || '',
             photo: parentArr[0].photo || '',
-            password: parentArr[0].password,
+            password: parentArr[0].password || '',
+            socialId: parentArr[0].socialId || '',
         }
         return parentDetails;
 
@@ -141,6 +142,7 @@ const findParentByToken = async (authToken) => {
             fcmToken: parentArr[0].fcmToken || '',
             photo: parentArr[0].photo || '',
             password: parentArr[0].password || '',
+            socialId: parentArr[0].socialId || ''
         }
 
         return parentDetails;
