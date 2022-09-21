@@ -309,8 +309,10 @@ const verifyOTP = async (res, bodyData, headers) => {
             return response.failure(res, 200, message.OTP_EXPIRED);
         }
 
-        let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId, { otpVerified: true });
-        newData = { authToken: parentRes.authToken };
+        const authToken = await KenanUtilities.generateToken(parentRes.email, parentRes.firestore_parentId);
+
+        let updateParentData = await parentService.updateSpecificParentData(parentRes.firestore_parentId, { otpVerified: true, authToken: authToken });
+        newData = { authToken: authToken };
 
         if (headers.lang == 'ar') {
             return response.data(res, newData, 200, arabicMessage.OTP_VERIFIED)

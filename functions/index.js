@@ -428,19 +428,12 @@ app.post('/upload', async (req, res, next) => {
 })
 
 //  cron to reset time spent of all device at midnight  //
-cron.schedule('0 0 0 * * *', () => {
-  console.log("432 ==========  Cron job every night at midnight =========");
-  cronController.resetTimeSpent()
-}, {
-  scheduled: true,
-  timezone: "Asia/Aden"
-});
-
-// cron.schedule('0 0 0 * * *', () => {
-//   return ("437 =============  Cron job every night at midnight ============");
-// },{
+// cron.schedule('0 0 * * *', () => {
+//   console.log("432 ==========  Cron job every night at midnight =========");
+//   cronController.resetTimeSpent()
+// }, {
 //   scheduled: true,
-//   timezone: "America/New_York"
+//   timezone: "Asia/Aden"
 // });
 
 
@@ -727,7 +720,11 @@ exports.app = functions.https.onRequest(app);
 
 
 
-// exports.myPubSubFunction = functions.pubsub.schedule('* * * * *').onRun(() => {
-//   console.log('Hello World');
-//   return 
-// })
+exports.myPubSubFunction = functions.pubsub.schedule('0 0 * * *')
+  .timeZone('Asia/Aden')
+  .onRun(() => {
+    console.log('@@@@@@@@@@@@@@@@   Cron job every night at midnight  @@@@@@@@@@@@@@@');
+    cronController.resetTimeSpent();
+    return null
+  })
+
